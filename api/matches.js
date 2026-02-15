@@ -1,23 +1,23 @@
 export default async function handler(request, response) {
-  const apiUrl = 'https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=2024';
-  
   try {
-    const res = await fetch(apiUrl, {
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'ScarvesAndSpikes/1.0'
-      }
+    // First get teams to find Atlanta's ID
+    const teamsRes = await fetch('https://app.americansocceranalysis.com/api/v1/mls/teams', {
+      headers: { 'Accept': 'application/json', 'User-Agent': 'ScarvesAndSpikes/1.0' }
     });
+    const teams = await teamsRes.json();
     
-    const data = await res.json();
+    // Find Atlanta
+    const atlanta = teams.find(t => 
+      t.team_name?.toLowerCase().includes('atlanta') ||
+      t.team_abbreviation?.toLowerCase() === 'atl'
+    );
     
-    // Return the first game's complete structure so we can see all field names
     response.setHeader('Access-Control-Allow-Origin', '*');
     
     return response.status(200).json({
-      total_games: data.length,
-      first_game_fields: Object.keys(data[0] || {}),
-      first_game_full: data[0]
+      total_teams: teams.length,
+      sample_team: teams[0],
+      atlanta: atlanta
     });
     
   } catch (error) {
