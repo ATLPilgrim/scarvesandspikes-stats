@@ -28,21 +28,24 @@ export default async function handler(request, response) {
       });
     }
     
-    // Filter for Atlanta United
-    const atlMatches = data.filter(game => 
-      game.home_team_name?.includes('Atlanta') || 
-      game.away_team_name?.includes('Atlanta')
-    );
+    // Debug: return first 3 games with team names so we can see the format
+    const sample = data.slice(0, 3).map(g => ({
+      home: g.home_team_name,
+      away: g.away_team_name,
+      date: g.date_time_utc
+    }));
     
     response.setHeader('Access-Control-Allow-Origin', '*');
-    response.setHeader('Cache-Control', 's-maxage=3600');
     
-    return response.status(200).json(atlMatches);
+    return response.status(200).json({
+      total_games: data.length,
+      sample_teams: sample,
+      all_home_teams: [...new Set(data.map(g => g.home_team_name))].sort()
+    });
     
   } catch (error) {
     return response.status(500).json({ 
-      error: error.message,
-      stack: error.stack
+      error: error.message
     });
   }
 }
