@@ -1,266 +1,625 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlanta United xG History | ScarvesAndSpikes</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Georgia', serif;
-            background: #0a0a0a;
-            color: #e8e8e8;
-            line-height: 1.6;
-        }
-        
-        .header {
-            background: linear-gradient(180deg, #80000A 0%, #5a0007 100%);
-            padding: 40px 20px;
-            text-align: center;
-            border-bottom: 3px solid #A19060;
-        }
-        
-        .header h1 {
-            font-size: 2.2rem;
-            font-weight: 400;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-        
-        .header p {
-            color: #ccb872;
-            font-size: 0.95rem;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-        
-        .status-bar {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 15px 20px;
-            margin-bottom: 30px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 0.9rem;
-            color: #888;
-        }
-        
-        .status-bar.loading {
-            border-left: 3px solid #A19060;
-        }
-        
-        .status-bar.success {
-            border-left: 3px solid #4a9;
-        }
-        
-        .status-bar.error {
-            border-left: 3px solid #a44;
-        }
-        
-        .match-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .match-card {
-            background: #141414;
-            border: 1px solid #2a2a2a;
-            border-radius: 4px;
-            padding: 20px;
-            transition: border-color 0.2s;
-        }
-        
-        .match-card:hover {
-            border-color: #444;
-        }
-        
-        .match-date {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 0.8rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-        
-        .match-teams {
-            font-size: 1.2rem;
-            margin-bottom: 12px;
-        }
-        
-        .match-score {
-            color: #fff;
-            font-weight: 600;
-        }
-        
-        .atl-name {
-            color: #c8a870;
-        }
-        
-        .match-xg {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 0.9rem;
-        }
-        
-        .xg-item {
-            color: #999;
-        }
-        
-        .xg-value {
-            color: #ccb872;
-            font-weight: 600;
-        }
-        
-        .xg-diff {
-            margin-left: auto;
-        }
-        
-        .xg-diff.positive {
-            color: #5a9;
-        }
-        
-        .xg-diff.negative {
-            color: #a55;
-        }
-        
-        .result-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 10px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-        
-        .result-badge.win {
-            background: #1a3d1a;
-            color: #5a9;
-        }
-        
-        .result-badge.loss {
-            background: #3d1a1a;
-            color: #a55;
-        }
-        
-        .result-badge.draw {
-            background: #3d3d1a;
-            color: #aa5;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlanta United Stats | ScarvesAndSpikes.com</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #80000a;
+    }
+
+    h1 {
+      color: #c9a227;
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    /* Summary Stats */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #242424;
+      border-radius: 8px;
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: 10px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #c9a227;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #242424;
+      border-radius: 8px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .filter-group label {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .filter-group select {
+      padding: 8px 12px;
+      background: #333;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .filter-group select:hover {
+      border-color: #c9a227;
+    }
+
+    /* Match Cards */
+    .matches {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .match-card {
+      background: #242424;
+      border-radius: 8px;
+      padding: 15px 20px;
+      border-left: 4px solid #444;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .match-card:hover {
+      background: #2a2a2a;
+    }
+
+    .match-card.win {
+      border-left-color: #4caf50;
+    }
+
+    .match-card.loss {
+      border-left-color: #f44336;
+    }
+
+    .match-card.draw {
+      border-left-color: #888;
+    }
+
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .match-date {
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .match-badges {
+      display: flex;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .badge.result-w {
+      background: #4caf50;
+      color: #fff;
+    }
+
+    .badge.result-l {
+      background: #f44336;
+      color: #fff;
+    }
+
+    .badge.result-d {
+      background: #888;
+      color: #fff;
+    }
+
+    .badge.playoff {
+      background: #9c27b0;
+      color: #fff;
+    }
+
+    .badge.robbed {
+      background: #ff9800;
+      color: #000;
+    }
+
+    .badge.smash {
+      background: #00bcd4;
+      color: #000;
+    }
+
+    .match-score {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .team-name {
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    .team-name.atlanta {
+      color: #c9a227;
+    }
+
+    .score {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .venue-indicator {
+      font-size: 0.8rem;
+      color: #888;
+      margin-left: 5px;
+    }
+
+    .match-xg {
+      display: flex;
+      gap: 20px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .xg-item {
+      display: flex;
+      gap: 5px;
+    }
+
+    .xg-label {
+      color: #666;
+    }
+
+    .xg-value {
+      color: #c9a227;
+      font-weight: 500;
+    }
+
+    .xg-value.positive {
+      color: #4caf50;
+    }
+
+    .xg-value.negative {
+      color: #f44336;
+    }
+
+    /* Expanded Match Details */
+    .match-details {
+      display: none;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #333;
+    }
+
+    .match-card.expanded .match-details {
+      display: block;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .detail-label {
+      font-size: 0.7rem;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    .detail-value {
+      font-size: 0.9rem;
+      color: #e0e0e0;
+    }
+
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 50px;
+      color: #888;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 3px solid #333;
+      border-top-color: #c9a227;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Match Count */
+    .match-count {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 15px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .match-score {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+
+      .match-xg {
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .summary {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Atlanta United xG History</h1>
-        <p>Expected goals data for every match since 2017</p>
-    </div>
-    
-    <div class="container">
-        <div id="status" class="status-bar loading">
-            Loading match data...
-        </div>
-        
-        <div id="matches" class="match-list"></div>
+  <div class="container">
+    <header>
+      <h1>Atlanta United Match History</h1>
+      <p class="subtitle">Expected Goals (xG) Analysis | 2017-Present</p>
+    </header>
+
+    <div id="summary" class="summary" style="display: none;"></div>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label>Season</label>
+        <select id="seasonFilter">
+          <option value="all">All Seasons</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Result</label>
+        <select id="resultFilter">
+          <option value="all">All Results</option>
+          <option value="W">Wins</option>
+          <option value="D">Draws</option>
+          <option value="L">Losses</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Venue</label>
+        <select id="venueFilter">
+          <option value="all">Home & Away</option>
+          <option value="home">Home Only</option>
+          <option value="away">Away Only</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>xG Verdict</label>
+        <select id="verdictFilter">
+          <option value="all">All Matches</option>
+          <option value="robbed">Robberies</option>
+          <option value="smash-and-grab">Smash & Grabs</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Competition</label>
+        <select id="compFilter">
+          <option value="all">All Matches</option>
+          <option value="regular">Regular Season</option>
+          <option value="playoff">Playoffs</option>
+        </select>
+      </div>
     </div>
 
-    <script>
-        async function fetchMatches() {
-            const statusEl = document.getElementById('status');
-            const matchesEl = document.getElementById('matches');
-            
-            try {
-                const response = await fetch('/api/matches');
-                
-                if (!response.ok) {
-                    throw new Error('API returned ' + response.status);
-                }
-                
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                statusEl.className = 'status-bar success';
-                statusEl.textContent = 'Loaded ' + data.length + ' matches from 2017-present';
-                
-                // Render matches
-                data.forEach(match => {
-                    const isHome = match.home_abbrev === 'ATL';
-                    const atlGoals = isHome ? match.home_goals : match.away_goals;
-                    const oppGoals = isHome ? match.away_goals : match.home_goals;
-                    const atlXg = isHome ? match.home_xg : match.away_xg;
-                    const oppXg = isHome ? match.away_xg : match.home_xg;
-                    const opponent = isHome ? match.away_team : match.home_team;
-                    const oppAbbrev = isHome ? match.away_abbrev : match.home_abbrev;
-                    const venue = isHome ? 'vs' : 'at';
-                    
-                    const xgDiff = (atlXg - oppXg).toFixed(2);
-                    const xgDiffClass = xgDiff > 0 ? 'positive' : xgDiff < 0 ? 'negative' : '';
-                    const xgDiffSign = xgDiff > 0 ? '+' : '';
-                    
-                    let result, resultClass;
-                    if (atlGoals > oppGoals) {
-                        result = 'W';
-                        resultClass = 'win';
-                    } else if (atlGoals < oppGoals) {
-                        result = 'L';
-                        resultClass = 'loss';
-                    } else {
-                        result = 'D';
-                        resultClass = 'draw';
-                    }
-                    
-                    const dateStr = new Date(match.date.replace(' UTC', 'Z')).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                    });
-                    
-                    const card = document.createElement('div');
-                    card.className = 'match-card';
-                    card.innerHTML = `
-                        <div class="match-date">${dateStr}</div>
-                        <div class="match-teams">
-                            <span class="atl-name">Atlanta United</span> 
-                            <span class="match-score">${atlGoals}</span> 
-                            ${venue} 
-                            ${opponent} 
-                            <span class="match-score">${oppGoals}</span>
-                            <span class="result-badge ${resultClass}">${result}</span>
-                        </div>
-                        <div class="match-xg">
-                            <div class="xg-item">ATL xG: <span class="xg-value">${atlXg.toFixed(2)}</span></div>
-                            <div class="xg-item">${oppAbbrev} xG: <span class="xg-value">${oppXg.toFixed(2)}</span></div>
-                            <div class="xg-item xg-diff ${xgDiffClass}">xG Diff: ${xgDiffSign}${xgDiff}</div>
-                        </div>
-                    `;
-                    
-                    matchesEl.appendChild(card);
-                });
-                
-            } catch (error) {
-                statusEl.className = 'status-bar error';
-                statusEl.textContent = 'Error loading data: ' + error.message;
-                console.error('Fetch error:', error);
-            }
-        }
+    <div id="matchCount" class="match-count"></div>
+
+    <div id="matches" class="matches">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading match data...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allMatches = [];
+    let summaryData = {};
+
+    // Format date for display
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const options = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    // Format attendance with commas
+    function formatNumber(num) {
+      if (!num) return '-';
+      return num.toLocaleString();
+    }
+
+    // Render summary stats
+    function renderSummary(summary) {
+      const container = document.getElementById('summary');
+      container.style.display = 'grid';
+      container.innerHTML = `
+        <div class="stat-box">
+          <div class="stat-value">${summary.totalMatches}</div>
+          <div class="stat-label">Matches</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${summary.wins}-${summary.draws}-${summary.losses}</div>
+          <div class="stat-label">W-D-L</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${summary.goalsFor}</div>
+          <div class="stat-label">Goals For</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${summary.goalsAgainst}</div>
+          <div class="stat-label">Goals Against</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${summary.totalXgFor.toFixed(1)}</div>
+          <div class="stat-label">Total xG For</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${summary.totalXgAgainst.toFixed(1)}</div>
+          <div class="stat-label">Total xG Against</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${summary.robberies}</div>
+          <div class="stat-label">Robberies</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">${summary.smashAndGrabs}</div>
+          <div class="stat-label">Smash & Grabs</div>
+        </div>
+      `;
+    }
+
+    // Populate season filter dropdown
+    function populateSeasonFilter(matches) {
+      const seasons = [...new Set(matches.map(m => m.season))].sort((a, b) => b - a);
+      const select = document.getElementById('seasonFilter');
+      seasons.forEach(season => {
+        const option = document.createElement('option');
+        option.value = season;
+        option.textContent = season;
+        select.appendChild(option);
+      });
+    }
+
+    // Render match cards
+    function renderMatches(matches) {
+      const container = document.getElementById('matches');
+      const countEl = document.getElementById('matchCount');
+      
+      countEl.textContent = `Showing ${matches.length} match${matches.length !== 1 ? 'es' : ''}`;
+
+      if (matches.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #888; padding: 30px;">No matches found matching your filters.</p>';
+        return;
+      }
+
+      container.innerHTML = matches.map(match => {
+        const xgDiffClass = match.xgDiff > 0 ? 'positive' : match.xgDiff < 0 ? 'negative' : '';
+        const venueText = match.isHome ? 'vs' : 'at';
         
-        fetchMatches();
-    </script>
+        return `
+          <div class="match-card ${match.result.toLowerCase()}" onclick="this.classList.toggle('expanded')">
+            <div class="match-header">
+              <span class="match-date">${formatDate(match.date)} | Matchday ${match.matchday || '-'}</span>
+              <div class="match-badges">
+                ${match.isPlayoff ? '<span class="badge playoff">Playoff</span>' : ''}
+                ${match.xgVerdict === 'robbed' ? '<span class="badge robbed">Robbed</span>' : ''}
+                ${match.xgVerdict === 'smash-and-grab' ? '<span class="badge smash">Smash & Grab</span>' : ''}
+                <span class="badge result-${match.result.toLowerCase()}">${match.result}</span>
+              </div>
+            </div>
+            
+            <div class="match-score">
+              <span class="team-name atlanta">Atlanta United</span>
+              <span class="score">${match.atlScore}</span>
+              <span class="venue-indicator">${venueText}</span>
+              <span class="score">${match.oppScore}</span>
+              <span class="team-name">${match.opponent}</span>
+            </div>
+            
+            <div class="match-xg">
+              <div class="xg-item">
+                <span class="xg-label">ATL xG:</span>
+                <span class="xg-value">${match.atlXg !== null ? match.atlXg : '-'}</span>
+              </div>
+              <div class="xg-item">
+                <span class="xg-label">${match.opponentAbbr} xG:</span>
+                <span class="xg-value">${match.oppXg !== null ? match.oppXg : '-'}</span>
+              </div>
+              <div class="xg-item">
+                <span class="xg-label">xG Diff:</span>
+                <span class="xg-value ${xgDiffClass}">${match.xgDiff !== null ? (match.xgDiff > 0 ? '+' : '') + match.xgDiff : '-'}</span>
+              </div>
+            </div>
+
+            <div class="match-details">
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Attendance</span>
+                  <span class="detail-value">${formatNumber(match.attendance)}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Stadium</span>
+                  <span class="detail-value">${match.stadium || '-'}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">ATL Manager</span>
+                  <span class="detail-value">${match.atlManager || '-'}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">${match.opponentAbbr} Manager</span>
+                  <span class="detail-value">${match.oppManager || '-'}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Referee</span>
+                  <span class="detail-value">${match.referee || '-'}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Match Length</span>
+                  <span class="detail-value">${match.expandedMinutes ? match.expandedMinutes + ' min' : '-'}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">ATL xPoints</span>
+                  <span class="detail-value">${match.atlXpoints !== null ? match.atlXpoints : '-'}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Season</span>
+                  <span class="detail-value">${match.season}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Apply filters
+    function applyFilters() {
+      const season = document.getElementById('seasonFilter').value;
+      const result = document.getElementById('resultFilter').value;
+      const venue = document.getElementById('venueFilter').value;
+      const verdict = document.getElementById('verdictFilter').value;
+      const comp = document.getElementById('compFilter').value;
+
+      let filtered = allMatches;
+
+      if (season !== 'all') {
+        filtered = filtered.filter(m => m.season == season);
+      }
+      if (result !== 'all') {
+        filtered = filtered.filter(m => m.result === result);
+      }
+      if (venue === 'home') {
+        filtered = filtered.filter(m => m.isHome);
+      } else if (venue === 'away') {
+        filtered = filtered.filter(m => !m.isHome);
+      }
+      if (verdict !== 'all') {
+        filtered = filtered.filter(m => m.xgVerdict === verdict);
+      }
+      if (comp === 'regular') {
+        filtered = filtered.filter(m => !m.isPlayoff);
+      } else if (comp === 'playoff') {
+        filtered = filtered.filter(m => m.isPlayoff);
+      }
+
+      renderMatches(filtered);
+    }
+
+    // Initialize
+    async function init() {
+      try {
+        const response = await fetch('/api/matches');
+        const data = await response.json();
+        
+        allMatches = data.matches;
+        summaryData = data.summary;
+
+        renderSummary(summaryData);
+        populateSeasonFilter(allMatches);
+        renderMatches(allMatches);
+
+        // Add filter event listeners
+        document.getElementById('seasonFilter').addEventListener('change', applyFilters);
+        document.getElementById('resultFilter').addEventListener('change', applyFilters);
+        document.getElementById('venueFilter').addEventListener('change', applyFilters);
+        document.getElementById('verdictFilter').addEventListener('change', applyFilters);
+        document.getElementById('compFilter').addEventListener('change', applyFilters);
+
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('matches').innerHTML = `
+          <p style="text-align: center; color: #f44336; padding: 30px;">
+            Error loading match data. Please try refreshing the page.
+          </p>
+        `;
+      }
+    }
+
+    init();
+  </script>
 </body>
 </html>
