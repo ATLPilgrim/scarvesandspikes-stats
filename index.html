@@ -398,6 +398,8 @@
   <script>
     let allMatches = [];
     let summaryData = {};
+    let loadedSeasons = new Set();
+    let availableSeasons = [];
 
     // Format date for display
     function formatDate(dateStr) {
@@ -455,15 +457,17 @@
     }
 
     // Populate season filter dropdown
-    function populateSeasonFilter(matches) {
-      const seasons = [...new Set(matches.map(m => m.season))].sort((a, b) => b - a);
+    function populateSeasonFilter(seasons, currentSeason) {
       const select = document.getElementById('seasonFilter');
+      select.innerHTML = '<option value="all">All Seasons</option>';
       seasons.forEach(season => {
         const option = document.createElement('option');
         option.value = season;
         option.textContent = season;
         select.appendChild(option);
       });
+      // Default to current season
+      select.value = currentSeason;
     }
 
     // Render match cards
@@ -559,17 +563,52 @@
     }
 
     // Apply filters
-    function applyFilters() {
+    async function applyFilters() {
       const season = document.getElementById('seasonFilter').value;
       const result = document.getElementById('resultFilter').value;
       const venue = document.getElementById('venueFilter').value;
       const verdict = document.getElementById('verdictFilter').value;
       const comp = document.getElementById('compFilter').value;
 
+      // Check if we need to load more data
+      if (season === 'all') {
+        // Load all seasons we haven't loaded yet
+        const seasonsToLoad = availableSeasons.filter(s => !loadedSeasons.has(String(s)));
+        if (seasonsToLoad.length > 0) {
+          document.getElementById('matches').innerHTML = `
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>Loading all seasons...</p>
+            </div>
+          `;
+          const response = await fetch('/api/matches?season=all');
+          const data = await response.json();
+          allMatches = data.matches;
+          summaryData = data.summary;
+          availableSeasons.forEach(s => loadedSeasons.add(String(s)));
+          renderSummary(summaryData);
+        }
+      } else if (!loadedSeasons.has(String(season))) {
+        // Load the specific season
+        document.getElementById('matches').innerHTML = `
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading ${season} season...</p>
+          </div>
+        `;
+        const response = await fetch(`/api/matches?season=${season}`);
+        const data = await response.json();
+        // Add new matches to our collection
+        allMatches = [...allMatches, ...data.matches];
+        loadedSeasons.add(String(season));
+        // Recalculate summary for displayed matches
+      }
+
+      // Filter the matches we have
       let filtered = allMatches;
 
       if (season !== 'all') {
-        filtered = filtered.filter(m => m.season == season);
+        filtered = filtered.filter(m => String(m.season) === String(season));
       }
       if (result !== 'all') {
         filtered = filtered.filter(m => m.result === result);
@@ -588,20 +627,26 @@
         filtered = filtered.filter(m => m.isPlayoff);
       }
 
+      // Sort by date descending
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
       renderMatches(filtered);
     }
 
     // Initialize
     async function init() {
       try {
+        // Load current season by default (fastest)
         const response = await fetch('/api/matches');
         const data = await response.json();
         
         allMatches = data.matches;
         summaryData = data.summary;
+        availableSeasons = data.availableSeasons;
+        loadedSeasons.add(String(data.loadedSeason));
 
         renderSummary(summaryData);
-        populateSeasonFilter(allMatches);
+        populateSeasonFilter(availableSeasons, data.loadedSeason);
         renderMatches(allMatches);
 
         // Add filter event listeners
@@ -620,7 +665,6 @@
         `;
       }
     }
-
     init();
   </script>
 </body>
