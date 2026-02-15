@@ -101,9 +101,12 @@ export default async function handler(req, res) {
     
     seasonData.forEach(({ games, xgoals, playerXgoals, players }) => {
       // Add players from this season to the lookup map
-      players.forEach(player => {
-        playerMap[player.player_id] = player.player_name;
-      });
+      // Add players from this season to the lookup map (with safety check)
+      if (Array.isArray(players)) {
+        players.forEach(player => {
+          playerMap[player.player_id] = player.player_name;
+        });
+      }
       const atlantaGames = games.filter(g => 
         g.home_team_id === atlantaId || g.away_team_id === atlantaId
       );
