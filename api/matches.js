@@ -72,41 +72,48 @@ export default async function handler(req, res) {
 
     // Fetch game data for requested seasons in parallel
     const seasonPromises = seasons.map(async (season) => {
-      const [gamesRes, xgoalsRes, playerXgoalsRes, playersRes] = await Promise.all([
+      const [gamesRes, xgoalsRes, playerXgoalsRes] = await Promise.all([
         fetch(`https://app.americansocceranalysis.com/api/v1/mls/games?season_name=${season}`),
         fetch(`https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=${season}`),
-        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}&split_by_games=true`),
-        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players?season_name=${season}`)
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}&split_by_games=true`)
       ]);
       
-      const [games, xgoals, playerXgoals, players] = await Promise.all([
+      const [games, xgoals, playerXgoals] = await Promise.all([
         gamesRes.json(),
         xgoalsRes.json(),
-        playerXgoalsRes.json(),
-        playersRes.json()
+        playerXgoalsRes.json()
       ]);
       
-      return { games, xgoals, playerXgoals, players };
+      return { games, xgoals, playerXgoals };
     });
 
     const seasonData = await Promise.all(seasonPromises);
+
+    // Fetch ALL players with pagination (API returns max 1000 per call)
+    const [players1Res, players2Res, players3Res] = await Promise.all([
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=0'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=1000'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=2000')
+    ]);
+    const [players1, players2, players3] = await Promise.all([
+      players1Res.json(),
+      players2Res.json(),
+      players3Res.json()
+    ]);
+    const allPlayers = [...players1, ...players2, ...players3];
+
+    // Build player lookup map
+    const playerMap = {};
+    allPlayers.forEach(player => {
+      playerMap[player.player_id] = player.player_name;
+    });
 
     // Combine all games and xgoals
     const allGames = [];
     const allXgoals = [];
     const allPlayerXgoals = [];
     
-    // Build player lookup map from per-season player data
-    const playerMap = {};
-    
-    seasonData.forEach(({ games, xgoals, playerXgoals, players }) => {
-      // Add players from this season to the lookup map
-      // Add players from this season to the lookup map (with safety check)
-      if (Array.isArray(players)) {
-        players.forEach(player => {
-          playerMap[player.player_id] = player.player_name;
-        });
-      }
+    seasonData.forEach(({ games, xgoals, playerXgoals }) => {
       const atlantaGames = games.filter(g => 
         g.home_team_id === atlantaId || g.away_team_id === atlantaId
       );
