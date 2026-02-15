@@ -1,11 +1,19 @@
 export default async function handler(request, response) {
   try {
+    // Build season list dynamically: 2017 through current year
+    const currentYear = new Date().getFullYear();
+    const seasons = [];
+    for (let year = 2017; year <= currentYear; year++) {
+      seasons.push(year);
+    }
+    const seasonParam = seasons.join(',');
+    
     // Fetch teams and games in parallel
     const [teamsRes, gamesRes] = await Promise.all([
       fetch('https://app.americansocceranalysis.com/api/v1/mls/teams', {
         headers: { 'Accept': 'application/json', 'User-Agent': 'ScarvesAndSpikes/1.0' }
       }),
-      fetch('https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=2024', {
+      fetch(`https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=${seasonParam}`, {
         headers: { 'Accept': 'application/json', 'User-Agent': 'ScarvesAndSpikes/1.0' }
       })
     ]);
@@ -36,7 +44,8 @@ export default async function handler(request, response) {
         away_goals: g.away_goals,
         home_xg: g.home_team_xgoals,
         away_xg: g.away_team_xgoals
-      }));
+      }))
+      .sort((a, b) => new Date(b.date) - new Date(a.date)); // Most recent first
     
     response.setHeader('Access-Control-Allow-Origin', '*');
     response.setHeader('Cache-Control', 's-maxage=3600');
