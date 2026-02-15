@@ -33,20 +33,17 @@ export default async function handler(req, res) {
     }
 
     // Fetch lookup data in parallel for speed
-    const [teamsRes, stadiaRes, managersRes, refereesRes, playersRes] = await Promise.all([
+    const [teamsRes, stadiaRes, managersRes, refereesRes] = await Promise.all([
       fetch('https://app.americansocceranalysis.com/api/v1/mls/teams'),
       fetch('https://app.americansocceranalysis.com/api/v1/mls/stadia'),
       fetch('https://app.americansocceranalysis.com/api/v1/mls/managers'),
-      fetch('https://app.americansocceranalysis.com/api/v1/mls/referees'),
-      fetch('https://app.americansocceranalysis.com/api/v1/mls/players')
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/referees')
     ]);
-
-    const [teams, stadia, managers, referees, players] = await Promise.all([
+    const [teams, stadia, managers, referees] = await Promise.all([
       teamsRes.json(),
       stadiaRes.json(),
       managersRes.json(),
-      refereesRes.json(),
-      playersRes.json()
+      refereesRes.json()
     ]);
     
     // Build lookup maps
@@ -73,27 +70,23 @@ export default async function handler(req, res) {
       refereeMap[referee.referee_id] = referee.referee_name;
     });
 
-    // Build player lookup map
-    const playerMap = {};
-    players.forEach(player => {
-      playerMap[player.player_id] = player.player_name;
-    });
-
     // Fetch game data for requested seasons in parallel
     const seasonPromises = seasons.map(async (season) => {
-      const [gamesRes, xgoalsRes, playerXgoalsRes] = await Promise.all([
+      const [gamesRes, xgoalsRes, playerXgoalsRes, playersRes] = await Promise.all([
         fetch(`https://app.americansocceranalysis.com/api/v1/mls/games?season_name=${season}`),
         fetch(`https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=${season}`),
-        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}&split_by_games=true`)
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}&split_by_games=true`),
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players?season_name=${season}`)
       ]);
       
-      const [games, xgoals, playerXgoals] = await Promise.all([
+      const [games, xgoals, playerXgoals, players] = await Promise.all([
         gamesRes.json(),
         xgoalsRes.json(),
-        playerXgoalsRes.json()
+        playerXgoalsRes.json(),
+        playersRes.json()
       ]);
       
-      return { games, xgoals, playerXgoals };
+      return { games, xgoals, playerXgoals, players };
     });
 
     const seasonData = await Promise.all(seasonPromises);
@@ -103,7 +96,14 @@ export default async function handler(req, res) {
     const allXgoals = [];
     const allPlayerXgoals = [];
     
-    seasonData.forEach(({ games, xgoals, playerXgoals }) => {
+    // Build player lookup map from per-season player data
+    const playerMap = {};
+    
+    seasonData.forEach(({ games, xgoals, playerXgoals, players }) => {
+      // Add players from this season to the lookup map
+      players.forEach(player => {
+        playerMap[player.player_id] = player.player_name;
+      });
       const atlantaGames = games.filter(g => 
         g.home_team_id === atlantaId || g.away_team_id === atlantaId
       );
