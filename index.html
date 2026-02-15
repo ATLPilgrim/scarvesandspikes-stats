@@ -562,6 +562,23 @@
       }).join('');
     }
 
+// Update summary stats for given matches
+    function updateSummary(matches) {
+      const summary = {
+        totalMatches: matches.length,
+        wins: matches.filter(m => m.result === 'W').length,
+        draws: matches.filter(m => m.result === 'D').length,
+        losses: matches.filter(m => m.result === 'L').length,
+        goalsFor: matches.reduce((sum, m) => sum + (m.atlScore || 0), 0),
+        goalsAgainst: matches.reduce((sum, m) => sum + (m.oppScore || 0), 0),
+        totalXgFor: matches.reduce((sum, m) => sum + (m.atlXg || 0), 0),
+        totalXgAgainst: matches.reduce((sum, m) => sum + (m.oppXg || 0), 0),
+        robberies: matches.filter(m => m.xgVerdict === 'robbed').length,
+        smashAndGrabs: matches.filter(m => m.xgVerdict === 'smash-and-grab').length
+      };
+      renderSummary(summary);
+    }
+    
     // Apply filters
     async function applyFilters() {
       const season = document.getElementById('seasonFilter').value;
@@ -629,6 +646,9 @@
 
       // Sort by date descending
       filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Update summary for filtered matches
+      updateSummary(filtered);
 
       renderMatches(filtered);
     }
