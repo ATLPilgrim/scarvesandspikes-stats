@@ -33,18 +33,20 @@ export default async function handler(req, res) {
     }
 
     // Fetch lookup data in parallel for speed
-    const [teamsRes, stadiaRes, managersRes, refereesRes] = await Promise.all([
+    const [teamsRes, stadiaRes, managersRes, refereesRes, playersRes] = await Promise.all([
       fetch('https://app.americansocceranalysis.com/api/v1/mls/teams'),
       fetch('https://app.americansocceranalysis.com/api/v1/mls/stadia'),
       fetch('https://app.americansocceranalysis.com/api/v1/mls/managers'),
-      fetch('https://app.americansocceranalysis.com/api/v1/mls/referees')
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/referees'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players')
     ]);
 
-    const [teams, stadia, managers, referees] = await Promise.all([
+    const [teams, stadia, managers, referees, players] = await Promise.all([
       teamsRes.json(),
       stadiaRes.json(),
       managersRes.json(),
-      refereesRes.json()
+      refereesRes.json(),
+      playersRes.json()
     ]);
     
     // Build lookup maps
@@ -71,19 +73,27 @@ export default async function handler(req, res) {
       refereeMap[referee.referee_id] = referee.referee_name;
     });
 
+    // Build player lookup map
+    const playerMap = {};
+    players.forEach(player => {
+      playerMap[player.player_id] = player.player_name;
+    });
+
     // Fetch game data for requested seasons in parallel
     const seasonPromises = seasons.map(async (season) => {
-      const [gamesRes, xgoalsRes] = await Promise.all([
+      const [gamesRes, xgoalsRes, playerXgoalsRes] = await Promise.all([
         fetch(`https://app.americansocceranalysis.com/api/v1/mls/games?season_name=${season}`),
-        fetch(`https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=${season}`)
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=${season}`),
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}&split_by_games=true`)
       ]);
       
-      const [games, xgoals] = await Promise.all([
+      const [games, xgoals, playerXgoals] = await Promise.all([
         gamesRes.json(),
-        xgoalsRes.json()
+        xgoalsRes.json(),
+        playerXgoalsRes.json()
       ]);
       
-      return { games, xgoals };
+      return { games, xgoals, playerXgoals };
     });
 
     const seasonData = await Promise.all(seasonPromises);
@@ -91,8 +101,9 @@ export default async function handler(req, res) {
     // Combine all games and xgoals
     const allGames = [];
     const allXgoals = [];
+    const allPlayerXgoals = [];
     
-    seasonData.forEach(({ games, xgoals }) => {
+    seasonData.forEach(({ games, xgoals, playerXgoals }) => {
       const atlantaGames = games.filter(g => 
         g.home_team_id === atlantaId || g.away_team_id === atlantaId
       );
@@ -102,12 +113,37 @@ export default async function handler(req, res) {
         g.home_team_id === atlantaId || g.away_team_id === atlantaId
       );
       allXgoals.push(...atlantaXgoals);
+      
+      // Player xgoals already filtered by team_id in the API call
+      allPlayerXgoals.push(...playerXgoals);
     });
 
     // Build xgoals lookup map by game_id
     const xgoalsMap = {};
     allXgoals.forEach(xg => {
       xgoalsMap[xg.game_id] = xg;
+    });
+
+    // Build player xgoals lookup map by game_id (array of players per game)
+    const playerXgoalsMap = {};
+    allPlayerXgoals.forEach(px => {
+      if (!playerXgoalsMap[px.game_id]) {
+        playerXgoalsMap[px.game_id] = [];
+      }
+      playerXgoalsMap[px.game_id].push({
+        name: playerMap[px.player_id] || 'Unknown',
+        position: px.general_position,
+        minutes: px.minutes_played,
+        shots: px.shots,
+        shotsOnTarget: px.shots_on_target,
+        goals: px.goals,
+        xg: px.xgoals,
+        xgDiff: px.goals_minus_xgoals,
+        keyPasses: px.key_passes,
+        assists: px.primary_assists,
+        xa: px.xassists,
+        xgPlusXa: px.xgoals_plus_xassists
+      });
     });
 
     // Combine data and enrich with names
@@ -171,7 +207,12 @@ export default async function handler(req, res) {
           : (managerMap[game.home_manager_id] || null),
         expandedMinutes: game.expanded_minutes,
         isPlayoff: game.knockout_game,
-        status: game.status
+        status: game.status,
+        
+        // Player stats for this match (sorted by xG contribution)
+        players: (playerXgoalsMap[game.game_id] || [])
+          .filter(p => p.minutes > 0)
+          .sort((a, b) => (b.xgPlusXa || 0) - (a.xgPlusXa || 0))
       };
     });
 
