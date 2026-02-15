@@ -383,6 +383,12 @@
           <option value="playoff">Playoffs</option>
         </select>
       </div>
+      <div class="filter-group">
+        <label>Opponent</label>
+        <select id="opponentFilter">
+          <option value="all">All Opponents</option>
+        </select>
+      </div>
     </div>
 
     <div id="matchCount" class="match-count"></div>
@@ -468,6 +474,20 @@
       });
       // Default to current season
       select.value = currentSeason;
+    }
+
+    // Populate opponent filter dropdown
+    function populateOpponentFilter(matches) {
+      const opponents = [...new Set(matches.map(m => m.opponent))].sort();
+      const select = document.getElementById('opponentFilter');
+      // Keep "All Opponents" option, clear the rest
+      select.innerHTML = '<option value="all">All Opponents</option>';
+      opponents.forEach(opponent => {
+        const option = document.createElement('option');
+        option.value = opponent;
+        option.textContent = opponent;
+        select.appendChild(option);
+      });
     }
 
     // Render match cards
@@ -638,6 +658,10 @@
       if (verdict !== 'all') {
         filtered = filtered.filter(m => m.xgVerdict === verdict);
       }
+      const opponent = document.getElementById('opponentFilter').value;
+      if (opponent !== 'all') {
+        filtered = filtered.filter(m => m.opponent === opponent);
+      }
       if (comp === 'regular') {
         filtered = filtered.filter(m => !m.isPlayoff);
       } else if (comp === 'playoff') {
@@ -667,6 +691,7 @@
 
         renderSummary(summaryData);
         populateSeasonFilter(availableSeasons, data.loadedSeason);
+        populateOpponentFilter(allMatches);
         renderMatches(allMatches);
 
         // Add filter event listeners
@@ -675,6 +700,7 @@
         document.getElementById('venueFilter').addEventListener('change', applyFilters);
         document.getElementById('verdictFilter').addEventListener('change', applyFilters);
         document.getElementById('compFilter').addEventListener('change', applyFilters);
+        document.getElementById('opponentFilter').addEventListener('change', applyFilters);
 
       } catch (error) {
         console.error('Error:', error);
