@@ -1,21 +1,48 @@
 export default async function handler(request, response) {
+  const apiUrl = 'https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=2024';
+  
   try {
-    const apiUrl = 'https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?team_names=Atlanta%20United&season_name=2024';
+    const res = await fetch(apiUrl, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'ScarvesAndSpikes/1.0'
+      }
+    });
     
-    const res = await fetch(apiUrl);
+    const text = await res.text();
     
     if (!res.ok) {
-      throw new Error(`API returned ${res.status}`);
+      return response.status(500).json({ 
+        error: `API returned ${res.status}`,
+        details: text.substring(0, 500)
+      });
     }
     
-    const data = await res.json();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      return response.status(500).json({ 
+        error: 'Failed to parse JSON',
+        details: text.substring(0, 500)
+      });
+    }
+    
+    // Filter for Atlanta United
+    const atlMatches = data.filter(game => 
+      game.home_team_name?.includes('Atlanta') || 
+      game.away_team_name?.includes('Atlanta')
+    );
     
     response.setHeader('Access-Control-Allow-Origin', '*');
     response.setHeader('Cache-Control', 's-maxage=3600');
     
-    return response.status(200).json(data);
+    return response.status(200).json(atlMatches);
     
   } catch (error) {
-    return response.status(500).json({ error: error.message });
+    return response.status(500).json({ 
+      error: error.message,
+      stack: error.stack
+    });
   }
 }
