@@ -3,6 +3,8 @@
 //   /mls/games - accurate final scores (includes own goals)
 //   /mls/games/xgoals - xG analytics data
 // Joins them by game_id for complete match information
+// 
+// Supports ?season= parameter to load one season at a time for faster response
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -13,18 +15,36 @@ export default async function handler(req, res) {
   try {
     const atlantaId = 'KAqBN0Vqbg';
     
-    // Build season list dynamically (Atlanta joined MLS in 2017)
+    // Get season from query param, default to current year
+    const requestedSeason = req.query.season;
     const currentYear = new Date().getFullYear();
-    const seasons = [];
-    for (let year = 2017; year <= currentYear; year++) {
-      seasons.push(year);
+    
+    // If "all" is requested, fetch all seasons; otherwise fetch just the requested one
+    let seasons = [];
+    if (requestedSeason === 'all') {
+      for (let year = 2017; year <= currentYear; year++) {
+        seasons.push(year);
+      }
+    } else {
+      seasons = [requestedSeason || currentYear];
     }
 
-    // Fetch teams for name lookup
-    const teamsRes = await fetch('https://app.americansocceranalysis.com/api/v1/mls/teams');
-    const teams = await teamsRes.json();
+    // Fetch lookup data in parallel for speed
+    const [teamsRes, stadiaRes, managersRes, refereesRes] = await Promise.all([
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/teams'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/stadia'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/managers'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/referees')
+    ]);
+
+    const [teams, stadia, managers, referees] = await Promise.all([
+      teamsRes.json(),
+      stadiaRes.json(),
+      managersRes.json(),
+      refereesRes.json()
+    ]);
     
-    // Build team lookup map
+    // Build lookup maps
     const teamMap = {};
     teams.forEach(team => {
       teamMap[team.team_id] = {
@@ -33,65 +53,53 @@ export default async function handler(req, res) {
       };
     });
 
-    // Fetch stadia for stadium name lookup
-    const stadiaRes = await fetch('https://app.americansocceranalysis.com/api/v1/mls/stadia');
-    const stadia = await stadiaRes.json();
-    
-    // Build stadium lookup map
     const stadiumMap = {};
     stadia.forEach(stadium => {
       stadiumMap[stadium.stadium_id] = stadium.stadium_name;
     });
 
-    // Fetch managers for manager name lookup
-    const managersRes = await fetch('https://app.americansocceranalysis.com/api/v1/mls/managers');
-    const managers = await managersRes.json();
-    
-    // Build manager lookup map
     const managerMap = {};
     managers.forEach(manager => {
       managerMap[manager.manager_id] = manager.manager_name;
     });
 
-    // Fetch referees for referee name lookup
-    const refereesRes = await fetch('https://app.americansocceranalysis.com/api/v1/mls/referees');
-    const referees = await refereesRes.json();
-    
-    // Build referee lookup map
     const refereeMap = {};
     referees.forEach(referee => {
       refereeMap[referee.referee_id] = referee.referee_name;
     });
 
-    // Fetch data from both endpoints for each season
+    // Fetch game data for requested seasons in parallel
+    const seasonPromises = seasons.map(async (season) => {
+      const [gamesRes, xgoalsRes] = await Promise.all([
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/games?season_name=${season}`),
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=${season}`)
+      ]);
+      
+      const [games, xgoals] = await Promise.all([
+        gamesRes.json(),
+        xgoalsRes.json()
+      ]);
+      
+      return { games, xgoals };
+    });
+
+    const seasonData = await Promise.all(seasonPromises);
+
+    // Combine all games and xgoals
     const allGames = [];
     const allXgoals = [];
-
-    for (const season of seasons) {
-      // Fetch actual match results (accurate scores)
-      const gamesRes = await fetch(
-        `https://app.americansocceranalysis.com/api/v1/mls/games?season_name=${season}`
-      );
-      const games = await gamesRes.json();
-      
-      // Filter for Atlanta United games
+    
+    seasonData.forEach(({ games, xgoals }) => {
       const atlantaGames = games.filter(g => 
         g.home_team_id === atlantaId || g.away_team_id === atlantaId
       );
       allGames.push(...atlantaGames);
-
-      // Fetch xG data
-      const xgoalsRes = await fetch(
-        `https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=${season}`
-      );
-      const xgoals = await xgoalsRes.json();
       
-      // Filter for Atlanta United games
       const atlantaXgoals = xgoals.filter(g => 
         g.home_team_id === atlantaId || g.away_team_id === atlantaId
       );
       allXgoals.push(...atlantaXgoals);
-    }
+    });
 
     // Build xgoals lookup map by game_id
     const xgoalsMap = {};
@@ -125,8 +133,6 @@ export default async function handler(req, res) {
       const atlXpoints = isHome ? xgData.home_xpoints : xgData.away_xpoints;
       
       // Determine if Atlanta was robbed or got a smash-and-grab
-      // Robbed: Won xG battle significantly but didn't get expected result
-      // Smash and grab: Won despite losing xG battle
       let xgVerdict = null;
       const xgDiff = (atlXg || 0) - (oppXg || 0);
       if (result === 'L' && xgDiff > 0.5) {
@@ -136,30 +142,21 @@ export default async function handler(req, res) {
       }
 
       return {
-        // Match identification
         gameId: game.game_id,
         date: game.date_time_utc,
         season: game.season_name,
         matchday: game.matchday,
-        
-        // Teams
         isHome: isHome,
         opponent: opponent.name,
         opponentAbbr: opponent.abbreviation,
-        
-        // ACTUAL score (from /games endpoint - includes own goals)
         atlScore: atlScore,
         oppScore: oppScore,
         result: result,
-        
-        // xG analytics (from /games/xgoals endpoint)
         atlXg: atlXg ? parseFloat(atlXg.toFixed(2)) : null,
         oppXg: oppXg ? parseFloat(oppXg.toFixed(2)) : null,
         xgDiff: atlXg && oppXg ? parseFloat((atlXg - oppXg).toFixed(2)) : null,
         atlXpoints: atlXpoints ? parseFloat(atlXpoints.toFixed(2)) : null,
         xgVerdict: xgVerdict,
-        
-        // Match details
         attendance: game.attendance,
         stadium: stadiumMap[game.stadium_id] || null,
         referee: refereeMap[game.referee_id] || null,
@@ -189,16 +186,20 @@ export default async function handler(req, res) {
       totalXgFor: parseFloat(enrichedMatches.reduce((sum, m) => sum + (m.atlXg || 0), 0).toFixed(2)),
       totalXgAgainst: parseFloat(enrichedMatches.reduce((sum, m) => sum + (m.oppXg || 0), 0).toFixed(2)),
       robberies: enrichedMatches.filter(m => m.xgVerdict === 'robbed').length,
-      smashAndGrabs: enrichedMatches.filter(m => m.xgVerdict === 'smash-and-grab').length,
-      avgAttendance: Math.round(
-        enrichedMatches.filter(m => m.attendance).reduce((sum, m) => sum + m.attendance, 0) /
-        enrichedMatches.filter(m => m.attendance).length
-      )
+      smashAndGrabs: enrichedMatches.filter(m => m.xgVerdict === 'smash-and-grab').length
     };
+
+    // Build available seasons list
+    const availableSeasons = [];
+    for (let year = currentYear; year >= 2017; year--) {
+      availableSeasons.push(year);
+    }
 
     res.status(200).json({
       summary: summary,
-      matches: enrichedMatches
+      matches: enrichedMatches,
+      availableSeasons: availableSeasons,
+      loadedSeason: requestedSeason || currentYear
     });
 
   } catch (error) {
