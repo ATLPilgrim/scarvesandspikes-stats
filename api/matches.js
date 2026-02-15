@@ -90,17 +90,19 @@ export default async function handler(req, res) {
     const seasonData = await Promise.all(seasonPromises);
 
     // Fetch ALL players with pagination (API returns max 1000 per call)
-    const [players1Res, players2Res, players3Res] = await Promise.all([
+    const [players1Res, players2Res, players3Res, players4Res] = await Promise.all([
       fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=0'),
       fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=1000'),
-      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=2000')
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=2000'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=3000')
     ]);
-    const [players1, players2, players3] = await Promise.all([
+    const [players1, players2, players3, players4] = await Promise.all([
       players1Res.json(),
       players2Res.json(),
-      players3Res.json()
+      players3Res.json(),
+      players4Res.json()
     ]);
-    const allPlayers = [...players1, ...players2, ...players3];
+    const allPlayers = [...players1, ...players2, ...players3, ...players4];
 
     // Build player lookup map
     const playerMap = {};
@@ -219,9 +221,9 @@ export default async function handler(req, res) {
         isPlayoff: game.knockout_game,
         status: game.status,
         
-        // Player stats for this match (sorted by xG contribution)
+        // Player stats for this match (sorted by xG contribution, excluding unknown players)
         players: (playerXgoalsMap[game.game_id] || [])
-          .filter(p => p.minutes > 0)
+          .filter(p => p.minutes > 0 && p.name !== 'Unknown')
           .sort((a, b) => (b.xgPlusXa || 0) - (a.xgPlusXa || 0))
       };
     });
