@@ -583,8 +583,9 @@
 
     // Populate opponent filter dropdown
     function populateOpponentFilter(matches) {
-      const opponents = [...new Set(matches.map(m => m.opponent))].sort();
       const select = document.getElementById('opponentFilter');
+      const currentValue = select.value; // Remember current selection
+      const opponents = [...new Set(matches.map(m => m.opponent))].sort();
       // Keep "All Opponents" option, clear the rest
       select.innerHTML = '<option value="all">All Opponents</option>';
       opponents.forEach(opponent => {
@@ -593,6 +594,10 @@
         option.textContent = opponent;
         select.appendChild(option);
       });
+      // Restore selection if it still exists in the new list
+      if (opponents.includes(currentValue)) {
+        select.value = currentValue;
+      }
     }
 
     // Render match cards
