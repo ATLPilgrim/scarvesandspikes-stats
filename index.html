@@ -623,8 +623,9 @@
           allMatches = data.matches;
           summaryData = data.summary;
           availableSeasons.forEach(s => loadedSeasons.add(String(s)));
-          renderSummary(summaryData);
-        }
+        renderSummary(summaryData);
+        populateOpponentFilter(allMatches);
+      }
       } else if (!loadedSeasons.has(String(season))) {
         // Load the specific season
         document.getElementById('matches').innerHTML = `
@@ -638,7 +639,7 @@
         // Add new matches to our collection
         allMatches = [...allMatches, ...data.matches];
         loadedSeasons.add(String(season));
-        // Recalculate summary for displayed matches
+        populateOpponentFilter(allMatches);
       }
 
       // Filter the matches we have
