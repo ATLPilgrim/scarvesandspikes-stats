@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       fetch('https://app.americansocceranalysis.com/api/v1/mls/stadia'),
       fetch('https://app.americansocceranalysis.com/api/v1/mls/managers'),
       fetch('https://app.americansocceranalysis.com/api/v1/mls/referees'),
-      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?limit=5000')
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players')
     ]);
 
     const [teams, stadia, managers, referees, players] = await Promise.all([
