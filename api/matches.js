@@ -26,7 +26,10 @@ export default async function handler(req, res) {
         seasons.push(year);
       }
     } else {
-      seasons = [requestedSeason || currentYear];
+      // If no season requested, use current year unless it's early in the year (before March)
+      // when the new season hasn't started yet
+      const defaultSeason = (new Date().getMonth() < 2) ? currentYear - 1 : currentYear;
+      seasons = [requestedSeason || defaultSeason];
     }
 
     // Fetch lookup data in parallel for speed
@@ -199,7 +202,7 @@ export default async function handler(req, res) {
       summary: summary,
       matches: enrichedMatches,
       availableSeasons: availableSeasons,
-      loadedSeason: requestedSeason || currentYear
+      loadedSeason: requestedSeason || ((new Date().getMonth() < 2) ? currentYear - 1 : currentYear)
     });
 
   } catch (error) {
