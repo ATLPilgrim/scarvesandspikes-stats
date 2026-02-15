@@ -287,6 +287,77 @@
       color: #e0e0e0;
     }
 
+    /* Player Stats Section */
+    .players-section {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #333;
+    }
+
+    .players-title {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .players-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .player-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #1a1a1a;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    .player-name {
+      color: #e0e0e0;
+      font-weight: 500;
+      min-width: 140px;
+    }
+
+    .player-position {
+      color: #666;
+      font-size: 0.75rem;
+      margin-left: 8px;
+    }
+
+    .player-stats {
+      display: flex;
+      gap: 15px;
+      color: #888;
+      font-size: 0.8rem;
+    }
+
+    .player-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 45px;
+    }
+
+    .player-stat-value {
+      color: #c9a227;
+      font-weight: 600;
+    }
+
+    .player-stat-value.goal {
+      color: #4caf50;
+    }
+
+    .player-stat-label {
+      font-size: 0.65rem;
+      color: #666;
+      text-transform: uppercase;
+    }
+
     /* Loading State */
     .loading {
       text-align: center;
@@ -686,6 +757,44 @@
                   <span class="detail-value">${match.season}</span>
                 </div>
               </div>
+              
+              ${match.players && match.players.length > 0 ? `
+              <div class="players-section">
+                <div class="players-title">Top Performers</div>
+                <div class="players-list">
+                  ${match.players.slice(0, 5).map(p => `
+                    <div class="player-row">
+                      <div>
+                        <span class="player-name">${p.name}</span>
+                        <span class="player-position">${p.position || ''}</span>
+                      </div>
+                      <div class="player-stats">
+                        <div class="player-stat">
+                          <span class="player-stat-value">${p.minutes}'</span>
+                          <span class="player-stat-label">Min</span>
+                        </div>
+                        <div class="player-stat">
+                          <span class="player-stat-value ${p.goals > 0 ? 'goal' : ''}">${p.goals || 0}</span>
+                          <span class="player-stat-label">Goals</span>
+                        </div>
+                        <div class="player-stat">
+                          <span class="player-stat-value">${p.xg ? p.xg.toFixed(2) : '0.00'}</span>
+                          <span class="player-stat-label">xG</span>
+                        </div>
+                        <div class="player-stat">
+                          <span class="player-stat-value">${p.assists || 0}</span>
+                          <span class="player-stat-label">Ast</span>
+                        </div>
+                        <div class="player-stat">
+                          <span class="player-stat-value">${p.xa ? p.xa.toFixed(2) : '0.00'}</span>
+                          <span class="player-stat-label">xA</span>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              ` : ''}
             </div>
           </div>
         `;
