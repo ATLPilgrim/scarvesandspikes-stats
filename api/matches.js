@@ -9,43 +9,18 @@ export default async function handler(request, response) {
       }
     });
     
-    const text = await res.text();
+    const data = await res.json();
     
-    if (!res.ok) {
-      return response.status(500).json({ 
-        error: `API returned ${res.status}`,
-        details: text.substring(0, 500)
-      });
-    }
-    
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      return response.status(500).json({ 
-        error: 'Failed to parse JSON',
-        details: text.substring(0, 500)
-      });
-    }
-    
-    // Debug: return first 3 games with team names so we can see the format
-    const sample = data.slice(0, 3).map(g => ({
-      home: g.home_team_name,
-      away: g.away_team_name,
-      date: g.date_time_utc
-    }));
-    
+    // Return the first game's complete structure so we can see all field names
     response.setHeader('Access-Control-Allow-Origin', '*');
     
     return response.status(200).json({
       total_games: data.length,
-      sample_teams: sample,
-      all_home_teams: [...new Set(data.map(g => g.home_team_name))].sort()
+      first_game_fields: Object.keys(data[0] || {}),
+      first_game_full: data[0]
     });
     
   } catch (error) {
-    return response.status(500).json({ 
-      error: error.message
-    });
+    return response.status(500).json({ error: error.message });
   }
 }
