@@ -103,9 +103,14 @@
             font-weight: 600;
         }
         
+        .atl-name {
+            color: #c8a870;
+        }
+        
         .match-xg {
             display: flex;
             gap: 20px;
+            flex-wrap: wrap;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 0.9rem;
         }
@@ -130,6 +135,31 @@
         .xg-diff.negative {
             color: #a55;
         }
+        
+        .result-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .result-badge.win {
+            background: #1a3d1a;
+            color: #5a9;
+        }
+        
+        .result-badge.loss {
+            background: #3d1a1a;
+            color: #a55;
+        }
+        
+        .result-badge.draw {
+            background: #3d3d1a;
+            color: #aa5;
+        }
     </style>
 </head>
 <body>
@@ -140,7 +170,7 @@
     
     <div class="container">
         <div id="status" class="status-bar loading">
-            Connecting to American Soccer Analysis API...
+            Loading match data...
         </div>
         
         <div id="matches" class="match-list"></div>
@@ -152,7 +182,6 @@
             const matchesEl = document.getElementById('matches');
             
             try {
-                // ASA API endpoint for game xG data
                 const response = await fetch('/api/matches');
                 
                 if (!response.ok) {
@@ -161,27 +190,41 @@
                 
                 const data = await response.json();
                 
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
                 statusEl.className = 'status-bar success';
                 statusEl.textContent = 'Loaded ' + data.length + ' matches from 2024 season';
                 
-                // Sort by date, most recent first
-                data.sort((a, b) => new Date(b.date_time_utc) - new Date(a.date_time_utc));
-                
                 // Render matches
                 data.forEach(match => {
-                    const isHome = match.home_team_name.includes('Atlanta');
-                    const atlXg = isHome ? match.home_team_xgoals : match.away_team_xgoals;
-                    const oppXg = isHome ? match.away_team_xgoals : match.home_team_xgoals;
+                    const isHome = match.home_abbrev === 'ATL';
                     const atlGoals = isHome ? match.home_goals : match.away_goals;
                     const oppGoals = isHome ? match.away_goals : match.home_goals;
-                    const opponent = isHome ? match.away_team_name : match.home_team_name;
+                    const atlXg = isHome ? match.home_xg : match.away_xg;
+                    const oppXg = isHome ? match.away_xg : match.home_xg;
+                    const opponent = isHome ? match.away_team : match.home_team;
+                    const oppAbbrev = isHome ? match.away_abbrev : match.home_abbrev;
                     const venue = isHome ? 'vs' : 'at';
                     
                     const xgDiff = (atlXg - oppXg).toFixed(2);
                     const xgDiffClass = xgDiff > 0 ? 'positive' : xgDiff < 0 ? 'negative' : '';
                     const xgDiffSign = xgDiff > 0 ? '+' : '';
                     
-                    const dateStr = new Date(match.date_time_utc).toLocaleDateString('en-US', {
+                    let result, resultClass;
+                    if (atlGoals > oppGoals) {
+                        result = 'W';
+                        resultClass = 'win';
+                    } else if (atlGoals < oppGoals) {
+                        result = 'L';
+                        resultClass = 'loss';
+                    } else {
+                        result = 'D';
+                        resultClass = 'draw';
+                    }
+                    
+                    const dateStr = new Date(match.date.replace(' UTC', 'Z')).toLocaleDateString('en-US', {
                         weekday: 'short',
                         month: 'short',
                         day: 'numeric',
@@ -193,15 +236,16 @@
                     card.innerHTML = `
                         <div class="match-date">${dateStr}</div>
                         <div class="match-teams">
-                            Atlanta United 
+                            <span class="atl-name">Atlanta United</span> 
                             <span class="match-score">${atlGoals}</span> 
                             ${venue} 
                             ${opponent} 
                             <span class="match-score">${oppGoals}</span>
+                            <span class="result-badge ${resultClass}">${result}</span>
                         </div>
                         <div class="match-xg">
                             <div class="xg-item">ATL xG: <span class="xg-value">${atlXg.toFixed(2)}</span></div>
-                            <div class="xg-item">OPP xG: <span class="xg-value">${oppXg.toFixed(2)}</span></div>
+                            <div class="xg-item">${oppAbbrev} xG: <span class="xg-value">${oppXg.toFixed(2)}</span></div>
                             <div class="xg-item xg-diff ${xgDiffClass}">xG Diff: ${xgDiffSign}${xgDiff}</div>
                         </div>
                     `;
