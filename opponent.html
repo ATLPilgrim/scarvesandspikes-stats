@@ -1,0 +1,873 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlanta United vs Opponent | ScarvesAndSpikes.com</title>
+  <meta name="description" content="Complete head-to-head history between Atlanta United and their MLS opponents with xG analytics.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --burgundy: #80000a;
+      --burgundy-dark: #5a0007;
+      --burgundy-light: #a8192a;
+      --gold: #c9a227;
+      --gold-dark: #9a7a1a;
+      --gold-light: #e0bc4a;
+      --black: #0a0a0a;
+      --gray-950: #121212;
+      --gray-900: #1a1a1a;
+      --gray-800: #242424;
+      --gray-700: #333333;
+      --gray-600: #444444;
+      --gray-500: #666666;
+      --gray-400: #888888;
+      --gray-300: #aaaaaa;
+      --gray-200: #cccccc;
+      --gray-100: #e0e0e0;
+      --white: #ffffff;
+      --win: #2e7d32;
+      --loss: #c62828;
+      --draw: #666666;
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'Source Sans 3', sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--gray-100);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      background: linear-gradient(180deg, var(--gray-900) 0%, var(--black) 100%);
+      border-bottom: 1px solid var(--gray-800);
+      padding: var(--space-md) var(--space-lg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .logo-wordmark { height: 32px; width: auto; }
+
+    .nav-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .nav-link {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover { color: var(--gold-light); }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--burgundy-dark) 0%, var(--gray-950) 50%, var(--gray-900) 100%);
+      padding: var(--space-3xl) var(--space-lg);
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: var(--space-sm);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: var(--space-md);
+    }
+
+    .hero-title span { color: var(--gold); }
+
+    .hero-record {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--gray-200);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .stats-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .stats-card-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--gray-800);
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) 0;
+    }
+
+    .stats-label {
+      font-size: 0.9rem;
+      color: var(--gray-300);
+    }
+
+    .stats-value {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .stats-value.win { color: var(--win); }
+    .stats-value.loss { color: var(--loss); }
+
+    /* Record Display */
+    .record-display {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin-bottom: var(--space-md);
+    }
+
+    .record-item {
+      text-align: center;
+    }
+
+    .record-number {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .record-number.win { color: var(--win); }
+    .record-number.draw { color: var(--gray-400); }
+    .record-number.loss { color: var(--loss); }
+
+    .record-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-top: var(--space-xs);
+    }
+
+    /* Streak Badge */
+    .streak-badge {
+      display: inline-block;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .streak-badge.W { background: var(--win); color: var(--white); }
+    .streak-badge.L { background: var(--loss); color: var(--white); }
+    .streak-badge.D { background: var(--gray-600); color: var(--white); }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+    }
+
+    /* Match Cards */
+    .matches { display: flex; flex-direction: column; gap: var(--space-md); }
+
+    .match-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .match-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--gray-700);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .match-card.win { border-left: 4px solid var(--win); }
+    .match-card.loss { border-left: 4px solid var(--loss); }
+    .match-card.draw { border-left: 4px solid var(--gray-500); }
+
+    .match-main { padding: var(--space-lg); }
+
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-md);
+    }
+
+    .match-meta { display: flex; flex-direction: column; gap: var(--space-xs); }
+
+    .match-date {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-400);
+    }
+
+    .match-competition { font-size: 0.75rem; color: var(--gray-500); }
+
+    .match-badges { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+
+    .badge {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge.result-w { background: var(--win); color: var(--white); }
+    .badge.result-l { background: var(--loss); color: var(--white); }
+    .badge.result-d { background: var(--gray-600); color: var(--white); }
+    .badge.playoff { background: var(--burgundy); color: var(--white); }
+    .badge.robbed { background: var(--gold); color: var(--black); }
+    .badge.smash { background: #00838f; color: var(--white); }
+
+    .match-score-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .team-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .team-name.atlanta { color: var(--gold); }
+    .team-name.opponent { color: var(--gray-100); }
+
+    .score-display { display: flex; align-items: center; gap: var(--space-sm); }
+
+    .score {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--white);
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .score-separator { font-size: 1.25rem; color: var(--gray-500); }
+
+    .venue-indicator {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .match-xg { display: flex; gap: var(--space-lg); flex-wrap: wrap; }
+
+    .xg-item { display: flex; align-items: baseline; gap: var(--space-xs); }
+
+    .xg-label {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .xg-value {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .xg-value.positive { color: var(--win); }
+    .xg-value.negative { color: var(--loss); }
+
+    /* Expanded Details */
+    .match-details {
+      display: none;
+      padding: var(--space-lg);
+      background: var(--gray-950);
+      border-top: 1px solid var(--gray-800);
+    }
+
+    .match-card.expanded .match-details { display: block; }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: var(--space-md);
+    }
+
+    .detail-item { display: flex; flex-direction: column; gap: 2px; }
+
+    .detail-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .detail-value { font-size: 0.9rem; color: var(--gray-200); }
+
+    /* Opponent Navigation */
+    .opponent-nav {
+      margin-top: var(--space-xl);
+      padding: var(--space-lg);
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+    }
+
+    .opponent-nav-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-md);
+    }
+
+    .opponent-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .opponent-link {
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--gray-800);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-sm);
+      color: var(--gray-200);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+
+    .opponent-link:hover {
+      background: var(--gray-700);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .opponent-link.active {
+      background: var(--burgundy);
+      border-color: var(--burgundy);
+      color: var(--white);
+    }
+
+    /* Loading & Error States */
+    .loading, .error-state {
+      text-align: center;
+      padding: var(--space-3xl);
+      color: var(--gray-400);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--gray-800);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      margin-top: var(--space-md);
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--gray-950);
+      border-top: 1px solid var(--gray-800);
+      padding: var(--space-2xl) var(--space-lg);
+      margin-top: var(--space-3xl);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .footer-logo { width: 60px; height: 60px; opacity: 0.8; }
+
+    .footer-text { font-size: 0.875rem; color: var(--gray-500); max-width: 400px; }
+
+    .footer-link { color: var(--gold); text-decoration: none; }
+    .footer-link:hover { text-decoration: underline; }
+
+    .footer-credit { font-size: 0.75rem; color: var(--gray-600); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content { flex-direction: column; gap: var(--space-sm); }
+      .record-display { gap: var(--space-lg); }
+      .record-number { font-size: 2rem; }
+      .match-score-row { flex-wrap: wrap; }
+      .score { font-size: 1.5rem; }
+      .team-name { font-size: 1rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-content">
+      <a href="https://scarvesandspikes.com" class="logo-link">
+        <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
+      </a>
+      <nav class="nav-section">
+        <a href="/" class="nav-link">Match History</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero (dynamic content) -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-subtitle">Head to Head History</p>
+      <h1 class="hero-title" id="heroTitle">Atlanta United vs <span id="opponentName">...</span></h1>
+      <p class="hero-record" id="heroRecord"></p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container">
+    <div id="content">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading History</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/badge_community.png" alt="Scarves and Spikes" class="footer-logo">
+      <p class="footer-text">
+        Built by <a href="https://scarvesandspikes.com" class="footer-link">ScarvesAndSpikes.com</a> for Atlanta United supporters who love diving deep into the numbers.
+      </p>
+      <p class="footer-credit">Data provided by American Soccer Analysis</p>
+    </div>
+  </footer>
+
+  <script>
+    // Get opponent from URL
+    function getOpponentFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('team') || params.get('opponent');
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const normalized = dateStr.replace(' UTC', 'Z').replace(' ', 'T');
+      const date = new Date(normalized);
+      if (isNaN(date.getTime())) return '-';
+      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatNumber(num) {
+      return num ? num.toLocaleString() : '-';
+    }
+
+    function renderStats(data) {
+      const { stats, opponent, opponentAbbr } = data;
+      
+      return `
+        <div class="stats-grid">
+          <div class="stats-card">
+            <div class="stats-card-title">All-Time Record</div>
+            <div class="record-display">
+              <div class="record-item">
+                <div class="record-number win">${stats.wins}</div>
+                <div class="record-label">Wins</div>
+              </div>
+              <div class="record-item">
+                <div class="record-number draw">${stats.draws}</div>
+                <div class="record-label">Draws</div>
+              </div>
+              <div class="record-item">
+                <div class="record-number loss">${stats.losses}</div>
+                <div class="record-label">Losses</div>
+              </div>
+            </div>
+            ${stats.currentStreak ? `
+              <div style="text-align: center; margin-top: var(--space-md);">
+                <span class="streak-badge ${stats.currentStreak.type}">
+                  ${stats.currentStreak.count} ${stats.currentStreak.type === 'W' ? 'Win' : stats.currentStreak.type === 'L' ? 'Loss' : 'Draw'} Streak
+                </span>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="stats-card">
+            <div class="stats-card-title">Goals</div>
+            <div class="stats-row">
+              <span class="stats-label">Goals For</span>
+              <span class="stats-value">${stats.goalsFor}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Goals Against</span>
+              <span class="stats-value">${stats.goalsAgainst}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Goal Difference</span>
+              <span class="stats-value ${stats.goalsFor - stats.goalsAgainst > 0 ? 'win' : stats.goalsFor - stats.goalsAgainst < 0 ? 'loss' : ''}">
+                ${stats.goalsFor - stats.goalsAgainst > 0 ? '+' : ''}${stats.goalsFor - stats.goalsAgainst}
+              </span>
+            </div>
+          </div>
+
+          <div class="stats-card">
+            <div class="stats-card-title">Expected Goals</div>
+            <div class="stats-row">
+              <span class="stats-label">xG For</span>
+              <span class="stats-value">${stats.xgFor.toFixed(1)}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">xG Against</span>
+              <span class="stats-value">${stats.xgAgainst.toFixed(1)}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">xG Difference</span>
+              <span class="stats-value ${stats.xgFor - stats.xgAgainst > 0 ? 'win' : stats.xgFor - stats.xgAgainst < 0 ? 'loss' : ''}">
+                ${stats.xgFor - stats.xgAgainst > 0 ? '+' : ''}${(stats.xgFor - stats.xgAgainst).toFixed(1)}
+              </span>
+            </div>
+          </div>
+
+          <div class="stats-card">
+            <div class="stats-card-title">Home vs Away</div>
+            <div class="stats-row">
+              <span class="stats-label">Home Record</span>
+              <span class="stats-value">${stats.homeWins}-${stats.homeDraws}-${stats.homeLosses}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Away Record</span>
+              <span class="stats-value">${stats.awayWins}-${stats.awayDraws}-${stats.awayLosses}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Robberies / Smash+Grabs</span>
+              <span class="stats-value">${stats.robberies} / ${stats.smashAndGrabs}</span>
+            </div>
+          </div>
+
+          ${stats.biggestWin ? `
+          <div class="stats-card">
+            <div class="stats-card-title">Biggest Win</div>
+            <div class="stats-row">
+              <span class="stats-label">Score</span>
+              <span class="stats-value win">${stats.biggestWin.score}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Date</span>
+              <span class="stats-value">${formatDate(stats.biggestWin.date)}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Venue</span>
+              <span class="stats-value">${stats.biggestWin.venue}</span>
+            </div>
+          </div>
+          ` : ''}
+
+          ${stats.biggestLoss ? `
+          <div class="stats-card">
+            <div class="stats-card-title">Biggest Loss</div>
+            <div class="stats-row">
+              <span class="stats-label">Score</span>
+              <span class="stats-value loss">${stats.biggestLoss.score}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Date</span>
+              <span class="stats-value">${formatDate(stats.biggestLoss.date)}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Venue</span>
+              <span class="stats-value">${stats.biggestLoss.venue}</span>
+            </div>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderMatches(matches, opponentAbbr) {
+      return `
+        <div class="section-header">
+          <h2 class="section-title">All Matches (${matches.length})</h2>
+        </div>
+        <div class="matches">
+          ${matches.map(match => {
+            const xgDiffClass = match.xgDiff > 0 ? 'positive' : match.xgDiff < 0 ? 'negative' : '';
+            return `
+              <article class="match-card ${match.result.toLowerCase()}" onclick="this.classList.toggle('expanded')">
+                <div class="match-main">
+                  <div class="match-header">
+                    <div class="match-meta">
+                      <span class="match-date">${formatDate(match.date)}</span>
+                      <span class="match-competition">${match.isPlayoff ? 'MLS Cup Playoffs' : 'MLS Regular Season'} | ${match.season}</span>
+                    </div>
+                    <div class="match-badges">
+                      ${match.isPlayoff ? '<span class="badge playoff">Playoff</span>' : ''}
+                      ${match.xgVerdict === 'robbed' ? '<span class="badge robbed">Robbed</span>' : ''}
+                      ${match.xgVerdict === 'smash-and-grab' ? '<span class="badge smash">Smash + Grab</span>' : ''}
+                      <span class="badge result-${match.result.toLowerCase()}">${match.result}</span>
+                    </div>
+                  </div>
+
+                  <div class="match-score-row">
+                    <span class="team-name atlanta">Atlanta United</span>
+                    <div class="score-display">
+                      <span class="score">${match.atlScore}</span>
+                      <span class="score-separator">-</span>
+                      <span class="score">${match.oppScore}</span>
+                    </div>
+                    <span class="team-name opponent">${match.opponent}</span>
+                    <span class="venue-indicator">${match.isHome ? 'HOME' : 'AWAY'}</span>
+                  </div>
+
+                  <div class="match-xg">
+                    <div class="xg-item">
+                      <span class="xg-label">ATL xG</span>
+                      <span class="xg-value">${match.atlXg !== null ? match.atlXg : '-'}</span>
+                    </div>
+                    <div class="xg-item">
+                      <span class="xg-label">${opponentAbbr} xG</span>
+                      <span class="xg-value">${match.oppXg !== null ? match.oppXg : '-'}</span>
+                    </div>
+                    <div class="xg-item">
+                      <span class="xg-label">xG Diff</span>
+                      <span class="xg-value ${xgDiffClass}">${match.xgDiff !== null ? (match.xgDiff > 0 ? '+' : '') + match.xgDiff : '-'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="match-details">
+                  <div class="details-grid">
+                    <div class="detail-item">
+                      <span class="detail-label">Attendance</span>
+                      <span class="detail-value">${formatNumber(match.attendance)}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Stadium</span>
+                      <span class="detail-value">${match.stadium || '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">ATL Manager</span>
+                      <span class="detail-value">${match.atlManager || '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">${opponentAbbr} Manager</span>
+                      <span class="detail-value">${match.oppManager || '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Referee</span>
+                      <span class="detail-value">${match.referee || '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Season</span>
+                      <span class="detail-value">${match.season}</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderOpponentNav(allOpponents, currentSlug) {
+      return `
+        <div class="opponent-nav">
+          <div class="opponent-nav-title">All Opponents</div>
+          <div class="opponent-list">
+            ${allOpponents.map(o => `
+              <a href="/opponent.html?team=${o.slug}" class="opponent-link ${o.slug === currentSlug ? 'active' : ''}">${o.name}</a>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadOpponentData() {
+      const opponent = getOpponentFromURL();
+      
+      if (!opponent) {
+        document.getElementById('content').innerHTML = `
+          <div class="error-state">
+            <p>No opponent specified. <a href="/" style="color: var(--gold);">Return to Match History</a></p>
+          </div>
+        `;
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/opponent?opponent=${encodeURIComponent(opponent)}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (data.availableOpponents) {
+            document.getElementById('opponentName').textContent = 'Unknown';
+            document.getElementById('content').innerHTML = `
+              <div class="error-state">
+                <p>Opponent "${opponent}" not found.</p>
+              </div>
+              ${renderOpponentNav(data.availableOpponents, '')}
+            `;
+          } else {
+            throw new Error(data.error || 'Failed to load data');
+          }
+          return;
+        }
+
+        // Update page title and meta
+        document.title = `Atlanta United vs ${data.opponent} - Head to Head History | ScarvesAndSpikes.com`;
+        document.querySelector('meta[name="description"]').content = 
+          `Complete head-to-head history: Atlanta United is ${data.stats.wins}-${data.stats.draws}-${data.stats.losses} against ${data.opponent} in MLS play. View all ${data.stats.totalMatches} matches with xG analytics.`;
+
+        // Update hero
+        document.getElementById('opponentName').textContent = data.opponent;
+        document.getElementById('heroRecord').textContent = 
+          `${data.stats.totalMatches} Matches | ${data.stats.wins}W - ${data.stats.draws}D - ${data.stats.losses}L`;
+
+        // Render content
+        document.getElementById('content').innerHTML = 
+          renderStats(data) + 
+          renderMatches(data.matches, data.opponentAbbr) +
+          renderOpponentNav(data.allOpponents, data.slug);
+
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('content').innerHTML = `
+          <div class="error-state">
+            <p>Error loading data. <a href="/" style="color: var(--gold);">Return to Match History</a></p>
+          </div>
+        `;
+      }
+    }
+
+    loadOpponentData();
+  </script>
+</body>
+</html>
