@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://scarvesandspikes-stats.vercel.app/api/sitemap
