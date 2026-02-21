@@ -66,6 +66,12 @@ export default async function handler(req, res) {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>${baseUrl}/goalkeeper.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 ${opponents.map(o => `  <url>
     <loc>${baseUrl}/opponent.html?team=${o.slug}</loc>
     <lastmod>${today}</lastmod>

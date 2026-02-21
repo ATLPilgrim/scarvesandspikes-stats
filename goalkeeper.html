@@ -1,0 +1,920 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlanta United Goalkeeper Analytics | ScarvesAndSpikes.com</title>
+  <meta name="description" content="Atlanta United goalkeeper analytics with save performance, expected goals, and goals added breakdown by season.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --burgundy: #80000a;
+      --burgundy-dark: #5a0007;
+      --burgundy-light: #a8192a;
+      --gold: #c9a227;
+      --gold-dark: #9a7a1a;
+      --gold-light: #e0bc4a;
+      --black: #0a0a0a;
+      --gray-950: #121212;
+      --gray-900: #1a1a1a;
+      --gray-800: #242424;
+      --gray-700: #333333;
+      --gray-600: #444444;
+      --gray-500: #666666;
+      --gray-400: #888888;
+      --gray-300: #aaaaaa;
+      --gray-200: #cccccc;
+      --gray-100: #e0e0e0;
+      --white: #ffffff;
+      --win: #2e7d32;
+      --loss: #c62828;
+      --draw: #666666;
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'Source Sans 3', sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--gray-100);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      background: linear-gradient(180deg, var(--gray-900) 0%, var(--black) 100%);
+      border-bottom: 1px solid var(--gray-800);
+      padding: var(--space-md) var(--space-lg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .logo-wordmark { height: 32px; width: auto; }
+
+    .nav-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .nav-link {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover { color: var(--gold-light); }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--burgundy-dark) 0%, var(--gray-950) 50%, var(--gray-900) 100%);
+      padding: var(--space-3xl) var(--space-lg);
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: var(--space-sm);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: var(--space-md);
+    }
+
+    .hero-title span { color: var(--gold); }
+
+    .hero-season {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--gray-200);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    /* Season Selector */
+    .gk-season-selector {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-xl);
+    }
+
+    .gk-season-selector select {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--gray-800);
+      color: var(--gold);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-lg);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23c9a227' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    .gk-season-selector select:hover {
+      border-color: var(--gold);
+    }
+
+    /* Stats Card (reused pattern) */
+    .stats-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .stats-card-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--gray-800);
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) 0;
+    }
+
+    .stats-label {
+      font-size: 0.9rem;
+      color: var(--gray-300);
+    }
+
+    .stats-value {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .stats-value.win { color: var(--win); }
+    .stats-value.loss { color: var(--loss); }
+
+    .insights-explainer {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-bottom: var(--space-lg);
+      line-height: 1.4;
+    }
+
+    /* GK Profile */
+    .gk-profile {
+      margin-bottom: var(--space-2xl);
+    }
+
+    .gk-profile-header {
+      margin-bottom: var(--space-lg);
+    }
+
+    .gk-profile-name {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gold);
+      line-height: 1.1;
+    }
+
+    .gk-profile-summary {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: var(--space-xs);
+    }
+
+    /* Stats + Luck + Radar grid */
+    .gk-analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    /* Luck Meter (GK version - center at 1.0) */
+    .gk-luck-container {
+      position: relative;
+      height: 32px;
+      background: var(--gray-800);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: var(--space-sm);
+    }
+
+    .gk-luck-center {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--gray-500);
+      z-index: 2;
+    }
+
+    .gk-luck-fill {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      border-radius: var(--radius-sm);
+      z-index: 1;
+      transition: width 0.6s ease, left 0.6s ease;
+    }
+
+    .gk-luck-fill.outperform {
+      background: linear-gradient(90deg, #43a047, var(--win));
+      right: 50%;
+    }
+
+    .gk-luck-fill.underperform {
+      background: linear-gradient(90deg, var(--loss), #e53935);
+      left: 50%;
+    }
+
+    .gk-luck-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: var(--space-sm);
+    }
+
+    .gk-luck-value.outperform { color: var(--win); }
+    .gk-luck-value.underperform { color: var(--loss); }
+    .gk-luck-value.neutral { color: var(--gray-400); }
+
+    .gk-luck-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .gk-luck-context {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+      margin-top: var(--space-lg);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--gray-800);
+    }
+
+    .gk-luck-context-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .gk-luck-context-label { color: var(--gray-500); }
+    .gk-luck-context-value { color: var(--gray-200); font-weight: 600; }
+
+    /* Radar Chart */
+    .radar-chart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+    }
+
+    .radar-chart svg text {
+      font-family: var(--font-display);
+    }
+
+    /* Game Log */
+    .gk-game-log {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .gk-game-log-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-sm);
+    }
+
+    .gk-game-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border-left: 4px solid var(--gray-500);
+      gap: var(--space-md);
+    }
+
+    .gk-game-row.win { border-left-color: var(--win); }
+    .gk-game-row.loss { border-left-color: var(--loss); }
+    .gk-game-row.draw { border-left-color: var(--gray-500); }
+
+    .gk-game-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 140px;
+    }
+
+    .gk-game-date {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-400);
+    }
+
+    .gk-game-matchup {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-100);
+    }
+
+    .gk-game-matchup span { color: var(--gold); }
+
+    .gk-game-stats {
+      display: flex;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .gk-game-stat {
+      text-align: center;
+    }
+
+    .gk-game-stat-value {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .gk-game-stat-value.good { color: var(--win); }
+    .gk-game-stat-value.bad { color: var(--loss); }
+
+    .gk-game-stat-label {
+      font-size: 0.55rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Loading & Error States */
+    .loading, .error-state {
+      text-align: center;
+      padding: var(--space-3xl);
+      color: var(--gray-400);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--gray-800);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      margin-top: var(--space-md);
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .no-data-message {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 0.9rem;
+      padding: var(--space-2xl);
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--gray-950);
+      border-top: 1px solid var(--gray-800);
+      padding: var(--space-2xl) var(--space-lg);
+      margin-top: var(--space-3xl);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .footer-logo { width: 140px; height: auto; opacity: 0.8; }
+
+    .footer-text { font-size: 0.875rem; color: var(--gray-500); max-width: 400px; }
+
+    .footer-link { color: var(--gold); text-decoration: none; }
+    .footer-link:hover { text-decoration: underline; }
+
+    .footer-credit { font-size: 0.75rem; color: var(--gray-600); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content { flex-direction: column; gap: var(--space-sm); }
+      .gk-analytics-grid { grid-template-columns: 1fr; }
+      .gk-game-row { flex-direction: column; align-items: flex-start; }
+      .gk-game-stats { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-content">
+      <a href="https://scarvesandspikes.com" class="logo-link">
+        <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
+      </a>
+      <nav class="nav-section">
+        <a href="/" class="nav-link">&larr; Match History</a>
+        <a href="/goalkeeper.html" class="nav-link" style="color: var(--white); cursor: default;">Goalkeepers</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-subtitle">Goalkeeper Analytics</p>
+      <h1 class="hero-title">Between the <span>Sticks</span></h1>
+      <p class="hero-season" id="heroSeasonLabel"></p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container">
+    <!-- Season Selector -->
+    <div class="gk-season-selector">
+      <select id="seasonSelector"></select>
+    </div>
+
+    <!-- Content Area -->
+    <div id="content">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading Goalkeeper Data</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <img src="/badge_community.png" alt="Scarves and Spikes" class="footer-logo">
+      <p class="footer-text">
+        Built by <a href="https://scarvesandspikes.com" class="footer-link">ScarvesAndSpikes.com</a> for Atlanta United supporters who love diving deep into the numbers.
+      </p>
+      <p class="footer-credit">Data provided by American Soccer Analysis</p>
+    </div>
+  </footer>
+
+  <script>
+    let gkDataCache = {};
+
+    function getCurrentSeason() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      // MLS season typically starts in Feb, so before Feb use previous year
+      return month < 1 ? year - 1 : year;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr + 'T12:00:00');
+      if (isNaN(date.getTime())) return '-';
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function formatDateLong(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr + 'T12:00:00');
+      if (isNaN(date.getTime())) return '-';
+      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+
+    async function loadGoalkeeperData(season) {
+      if (gkDataCache[season]) return gkDataCache[season];
+      try {
+        const res = await fetch(`/api/goalkeeper?season=${season}`);
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        gkDataCache[season] = data;
+        return data;
+      } catch (error) {
+        console.error('Error loading goalkeeper data:', error);
+        return null;
+      }
+    }
+
+    function populateSeasonSelector(seasons, currentSeason) {
+      const selector = document.getElementById('seasonSelector');
+      selector.innerHTML = '';
+      seasons.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s + ' Season';
+        if (s === currentSeason) opt.selected = true;
+        selector.appendChild(opt);
+      });
+      selector.addEventListener('change', async () => {
+        const season = parseInt(selector.value);
+        document.getElementById('heroSeasonLabel').textContent = season + ' Season';
+        document.getElementById('content').innerHTML = `
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading Goalkeeper Data</p>
+          </div>
+        `;
+        const data = await loadGoalkeeperData(season);
+        renderPage(data);
+      });
+    }
+
+    function renderPage(data) {
+      const content = document.getElementById('content');
+      if (!data || !data.goalkeepers || data.goalkeepers.length === 0) {
+        content.innerHTML = '<div class="no-data-message">No goalkeeper data available for this season.</div>';
+        return;
+      }
+
+      content.innerHTML = data.goalkeepers.map(gk => renderGkProfile(gk)).join('');
+    }
+
+    function renderGkProfile(gk) {
+      const agg = gk.aggregate;
+      const minutesFormatted = agg.minutesPlayed.toLocaleString();
+
+      return `
+        <div class="gk-profile">
+          <div class="gk-profile-header">
+            <div class="gk-profile-name">${gk.name}</div>
+            <div class="gk-profile-summary">${agg.gamesPlayed} Games | ${minutesFormatted} Minutes</div>
+          </div>
+
+          <div class="gk-analytics-grid">
+            ${renderGkStatsTable(gk)}
+            ${renderGkLuckMeter(agg.goalsDividedByXgoals, agg.goalsConceded, agg.xgoalsFaced)}
+            ${renderGkRadarChart(agg.goalsAdded)}
+          </div>
+
+          ${renderGkGameLog(gk)}
+        </div>
+      `;
+    }
+
+    function renderGkStatsTable(gk) {
+      const agg = gk.aggregate;
+      const xSavePct = agg.xgoalsFaced != null && agg.shotsFaced > 0
+        ? (((agg.shotsFaced - agg.xgoalsFaced) / agg.shotsFaced) * 100).toFixed(1)
+        : null;
+      const goalsPrevented = agg.goalsMinusXgoals;
+      const gpColor = goalsPrevented !== null
+        ? (goalsPrevented <= 0 ? 'win' : 'loss')
+        : '';
+
+      return `
+        <div class="stats-card">
+          <div class="stats-card-title">Season Stats</div>
+          <div class="insights-explainer">Season aggregate stats. Negative goals prevented means the keeper saved more than expected.</div>
+          <div class="stats-row">
+            <span class="stats-label">Shots Faced</span>
+            <span class="stats-value">${agg.shotsFaced}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Saves</span>
+            <span class="stats-value">${agg.saves}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Goals Conceded</span>
+            <span class="stats-value">${agg.goalsConceded}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Save %</span>
+            <span class="stats-value">${agg.savePercentage}%</span>
+          </div>
+          ${xSavePct !== null ? `
+          <div class="stats-row">
+            <span class="stats-label">Expected Save %</span>
+            <span class="stats-value">${xSavePct}%</span>
+          </div>
+          ` : ''}
+          ${goalsPrevented !== null ? `
+          <div class="stats-row">
+            <span class="stats-label">Goals Prevented</span>
+            <span class="stats-value ${gpColor}">${goalsPrevented >= 0 ? '+' : ''}${goalsPrevented.toFixed(2)}</span>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderGkLuckMeter(ratio, goalsConceded, xgFaced) {
+      if (ratio === null || ratio === undefined) {
+        return `
+          <div class="stats-card">
+            <div class="stats-card-title">Shot-stopping Ratio</div>
+            <div class="no-data-message">No ratio data available</div>
+          </div>
+        `;
+      }
+
+      // Scale: 0.0 to 2.0, center at 1.0
+      const clamped = Math.max(0, Math.min(2, ratio));
+      // Distance from center (1.0), as percentage of half-range (1.0)
+      const dist = Math.abs(clamped - 1.0);
+      const pct = dist / 1.0 * 50;
+      const isOutperform = ratio < 1.0;
+      const colorClass = ratio < 0.98 ? 'outperform' : ratio > 1.02 ? 'underperform' : 'neutral';
+
+      let fillStyle, fillClass;
+      if (isOutperform) {
+        // Fill goes left from center
+        fillClass = 'outperform';
+        fillStyle = `right: 50%; width: ${pct}%;`;
+      } else {
+        // Fill goes right from center
+        fillClass = 'underperform';
+        fillStyle = `left: 50%; width: ${pct}%;`;
+      }
+
+      return `
+        <div class="stats-card">
+          <div class="stats-card-title">Shot-stopping Ratio</div>
+          <div class="insights-explainer">Goals conceded as a ratio of expected goals. Below 1.0 = outperforming expectations.</div>
+          <div class="gk-luck-value ${colorClass}">${ratio.toFixed(3)}</div>
+          <div class="gk-luck-container">
+            <div class="gk-luck-center"></div>
+            <div class="gk-luck-fill ${fillClass}" style="${fillStyle}"></div>
+          </div>
+          <div class="gk-luck-labels">
+            <span>Outperform (0.0)</span>
+            <span>1.0</span>
+            <span>Underperform (2.0)</span>
+          </div>
+          <div class="gk-luck-context">
+            <div class="gk-luck-context-item">
+              <span class="gk-luck-context-label">Goals Conceded</span>
+              <span class="gk-luck-context-value">${goalsConceded}</span>
+            </div>
+            <div class="gk-luck-context-item">
+              <span class="gk-luck-context-label">xG Faced</span>
+              <span class="gk-luck-context-value">${xgFaced != null ? xgFaced.toFixed(1) : '-'}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGkRadarChart(goalsAdded) {
+      const axes = ['Claiming', 'Fielding', 'Handling', 'Passing', 'Shotstopping', 'Sweeping'];
+      const values = axes.map(a => {
+        const d = goalsAdded[a];
+        return d ? d.raw : 0;
+      });
+
+      if (values.every(v => v === 0) && Object.keys(goalsAdded).length === 0) {
+        return `
+          <div class="stats-card">
+            <div class="stats-card-title">Goals Added (g+) Radar</div>
+            <div class="no-data-message">No goals added data available</div>
+          </div>
+        `;
+      }
+
+      const padding = 60;
+      const chartSize = 200;
+      const size = chartSize + padding * 2;
+      const cx = size / 2;
+      const cy = size / 2;
+      const maxRadius = chartSize / 2;
+      const levels = 4;
+
+      const absMax = Math.max(0.5, ...values.map(Math.abs));
+      const scale = maxRadius / absMax;
+
+      const angleOffset = -Math.PI / 2;
+      function getPoint(index, radius) {
+        const angle = (2 * Math.PI / axes.length) * index + angleOffset;
+        return {
+          x: cx + radius * Math.cos(angle),
+          y: cy + radius * Math.sin(angle)
+        };
+      }
+
+      let gridLines = '';
+      for (let l = 1; l <= levels; l++) {
+        const r = (maxRadius / levels) * l;
+        const ringPoints = axes.map((_, i) => {
+          const p = getPoint(i, r);
+          return `${p.x},${p.y}`;
+        }).join(' ');
+        gridLines += `<polygon points="${ringPoints}" fill="none" stroke="#333" stroke-width="0.5"/>`;
+      }
+
+      let axisLines = '';
+      axes.forEach((_, i) => {
+        const p = getPoint(i, maxRadius);
+        axisLines += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#333" stroke-width="0.5"/>`;
+      });
+
+      const dataPoints = values.map((v, i) => {
+        const r = Math.max(0, v) * scale;
+        const p = getPoint(i, r);
+        return `${p.x},${p.y}`;
+      }).join(' ');
+
+      const labelOffset = 22;
+      let labels = '';
+      axes.forEach((axis, i) => {
+        const p = getPoint(i, maxRadius + labelOffset);
+        const val = values[i];
+        const anchor = Math.abs(p.x - cx) < 5 ? 'middle' : p.x > cx ? 'start' : 'end';
+        labels += `<text x="${p.x}" y="${p.y}" text-anchor="${anchor}" dominant-baseline="middle" fill="#aaa" font-size="11" font-weight="500">${axis}</text>`;
+        labels += `<text x="${p.x}" y="${p.y + 14}" text-anchor="${anchor}" dominant-baseline="middle" fill="#c9a227" font-size="10" font-weight="600">${val >= 0 ? '+' : ''}${val.toFixed(2)}</text>`;
+      });
+
+      return `
+        <div class="stats-card">
+          <div class="stats-card-title">Goals Added (g+) Radar</div>
+          <div class="insights-explainer">Goals Added (g+) measures contribution across six GK action types. Larger area = stronger overall performance.</div>
+          <div class="radar-chart">
+            <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+              ${gridLines}
+              ${axisLines}
+              <polygon points="${dataPoints}" fill="rgba(201,162,39,0.2)" stroke="#c9a227" stroke-width="2"/>
+              ${labels}
+            </svg>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGkGameLog(gk) {
+      if (!gk.games || gk.games.length === 0) {
+        return '';
+      }
+
+      const rows = gk.games.map(game => {
+        const resultClass = game.result === 'W' ? 'win' : game.result === 'L' ? 'loss' : 'draw';
+        const gp = game.goalsMinusXgoals;
+        const gpColor = gp !== null ? (gp <= 0 ? 'good' : 'bad') : '';
+        const gpText = gp !== null ? (gp >= 0 ? '+' : '') + gp.toFixed(2) : '-';
+        const gaTotal = game.goalsAddedTotal != null ? (game.goalsAddedTotal >= 0 ? '+' : '') + game.goalsAddedTotal.toFixed(2) : '-';
+        const gaTotalColor = game.goalsAddedTotal != null ? (game.goalsAddedTotal >= 0 ? 'good' : 'bad') : '';
+
+        const scoreText = game.isHome
+          ? `<span>${game.atlScore}</span> - ${game.oppScore}`
+          : `${game.oppScore} - <span>${game.atlScore}</span>`;
+        const venueLabel = game.isHome ? 'vs' : 'at';
+
+        return `
+          <div class="gk-game-row ${resultClass}">
+            <div class="gk-game-info">
+              <div class="gk-game-date">${formatDateLong(game.date)}</div>
+              <div class="gk-game-matchup">${venueLabel} ${game.opponent} ${scoreText}</div>
+            </div>
+            <div class="gk-game-stats">
+              <div class="gk-game-stat">
+                <div class="gk-game-stat-value">${game.shotsFaced}</div>
+                <div class="gk-game-stat-label">Shots</div>
+              </div>
+              <div class="gk-game-stat">
+                <div class="gk-game-stat-value">${game.saves}</div>
+                <div class="gk-game-stat-label">Saves</div>
+              </div>
+              <div class="gk-game-stat">
+                <div class="gk-game-stat-value ${gpColor}">${gpText}</div>
+                <div class="gk-game-stat-label">Goals Prev.</div>
+              </div>
+              <div class="gk-game-stat">
+                <div class="gk-game-stat-value ${gaTotalColor}">${gaTotal}</div>
+                <div class="gk-game-stat-label">g+ Total</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="gk-game-log">
+          <div class="gk-game-log-title">Game Log</div>
+          ${rows}
+        </div>
+      `;
+    }
+
+    async function init() {
+      const defaultSeason = getCurrentSeason();
+      const availableSeasons = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+
+      document.getElementById('heroSeasonLabel').textContent = defaultSeason + ' Season';
+      populateSeasonSelector(availableSeasons, defaultSeason);
+
+      const data = await loadGoalkeeperData(defaultSeason);
+      if (data && data.availableSeasons) {
+        populateSeasonSelector(data.availableSeasons, defaultSeason);
+      }
+      renderPage(data);
+    }
+
+    init();
+  </script>
+</body>
+</html>

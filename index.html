@@ -1528,6 +1528,7 @@
         <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
       </a>
       <nav class="nav-section">
+        <a href="/goalkeeper.html" class="nav-link">Goalkeepers</a>
         <a href="#" id="randomOpponentLink" class="nav-link" style="display:none;">Random Opponent →</a>
         <span class="nav-title">Match History + xG Analytics</span>
       </nav>
@@ -2236,7 +2237,7 @@
         ? (gMinusXg <= 0 ? 'var(--win)' : 'var(--loss)')
         : 'var(--gray-300)';
 
-      return `
+      let html = `
         <div class="gk-name">${gk.name}</div>
         <div class="gk-stats-grid">
           <div class="gk-stat-box">
@@ -2263,6 +2264,146 @@
             <div class="gk-stat-value" style="color: ${gMinusXgColor}">${gMinusXg != null ? (gMinusXg >= 0 ? '+' : '') + gMinusXg.toFixed(2) : '-'}</div>
             <div class="gk-stat-label">Goals - xG</div>
           </div>
+        </div>
+      `;
+
+      // Mini goals-prevented meter
+      html += `<div class="analytics-row" style="margin-top: var(--space-md);">`;
+      html += `<div class="analytics-mini-card">
+        <div class="mini-card-title">Goals Prevented</div>
+        ${renderMiniGkLuckMeter(gk.goalsMinusXgoals, gk.goalsConceded, gk.xgoalsFaced)}
+      </div>`;
+
+      // Mini GK g+ radar
+      html += `<div class="analytics-mini-card">
+        <div class="mini-card-title">GK Goals Added</div>
+        ${renderMiniGkRadar(gk.goalsAdded)}
+      </div>`;
+      html += `</div>`;
+
+      return html;
+    }
+
+    // Mini GK Goals Prevented Meter (negative = good for GK)
+    function renderMiniGkLuckMeter(goalsMinusXg, goalsConceded, xgFaced) {
+      if (goalsMinusXg === null || goalsMinusXg === undefined) {
+        return '<div class="analytics-no-data">No xG data</div>';
+      }
+
+      const value = goalsMinusXg;
+      const maxScale = Math.max(2, Math.ceil(Math.abs(value)));
+      const clamped = Math.max(-maxScale, Math.min(maxScale, value));
+      const pct = Math.abs(clamped) / maxScale * 50;
+      // For GK: negative = outperformed (green), positive = underperformed (red)
+      const isGood = value <= 0;
+      const colorClass = value < 0 ? 'positive' : value > 0 ? 'negative' : 'neutral';
+      const sign = value > 0 ? '+' : '';
+
+      let fillStyle;
+      if (value >= 0) {
+        fillStyle = `left: 50%; width: ${pct}%;`;
+      } else {
+        fillStyle = `left: ${50 - pct}%; width: ${pct}%;`;
+      }
+
+      // Invert colors: negative (left) = green/good, positive (right) = red/bad
+      const fillClass = isGood ? 'positive' : 'negative';
+
+      return `
+        <div class="mini-luck-value ${colorClass}">${sign}${value.toFixed(2)}</div>
+        <div class="mini-luck-container">
+          <div class="mini-luck-center"></div>
+          <div class="mini-luck-fill ${fillClass}" style="${fillStyle}"></div>
+        </div>
+        <div class="mini-luck-labels">
+          <span>Outperformed</span>
+          <span>0</span>
+          <span>Underperformed</span>
+        </div>
+        <div class="mini-luck-context">
+          <span><span class="mini-luck-context-label">Conceded: </span><span class="mini-luck-context-value">${goalsConceded != null ? goalsConceded : '-'}</span></span>
+          <span><span class="mini-luck-context-label">xG: </span><span class="mini-luck-context-value">${xgFaced != null ? xgFaced.toFixed(2) : '-'}</span></span>
+        </div>
+      `;
+    }
+
+    // Mini GK g+ Radar (6-axis: Claiming, Fielding, Handling, Passing, Shotstopping, Sweeping)
+    function renderMiniGkRadar(goalsAdded) {
+      if (!goalsAdded) {
+        return '<div class="analytics-no-data">No g+ data</div>';
+      }
+
+      const axes = ['Claiming', 'Fielding', 'Handling', 'Passing', 'Shotstopping', 'Sweeping'];
+      const shortLabels = ['Claim', 'Field', 'Hand', 'Pass', 'Shot', 'Sweep'];
+      const values = axes.map(a => {
+        const d = goalsAdded[a];
+        return d ? d.goalsAdded : 0;
+      });
+
+      if (values.every(v => v === 0) && Object.keys(goalsAdded).length === 0) {
+        return '<div class="analytics-no-data">No g+ data</div>';
+      }
+
+      const padding = 40;
+      const chartSize = 120;
+      const size = chartSize + padding * 2;
+      const cx = size / 2;
+      const cy = size / 2;
+      const maxRadius = chartSize / 2;
+      const levels = 3;
+
+      const absMax = Math.max(0.1, ...values.map(Math.abs));
+      const scale = maxRadius / absMax;
+
+      const angleOffset = -Math.PI / 2;
+      function getPoint(index, radius) {
+        const angle = (2 * Math.PI / axes.length) * index + angleOffset;
+        return {
+          x: cx + radius * Math.cos(angle),
+          y: cy + radius * Math.sin(angle)
+        };
+      }
+
+      let gridLines = '';
+      for (let l = 1; l <= levels; l++) {
+        const r = (maxRadius / levels) * l;
+        const ringPoints = axes.map((_, i) => {
+          const p = getPoint(i, r);
+          return `${p.x},${p.y}`;
+        }).join(' ');
+        gridLines += `<polygon points="${ringPoints}" fill="none" stroke="#333" stroke-width="0.5"/>`;
+      }
+
+      let axisLines = '';
+      axes.forEach((_, i) => {
+        const p = getPoint(i, maxRadius);
+        axisLines += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#333" stroke-width="0.5"/>`;
+      });
+
+      const dataPoints = values.map((v, i) => {
+        const r = Math.max(0, v) * scale;
+        const p = getPoint(i, r);
+        return `${p.x},${p.y}`;
+      }).join(' ');
+
+      const labelOffset = 16;
+      let labels = '';
+      axes.forEach((_, i) => {
+        const p = getPoint(i, maxRadius + labelOffset);
+        const val = values[i];
+        const anchor = Math.abs(p.x - cx) < 5 ? 'middle' : p.x > cx ? 'start' : 'end';
+        labels += `<text x="${p.x}" y="${p.y}" text-anchor="${anchor}" dominant-baseline="middle" fill="#aaa" font-size="9" font-weight="500">${shortLabels[i]}</text>`;
+        labels += `<text x="${p.x}" y="${p.y + 11}" text-anchor="${anchor}" dominant-baseline="middle" fill="#c9a227" font-size="8" font-weight="600">${val >= 0 ? '+' : ''}${val.toFixed(2)}</text>`;
+      });
+
+      return `
+        <div class="mini-radar">
+          <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+            ${gridLines}
+            ${axisLines}
+            <polygon points="${dataPoints}" fill="rgba(201,162,39,0.2)" stroke="#c9a227" stroke-width="1.5"/>
+            ${labels}
+          </svg>
         </div>
       `;
     }
