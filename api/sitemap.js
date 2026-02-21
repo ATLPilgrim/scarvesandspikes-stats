@@ -36,6 +36,7 @@ export default async function handler(req, res) {
     // Normalize opponent name to URL slug
     const normalizeOpponent = (name) => {
       return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '')
         .replace(/^fc-/, '')
