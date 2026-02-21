@@ -339,6 +339,23 @@
       color: var(--gold);
     }
 
+    .h2h-full-history {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 0.2s;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .h2h-full-history:hover {
+      color: var(--gold-light);
+    }
+
     .h2h-stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -947,6 +964,7 @@
     <section id="h2hSection" class="h2h-section">
       <div class="h2h-header">
         <h2 class="h2h-title">Head to Head vs <span id="h2hOpponent"></span></h2>
+        <a id="h2hFullHistory" class="h2h-full-history" href="#">View Full History →</a>
       </div>
       <div id="h2hStats" class="h2h-stats"></div>
     </section>
@@ -1144,6 +1162,7 @@
       const smashGrabs = h2hMatches.filter(m => m.xgVerdict === 'smash-and-grab').length;
 
       opponentEl.textContent = opponent;
+      document.getElementById('h2hFullHistory').href = '/opponent.html?team=' + encodeURIComponent(normalizeOpponent(opponent));
       section.classList.add('visible');
 
       statsEl.innerHTML = `
