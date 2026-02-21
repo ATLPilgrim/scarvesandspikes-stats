@@ -113,6 +113,19 @@
       gap: var(--space-lg);
     }
 
+    .nav-link {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover { color: var(--gold-light); }
+
     .nav-title {
       font-family: var(--font-display);
       font-size: 0.875rem;
@@ -554,6 +567,41 @@
       color: var(--loss);
     }
 
+    /* Expand Hint */
+    .expand-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--gray-800);
+      color: var(--gray-500);
+      font-size: 0.7rem;
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      gap: var(--space-xs);
+      transition: color 0.2s;
+    }
+
+    .match-card:hover .expand-hint { color: var(--gray-300); }
+
+    .expand-hint::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+      margin-bottom: 4px;
+    }
+
+    .match-card.expanded .expand-hint::after {
+      transform: rotate(-135deg);
+      margin-bottom: -2px;
+    }
+
     /* Expanded Match Details */
     .match-details {
       display: none;
@@ -821,6 +869,7 @@
         <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
       </a>
       <nav class="nav-section">
+        <a href="#" id="randomOpponentLink" class="nav-link" style="display:none;">Random Opponent →</a>
         <span class="nav-title">Match History + xG Analytics</span>
       </nav>
     </div>
@@ -931,6 +980,37 @@
     let matchesBySeasonCache = {};
     let availableSeasons = [];
     let currentLoadedSeason = null;
+    let allOpponentNames = [];
+
+    // Normalize opponent name to URL slug (mirrors api/opponent.js)
+    function normalizeOpponent(name) {
+      return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/^fc-/, '')
+        .replace(/-fc$/, '')
+        .replace(/-sc$/, '')
+        .replace(/^real-/, '')
+        .replace(/-cf$/, '');
+    }
+
+    // Setup random opponent link
+    function setupRandomOpponentLink(matches) {
+      allOpponentNames = [...new Set(matches.map(m => m.opponent))].sort();
+      const link = document.getElementById('randomOpponentLink');
+      if (allOpponentNames.length > 0) {
+        link.style.display = '';
+      }
+    }
+
+    // Attach random opponent click handler once
+    document.getElementById('randomOpponentLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      if (allOpponentNames.length === 0) return;
+      const randomName = allOpponentNames[Math.floor(Math.random() * allOpponentNames.length)];
+      window.location.href = '/opponent.html?team=' + encodeURIComponent(normalizeOpponent(randomName));
+    });
 
     // Format date for display
     function formatDate(dateStr) {
@@ -1151,6 +1231,7 @@
                   <span class="xg-value ${xgDiffClass}">${match.xgDiff !== null ? (match.xgDiff > 0 ? '+' : '') + match.xgDiff : '-'}</span>
                 </div>
               </div>
+              <div class="expand-hint"><span>Details</span></div>
             </div>
 
             <div class="match-details">
@@ -1302,6 +1383,7 @@
       }
 
       populateOpponentFilter(matches);
+      setupRandomOpponentLink(matches);
 
       let filtered = [...matches];
 
@@ -1344,6 +1426,7 @@
         document.getElementById('seasonFilter').value = defaultSeason;
 
         populateOpponentFilter(matches);
+        setupRandomOpponentLink(matches);
         updateSummary(matches);
         renderMatches(matches);
 

@@ -387,6 +387,41 @@
     .xg-value.positive { color: var(--win); }
     .xg-value.negative { color: var(--loss); }
 
+    /* Expand Hint */
+    .expand-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--gray-800);
+      color: var(--gray-500);
+      font-size: 0.7rem;
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      gap: var(--space-xs);
+      transition: color 0.2s;
+    }
+
+    .match-card:hover .expand-hint { color: var(--gray-300); }
+
+    .expand-hint::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+      margin-bottom: 4px;
+    }
+
+    .match-card.expanded .expand-hint::after {
+      transform: rotate(-135deg);
+      margin-bottom: -2px;
+    }
+
     /* Expanded Details */
     .match-details {
       display: none;
@@ -536,7 +571,8 @@
         <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
       </a>
       <nav class="nav-section">
-        <a href="/" class="nav-link">Match History</a>
+        <a href="/" class="nav-link">← Match History</a>
+        <a href="#" id="randomOpponentLink" class="nav-link">Random Opponent →</a>
       </nav>
     </div>
   </header>
@@ -760,6 +796,7 @@
                       <span class="xg-value ${xgDiffClass}">${match.xgDiff !== null ? (match.xgDiff > 0 ? '+' : '') + match.xgDiff : '-'}</span>
                     </div>
                   </div>
+                  <div class="expand-hint"><span>Details</span></div>
                 </div>
 
                 <div class="match-details">
@@ -852,10 +889,20 @@
           `${data.stats.totalMatches} Matches | ${data.stats.wins}W - ${data.stats.draws}D - ${data.stats.losses}L`;
 
         // Render content
-        document.getElementById('content').innerHTML = 
-          renderStats(data) + 
+        document.getElementById('content').innerHTML =
+          renderStats(data) +
           renderMatches(data.matches, data.opponentAbbr) +
           renderOpponentNav(data.allOpponents, data.slug);
+
+        // Wire up random opponent link
+        const currentSlug = data.slug;
+        const otherOpponents = data.allOpponents.filter(o => o.slug !== currentSlug);
+        document.getElementById('randomOpponentLink').addEventListener('click', function(e) {
+          e.preventDefault();
+          if (otherOpponents.length === 0) return;
+          const random = otherOpponents[Math.floor(Math.random() * otherOpponents.length)];
+          window.location.href = '/opponent.html?team=' + encodeURIComponent(random.slug);
+        });
 
       } catch (error) {
         console.error('Error:', error);
