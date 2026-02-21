@@ -820,6 +820,195 @@
       font-size: 1rem;
     }
 
+    /* Season Insights */
+    .insights-section {
+      display: none;
+      margin-bottom: var(--space-xl);
+    }
+
+    .insights-section.visible {
+      display: block;
+    }
+
+    .insights-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .insights-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--white);
+    }
+
+    .insights-season-label {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--burgundy);
+      color: var(--white);
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+    }
+
+    .insights-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .insights-card-title {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-sm);
+    }
+
+    .insights-explainer {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-bottom: var(--space-lg);
+      line-height: 1.4;
+    }
+
+    /* Luck Meter */
+    .luck-meter-container {
+      position: relative;
+      height: 32px;
+      background: var(--gray-800);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: var(--space-sm);
+    }
+
+    .luck-meter-center {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--gray-500);
+      z-index: 2;
+    }
+
+    .luck-meter-fill {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      border-radius: var(--radius-sm);
+      z-index: 1;
+      transition: width 0.6s ease, left 0.6s ease;
+    }
+
+    .luck-meter-fill.positive {
+      background: linear-gradient(90deg, var(--win), #43a047);
+      left: 50%;
+    }
+
+    .luck-meter-fill.negative {
+      background: linear-gradient(90deg, #e53935, var(--loss));
+      right: 50%;
+    }
+
+    .luck-meter-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: var(--space-sm);
+    }
+
+    .luck-meter-value.positive { color: var(--win); }
+    .luck-meter-value.negative { color: var(--loss); }
+    .luck-meter-value.neutral { color: var(--gray-400); }
+
+    .luck-meter-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .luck-meter-context {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+      margin-top: var(--space-lg);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--gray-800);
+    }
+
+    .luck-context-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .luck-context-label { color: var(--gray-500); }
+    .luck-context-value { color: var(--gray-200); font-weight: 600; }
+
+    /* Radar Chart */
+    .radar-chart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+    }
+
+    .radar-chart svg text {
+      font-family: var(--font-display);
+    }
+
+    /* Insights Loading & Empty */
+    .insights-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-lg);
+      color: var(--gray-400);
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .loading-spinner--small {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--gray-800);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .insights-no-data {
+      color: var(--gray-500);
+      font-size: 0.875rem;
+      text-align: center;
+      padding: var(--space-lg);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header-content {
@@ -865,6 +1054,10 @@
         grid-template-columns: repeat(2, 1fr);
       }
 
+      .insights-grid {
+        grid-template-columns: 1fr;
+      }
+
       .player-row {
         flex-direction: column;
         align-items: flex-start;
@@ -905,6 +1098,15 @@
   <main class="container">
     <!-- Summary Stats -->
     <div id="summary" class="summary"></div>
+
+    <!-- Season Insights -->
+    <section id="insightsSection" class="insights-section">
+      <div class="insights-header">
+        <h2 class="insights-title">Season Insights</h2>
+        <span class="insights-season-label" id="insightsSeasonLabel"></span>
+      </div>
+      <div id="insightsContent" class="insights-content"></div>
+    </section>
 
     <!-- Filters -->
     <section class="filters-section">
@@ -999,6 +1201,7 @@
     let availableSeasons = [];
     let currentLoadedSeason = null;
     let allOpponentNames = [];
+    let insightsCache = {};
 
     // Normalize opponent name to URL slug (mirrors api/opponent.js)
     function normalizeOpponent(name) {
@@ -1189,6 +1392,186 @@
         <div class="h2h-stat">
           <div class="h2h-stat-value">${robberies}/${smashGrabs}</div>
           <div class="h2h-stat-label">Robbed/Smash</div>
+        </div>
+      `;
+    }
+
+    // Season Insights functions
+    async function loadInsights(season) {
+      if (insightsCache[season]) return insightsCache[season];
+      try {
+        const response = await fetch(`/api/insights?season=${season}`);
+        if (!response.ok) return null;
+        const data = await response.json();
+        insightsCache[season] = data;
+        return data;
+      } catch (error) {
+        console.error('Error loading insights:', error);
+        return null;
+      }
+    }
+
+    function hideInsights() {
+      document.getElementById('insightsSection').classList.remove('visible');
+    }
+
+    function renderInsights(data, season) {
+      const section = document.getElementById('insightsSection');
+      const content = document.getElementById('insightsContent');
+      const label = document.getElementById('insightsSeasonLabel');
+
+      if (!data) {
+        hideInsights();
+        return;
+      }
+
+      label.textContent = season + ' Season';
+
+      const luckCard = data.luckValue !== null
+        ? renderLuckMeter(data.luckValue, data.context)
+        : '<div class="insights-no-data">No luck data available for this season</div>';
+
+      const radarKeys = Object.keys(data.radarData || {});
+      const radarCard = radarKeys.length > 0
+        ? renderRadarChart(data.radarData)
+        : '<div class="insights-no-data">No goals added data available for this season</div>';
+
+      content.innerHTML = `
+        <div class="insights-grid">
+          <div class="insights-card">
+            <div class="insights-card-title">Luck Meter</div>
+            <div class="insights-explainer">Points earned above or below expected points (xPoints). Positive = lucky, negative = unlucky.</div>
+            ${luckCard}
+          </div>
+          <div class="insights-card">
+            <div class="insights-card-title">Goals Added (g+) Radar</div>
+            <div class="insights-explainer">Team's goals added contribution by action type. Larger area = stronger overall performance.</div>
+            ${radarCard}
+          </div>
+        </div>
+      `;
+
+      section.classList.add('visible');
+    }
+
+    function renderLuckMeter(value, context) {
+      const maxScale = 10;
+      const clamped = Math.max(-maxScale, Math.min(maxScale, value));
+      const pct = Math.abs(clamped) / maxScale * 50;
+      const isPositive = value >= 0;
+      const colorClass = value > 0 ? 'positive' : value < 0 ? 'negative' : 'neutral';
+      const sign = value > 0 ? '+' : '';
+
+      let fillStyle;
+      if (isPositive) {
+        fillStyle = `left: 50%; width: ${pct}%;`;
+      } else {
+        fillStyle = `left: ${50 - pct}%; width: ${pct}%;`;
+      }
+
+      let contextHtml = '';
+      if (context) {
+        contextHtml = `
+          <div class="luck-meter-context">
+            ${context.points != null ? `<div class="luck-context-item"><span class="luck-context-label">Points</span><span class="luck-context-value">${context.points}</span></div>` : ''}
+            ${context.xpoints != null ? `<div class="luck-context-item"><span class="luck-context-label">xPoints</span><span class="luck-context-value">${context.xpoints}</span></div>` : ''}
+            ${context.goals_for != null ? `<div class="luck-context-item"><span class="luck-context-label">Goals For</span><span class="luck-context-value">${context.goals_for}</span></div>` : ''}
+            ${context.goals_against != null ? `<div class="luck-context-item"><span class="luck-context-label">Goals Against</span><span class="luck-context-value">${context.goals_against}</span></div>` : ''}
+            ${context.xgoals_for != null ? `<div class="luck-context-item"><span class="luck-context-label">xG For</span><span class="luck-context-value">${context.xgoals_for}</span></div>` : ''}
+            ${context.xgoals_against != null ? `<div class="luck-context-item"><span class="luck-context-label">xG Against</span><span class="luck-context-value">${context.xgoals_against}</span></div>` : ''}
+            ${context.games_played != null ? `<div class="luck-context-item"><span class="luck-context-label">Games Played</span><span class="luck-context-value">${context.games_played}</span></div>` : ''}
+          </div>
+        `;
+      }
+
+      return `
+        <div class="luck-meter-value ${colorClass}">${sign}${value.toFixed(1)}</div>
+        <div class="luck-meter-container">
+          <div class="luck-meter-center"></div>
+          <div class="luck-meter-fill ${isPositive ? 'positive' : 'negative'}" style="${fillStyle}"></div>
+        </div>
+        <div class="luck-meter-labels">
+          <span>Unlucky (-${maxScale})</span>
+          <span>0</span>
+          <span>Lucky (+${maxScale})</span>
+        </div>
+        ${contextHtml}
+      `;
+    }
+
+    function renderRadarChart(radarData) {
+      // 5 axes for the radar
+      const axes = ['Dribbling', 'Passing', 'Shooting', 'Interrupting', 'Receiving'];
+      const values = axes.map(a => {
+        const d = radarData[a];
+        return d ? d.goals_added_for : 0;
+      });
+
+      // SVG dimensions
+      const size = 280;
+      const cx = size / 2;
+      const cy = size / 2;
+      const maxRadius = 100;
+      const levels = 4;
+
+      // Determine scale: max absolute value across axes, minimum 2
+      const absMax = Math.max(2, ...values.map(Math.abs));
+      const scale = maxRadius / absMax;
+
+      // Calculate points for each axis
+      const angleOffset = -Math.PI / 2; // start from top
+      function getPoint(index, radius) {
+        const angle = (2 * Math.PI / axes.length) * index + angleOffset;
+        return {
+          x: cx + radius * Math.cos(angle),
+          y: cy + radius * Math.sin(angle)
+        };
+      }
+
+      // Build grid rings
+      let gridLines = '';
+      for (let l = 1; l <= levels; l++) {
+        const r = (maxRadius / levels) * l;
+        const ringPoints = axes.map((_, i) => {
+          const p = getPoint(i, r);
+          return `${p.x},${p.y}`;
+        }).join(' ');
+        gridLines += `<polygon points="${ringPoints}" fill="none" stroke="#333" stroke-width="0.5"/>`;
+      }
+
+      // Axis lines
+      let axisLines = '';
+      axes.forEach((_, i) => {
+        const p = getPoint(i, maxRadius);
+        axisLines += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#333" stroke-width="0.5"/>`;
+      });
+
+      // Data polygon
+      const dataPoints = values.map((v, i) => {
+        const r = Math.max(0, v) * scale;
+        const p = getPoint(i, r);
+        return `${p.x},${p.y}`;
+      }).join(' ');
+
+      // Labels positioned outside the chart
+      const labelOffset = 22;
+      let labels = '';
+      axes.forEach((axis, i) => {
+        const p = getPoint(i, maxRadius + labelOffset);
+        const val = values[i];
+        const anchor = Math.abs(p.x - cx) < 5 ? 'middle' : p.x > cx ? 'start' : 'end';
+        labels += `<text x="${p.x}" y="${p.y}" text-anchor="${anchor}" dominant-baseline="middle" fill="#aaa" font-size="11" font-weight="500">${axis}</text>`;
+        labels += `<text x="${p.x}" y="${p.y + 14}" text-anchor="${anchor}" dominant-baseline="middle" fill="#c9a227" font-size="10" font-weight="600">${val >= 0 ? '+' : ''}${val.toFixed(1)}</text>`;
+      });
+
+      return `
+        <div class="radar-chart">
+          <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+            ${gridLines}
+            ${axisLines}
+            <polygon points="${dataPoints}" fill="rgba(201,162,39,0.2)" stroke="#c9a227" stroke-width="2"/>
+            ${labels}
+          </svg>
         </div>
       `;
     }
@@ -1431,6 +1814,20 @@
       updateSummary(filtered);
       updateH2H(matches, opponent);
       renderMatches(filtered);
+
+      // Season Insights: show for specific season, hide for "all"
+      if (season !== 'all') {
+        const insightsContent = document.getElementById('insightsContent');
+        const insightsSection = document.getElementById('insightsSection');
+        if (!insightsCache[season]) {
+          insightsContent.innerHTML = '<div class="insights-loading"><div class="loading-spinner--small"></div><span>Loading Insights</span></div>';
+          insightsSection.classList.add('visible');
+        }
+        const insightsData = await loadInsights(season);
+        renderInsights(insightsData, season);
+      } else {
+        hideInsights();
+      }
     }
 
     // Initialize
@@ -1448,6 +1845,10 @@
         setupRandomOpponentLink(matches);
         updateSummary(matches);
         renderMatches(matches);
+
+        // Load season insights for default season
+        const insightsData = await loadInsights(defaultSeason);
+        renderInsights(insightsData, defaultSeason);
 
         // Add filter event listeners
         document.getElementById('seasonFilter').addEventListener('change', applyFilters);
