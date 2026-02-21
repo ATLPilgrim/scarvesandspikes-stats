@@ -14,6 +14,12 @@ Atlanta United match history and analytics dashboard. Displays complete match re
 - **Hosting/Deployment:** Vercel (auto-deploys from `main` branch)
 - **No package.json, no npm dependencies, no build tooling**
 
+## URLs
+
+- **Main stats page:** `https://scarvesandspikes-stats.vercel.app/`
+- **Opponent page:** `https://scarvesandspikes-stats.vercel.app/opponent.html?team={slug}`
+- **API endpoints** (`/api/matches`, `/api/opponent`) return raw JSON — they are not user-facing pages.
+
 ## Development
 
 There is no build step, test suite, or linter. The site is static HTML served by Vercel with serverless API functions. Deployment happens automatically when pushing to `main`.
@@ -36,12 +42,13 @@ Frontend pages fetch from local `/api/` endpoints. Those serverless functions ag
 - `opponent.html` — Opponent head-to-head page (same inline pattern)
 - `api/matches.js` — Primary data endpoint; fetches matches, teams, stadia, managers, referees, and player xG data from ASA API, joins by IDs, returns enriched match records. Supports `?season=` param (year, "all", or defaults to current).
 - `api/opponent.js` — Head-to-head endpoint; returns all matches vs a specific opponent with aggregate stats. Supports `?opponent=` param (team name slug). Normalizes team names (accent removal, suffix stripping).
-- `api/sitemap.js` — Dynamic XML sitemap for SEO.
+- `api/sitemap.js` — Dynamic XML sitemap for SEO. Has its own `normalizeOpponent` that must stay in sync with `opponent.js`.
 
 ### Patterns
 
 - **Parallel API fetching:** Serverless functions use `Promise.all()` to fetch multiple ASA endpoints concurrently.
 - **Data enrichment:** Raw API data is indexed into lookup maps, then joined by game_id/team_id/player_id to produce the final response.
+- **Opponent slug normalization:** Team names are lowercased, accents stripped via NFD normalization, then non-alphanumeric characters removed. This logic exists in both `opponent.js` and `sitemap.js` and must stay consistent.
 - **Client-side filtering:** Frontend caches fetched data in memory and applies filters (season, result, venue, competition, xG verdict) without refetching.
 - **Caching:** API responses use `Cache-Control` headers (`s-maxage=3600` for matches/opponent, `s-maxage=86400` for sitemap).
 
