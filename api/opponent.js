@@ -128,6 +128,7 @@ export default async function handler(req, res) {
     // Normalize opponent name for matching
     const normalizeOpponent = (name) => {
       return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove accents (é → e)
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '')
         .replace(/^fc-/, '')
