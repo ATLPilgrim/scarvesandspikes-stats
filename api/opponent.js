@@ -101,7 +101,7 @@ export default async function handler(req, res) {
           season: season,
           matchday: game.matchday,
           isHome,
-          isPlayoff: game.game_type !== 'Regular Season'
+          isPlayoff: game.game_type !== 'Regular Season',
           opponent: oppInfo.name,
           opponentAbbr: oppInfo.abbr,
           opponentId: oppId,
