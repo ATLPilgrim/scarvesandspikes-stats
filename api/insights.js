@@ -51,16 +51,17 @@ export default async function handler(req, res) {
       };
     }
 
-    // Build radar data from goals-added (grouped by action type)
+    // Build radar data from goals-added (nested: [{team_id, data: [{action_type, ...}]}])
     const radarData = {};
-    if (goalsAddedData && goalsAddedData.length > 0) {
-      goalsAddedData.forEach(entry => {
-        const action = entry.general_position || entry.action_type;
+    const teamGa = goalsAddedData && goalsAddedData.length > 0 ? goalsAddedData[0] : null;
+    if (teamGa && teamGa.data && teamGa.data.length > 0) {
+      teamGa.data.forEach(entry => {
+        const action = entry.action_type;
         if (action) {
           radarData[action] = {
             goals_added_for: entry.goals_added_for != null ? parseFloat(entry.goals_added_for.toFixed(2)) : 0,
             goals_added_against: entry.goals_added_against != null ? parseFloat(entry.goals_added_against.toFixed(2)) : 0,
-            count_games: entry.count_games || null
+            num_actions_for: entry.num_actions_for || null
           };
         }
       });
