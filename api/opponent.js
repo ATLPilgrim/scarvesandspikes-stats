@@ -74,12 +74,8 @@ export default async function handler(req, res) {
         const atlScore = isHome ? game.home_score : game.away_score;
         const oppScore = isHome ? game.away_score : game.home_score;
 
-        const atlXg = isHome
-          ? (xgData.home_xgoals !== undefined ? parseFloat(xgData.home_xgoals?.toFixed(2)) : null)
-          : (xgData.away_xgoals !== undefined ? parseFloat(xgData.away_xgoals?.toFixed(2)) : null);
-        const oppXg = isHome
-          ? (xgData.away_xgoals !== undefined ? parseFloat(xgData.away_xgoals?.toFixed(2)) : null)
-          : (xgData.home_xgoals !== undefined ? parseFloat(xgData.home_xgoals?.toFixed(2)) : null);
+        const atlXg = xgData.xgoals !== undefined ? parseFloat(xgData.xgoals.toFixed(2)) : null;
+        const oppXg = xgData.xgoals_against !== undefined ? parseFloat(xgData.xgoals_against.toFixed(2)) : null;
 
         let result = 'D';
         if (atlScore > oppScore) result = 'W';
@@ -101,7 +97,7 @@ export default async function handler(req, res) {
           season: season,
           matchday: game.matchday,
           isHome,
-          isPlayoff: game.game_type !== 'Regular Season',
+          isPlayoff: game.matchday === null || game.matchday === undefined || game.matchday > 34,
           opponent: oppInfo.name,
           opponentAbbr: oppInfo.abbr,
           opponentId: oppId,
