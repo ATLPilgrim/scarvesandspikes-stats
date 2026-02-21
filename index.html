@@ -1455,7 +1455,8 @@
     }
 
     function renderLuckMeter(value, context) {
-      const maxScale = 10;
+      // Dynamic scale: round up to nearest 5, minimum 10
+      const maxScale = Math.max(10, Math.ceil(Math.abs(value) / 5) * 5);
       const clamped = Math.max(-maxScale, Math.min(maxScale, value));
       const pct = Math.abs(clamped) / maxScale * 50;
       const isPositive = value >= 0;
@@ -1507,11 +1508,13 @@
         return d ? d.goals_added_for : 0;
       });
 
-      // SVG dimensions
-      const size = 280;
+      // SVG dimensions — padding around chart for labels
+      const padding = 60;
+      const chartSize = 200;
+      const size = chartSize + padding * 2;
       const cx = size / 2;
       const cy = size / 2;
-      const maxRadius = 100;
+      const maxRadius = chartSize / 2;
       const levels = 4;
 
       // Determine scale: max absolute value across axes, minimum 2
