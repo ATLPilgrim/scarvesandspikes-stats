@@ -74,8 +74,10 @@ export default async function handler(req, res) {
         const atlScore = isHome ? game.home_score : game.away_score;
         const oppScore = isHome ? game.away_score : game.home_score;
 
-        const atlXg = xgData.xgoals !== undefined ? parseFloat(xgData.xgoals.toFixed(2)) : null;
-        const oppXg = xgData.xgoals_against !== undefined ? parseFloat(xgData.xgoals_against.toFixed(2)) : null;
+        const atlXgRaw = isHome ? xgData.home_team_xgoals : xgData.away_team_xgoals;
+        const oppXgRaw = isHome ? xgData.away_team_xgoals : xgData.home_team_xgoals;
+        const atlXg = atlXgRaw ? parseFloat(atlXgRaw.toFixed(2)) : null;
+        const oppXg = oppXgRaw ? parseFloat(oppXgRaw.toFixed(2)) : null;
 
         let result = 'D';
         if (atlScore > oppScore) result = 'W';
@@ -97,7 +99,7 @@ export default async function handler(req, res) {
           season: season,
           matchday: game.matchday,
           isHome,
-          isPlayoff: game.matchday === null || game.matchday === undefined || game.matchday > 34,
+          isPlayoff: game.knockout_game,
           opponent: oppInfo.name,
           opponentAbbr: oppInfo.abbr,
           opponentId: oppId,
@@ -113,7 +115,7 @@ export default async function handler(req, res) {
           atlManager: managerMap[isHome ? game.home_manager_id : game.away_manager_id] || null,
           oppManager: managerMap[isHome ? game.away_manager_id : game.home_manager_id] || null,
           referee: refereeMap[game.referee_id] || null,
-          expandedMinutes: xgData.final_score_difference !== undefined ? xgData.expanded_minutes : null
+          expandedMinutes: game.expanded_minutes
         };
       });
     });
