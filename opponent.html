@@ -105,6 +105,11 @@
 
     .nav-link:hover { color: var(--gold-light); }
 
+    .nav-active {
+      color: var(--white);
+      cursor: default;
+    }
+
     /* Hero */
     .hero {
       background: linear-gradient(135deg, var(--burgundy-dark) 0%, var(--gray-950) 50%, var(--gray-900) 100%);
@@ -551,6 +556,125 @@
 
     .footer-credit { font-size: 0.75rem; color: var(--gray-600); }
 
+    /* Opponent Index Grid */
+    .opponent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-md);
+    }
+
+    .opponent-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-decoration: none;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .opponent-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--gold-dark);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .opponent-card-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .opponent-card-record {
+      display: flex;
+      gap: var(--space-lg);
+    }
+
+    .opponent-card-stat {
+      text-align: center;
+    }
+
+    .opponent-card-num {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .opponent-card-num.win { color: var(--win); }
+    .opponent-card-num.draw { color: var(--gray-400); }
+    .opponent-card-num.loss { color: var(--loss); }
+
+    .opponent-card-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-500);
+      margin-top: 2px;
+    }
+
+    .opponent-card-meta {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .opponent-card-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--gray-800);
+      overflow: hidden;
+      display: flex;
+    }
+
+    .opponent-card-bar-w { background: var(--win); }
+    .opponent-card-bar-d { background: var(--gray-500); }
+    .opponent-card-bar-l { background: var(--loss); }
+
+    /* Jump to Opponents Link */
+    .jump-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-decoration: none;
+      margin-bottom: var(--space-lg);
+      transition: color 0.2s;
+    }
+
+    .jump-link:hover { color: var(--gold-light); }
+
+    .jump-link::after {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      margin-bottom: 4px;
+    }
+
+    /* Index Total Counter */
+    .index-count {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-lg);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header-content { flex-direction: column; gap: var(--space-sm); }
@@ -560,6 +684,7 @@
       .score { font-size: 1.5rem; }
       .team-name { font-size: 1rem; }
       .stats-grid { grid-template-columns: 1fr; }
+      .opponent-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -573,7 +698,8 @@
       <nav class="nav-section">
         <a href="/" class="nav-link">Match History</a>
         <a href="/goalkeeper.html" class="nav-link">Goalkeepers</a>
-        <a href="#" id="randomOpponentLink" class="nav-link">Random Opponent</a>
+        <span class="nav-link nav-active" id="opponentsNavLabel">Opponents</span>
+        <a href="#" id="randomOpponentLink" class="nav-link" style="display:none;">Random Opponent</a>
       </nav>
     </div>
   </header>
@@ -581,8 +707,8 @@
   <!-- Hero (dynamic content) -->
   <section class="hero">
     <div class="hero-content">
-      <p class="hero-subtitle">Head to Head History</p>
-      <h1 class="hero-title" id="heroTitle">Atlanta United vs <span id="opponentName">...</span></h1>
+      <p class="hero-subtitle" id="heroSubtitle">Head to Head History</p>
+      <h1 class="hero-title" id="heroTitle">Pick an <span>Opponent</span></h1>
       <p class="hero-record" id="heroRecord"></p>
     </div>
   </section>
@@ -592,7 +718,7 @@
     <div id="content">
       <div class="loading">
         <div class="loading-spinner"></div>
-        <p class="loading-text">Loading History</p>
+        <p class="loading-text">Loading</p>
       </div>
     </div>
   </main>
@@ -627,10 +753,80 @@
       return num ? num.toLocaleString() : '-';
     }
 
+    // ── Index View (no team parameter) ──
+
+    function renderOpponentIndex(opponents) {
+      const cards = opponents.map(o => {
+        const total = o.wins + o.draws + o.losses;
+        const wPct = total > 0 ? (o.wins / total * 100) : 0;
+        const dPct = total > 0 ? (o.draws / total * 100) : 0;
+        const lPct = total > 0 ? (o.losses / total * 100) : 0;
+
+        return `
+          <a href="/opponent.html?team=${o.slug}" class="opponent-card">
+            <div class="opponent-card-name">${o.name}</div>
+            <div class="opponent-card-record">
+              <div class="opponent-card-stat">
+                <div class="opponent-card-num win">${o.wins}</div>
+                <div class="opponent-card-label">W</div>
+              </div>
+              <div class="opponent-card-stat">
+                <div class="opponent-card-num draw">${o.draws}</div>
+                <div class="opponent-card-label">D</div>
+              </div>
+              <div class="opponent-card-stat">
+                <div class="opponent-card-num loss">${o.losses}</div>
+                <div class="opponent-card-label">L</div>
+              </div>
+            </div>
+            <div class="opponent-card-bar">
+              <div class="opponent-card-bar-w" style="width:${wPct}%"></div>
+              <div class="opponent-card-bar-d" style="width:${dPct}%"></div>
+              <div class="opponent-card-bar-l" style="width:${lPct}%"></div>
+            </div>
+            <div class="opponent-card-meta">${total} matches</div>
+          </a>
+        `;
+      }).join('');
+
+      return `
+        <div class="index-count">${opponents.length} Opponents</div>
+        <div class="opponent-grid">
+          ${cards}
+        </div>
+      `;
+    }
+
+    async function loadOpponentIndex() {
+      try {
+        const response = await fetch('/api/opponents');
+        const data = await response.json();
+
+        if (!response.ok || !data.opponents) {
+          throw new Error('Failed to load opponents');
+        }
+
+        document.getElementById('heroRecord').textContent =
+          `${data.opponents.length} opponents faced since 2017`;
+        document.getElementById('content').innerHTML = renderOpponentIndex(data.opponents);
+
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('content').innerHTML = `
+          <div class="error-state">
+            <p>Error loading opponents. <a href="/" style="color: var(--gold);">Return to Match History</a></p>
+          </div>
+        `;
+      }
+    }
+
+    // ── Detail View (with team parameter) ──
+
     function renderStats(data) {
       const { stats, opponent, opponentAbbr } = data;
-      
+
       return `
+        <a href="#allOpponents" class="jump-link">View All Opponents</a>
         <div class="stats-grid">
           <div class="stats-card">
             <div class="stats-card-title">All-Time Record</div>
@@ -837,7 +1033,7 @@
 
     function renderOpponentNav(allOpponents, currentSlug) {
       return `
-        <div class="opponent-nav">
+        <div class="opponent-nav" id="allOpponents">
           <div class="opponent-nav-title">All Opponents</div>
           <div class="opponent-list">
             ${allOpponents.map(o => `
@@ -848,17 +1044,21 @@
       `;
     }
 
-    async function loadOpponentData() {
-      const opponent = getOpponentFromURL();
-      
-      if (!opponent) {
-        document.getElementById('content').innerHTML = `
-          <div class="error-state">
-            <p>No opponent specified. <a href="/" style="color: var(--gold);">Return to Match History</a></p>
-          </div>
-        `;
-        return;
-      }
+    async function loadOpponentDetail(opponent) {
+      // Switch hero to detail mode
+      document.getElementById('heroSubtitle').textContent = 'Head to Head History';
+      document.getElementById('heroTitle').innerHTML = 'Atlanta United vs <span id="opponentName">...</span>';
+
+      // Switch nav: Opponents becomes a link, not active
+      const navLabel = document.getElementById('opponentsNavLabel');
+      const link = document.createElement('a');
+      link.href = '/opponent.html';
+      link.className = 'nav-link';
+      link.textContent = 'Opponents';
+      navLabel.parentNode.replaceChild(link, navLabel);
+
+      // Show random opponent link
+      document.getElementById('randomOpponentLink').style.display = '';
 
       try {
         const response = await fetch(`/api/opponent?opponent=${encodeURIComponent(opponent)}`);
@@ -881,12 +1081,12 @@
 
         // Update page title and meta
         document.title = `Atlanta United vs ${data.opponent} - Head to Head History | ScarvesAndSpikes.com`;
-        document.querySelector('meta[name="description"]').content = 
+        document.querySelector('meta[name="description"]').content =
           `Complete head-to-head history: Atlanta United is ${data.stats.wins}-${data.stats.draws}-${data.stats.losses} against ${data.opponent} in MLS play. View all ${data.stats.totalMatches} matches with xG analytics.`;
 
         // Update hero
         document.getElementById('opponentName').textContent = data.opponent;
-        document.getElementById('heroRecord').textContent = 
+        document.getElementById('heroRecord').textContent =
           `${data.stats.totalMatches} Matches | ${data.stats.wins}W - ${data.stats.draws}D - ${data.stats.losses}L`;
 
         // Render content
@@ -915,7 +1115,15 @@
       }
     }
 
-    loadOpponentData();
+    // ── Route ──
+
+    const opponent = getOpponentFromURL();
+    if (opponent) {
+      loadOpponentDetail(opponent);
+    } else {
+      document.title = 'Atlanta United Opponents - Head to Head History | ScarvesAndSpikes.com';
+      loadOpponentIndex();
+    }
   </script>
 </body>
 </html>

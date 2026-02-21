@@ -1526,7 +1526,7 @@
       <nav class="nav-section">
         <span class="nav-link nav-active">Match History</span>
         <a href="/goalkeeper.html" class="nav-link">Goalkeepers</a>
-        <a href="#" id="randomOpponentLink" class="nav-link" style="display:none;">Random Opponent</a>
+        <a href="/opponent.html" class="nav-link">Opponents</a>
       </nav>
     </div>
   </header>
@@ -1646,7 +1646,7 @@
     let matchesBySeasonCache = {};
     let availableSeasons = [];
     let currentLoadedSeason = null;
-    let allOpponentNames = [];
+    function setupRandomOpponentLink() {} // No longer needed, opponents page handles this
     let insightsCache = {};
     let matchDetailsCache = {};
 
@@ -2416,23 +2416,6 @@
         .replace(/^real-/, '')
         .replace(/-cf$/, '');
     }
-
-    // Setup random opponent link
-    function setupRandomOpponentLink(matches) {
-      allOpponentNames = [...new Set(matches.map(m => m.opponent))].sort();
-      const link = document.getElementById('randomOpponentLink');
-      if (allOpponentNames.length > 0) {
-        link.style.display = '';
-      }
-    }
-
-    // Attach random opponent click handler once
-    document.getElementById('randomOpponentLink').addEventListener('click', function(e) {
-      e.preventDefault();
-      if (allOpponentNames.length === 0) return;
-      const randomName = allOpponentNames[Math.floor(Math.random() * allOpponentNames.length)];
-      window.location.href = '/opponent.html?team=' + encodeURIComponent(normalizeOpponent(randomName));
-    });
 
     // Format date for display
     function formatDate(dateStr) {
