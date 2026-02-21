@@ -1009,6 +1009,447 @@
       padding: var(--space-lg);
     }
 
+    /* Match Analytics (expanded card details) */
+    .match-analytics {
+      display: none;
+      padding: 0 var(--space-lg) var(--space-lg);
+      background: var(--gray-950);
+    }
+
+    .match-card.expanded .match-analytics {
+      display: block;
+    }
+
+    .match-analytics.loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-lg);
+      color: var(--gray-400);
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .analytics-group {
+      margin-top: var(--space-lg);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .analytics-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--gray-900);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .analytics-group-header:hover {
+      background: var(--gray-800);
+    }
+
+    .analytics-group-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+
+    .analytics-group-chevron {
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid var(--gray-400);
+      border-bottom: 2px solid var(--gray-400);
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+    }
+
+    .analytics-group.collapsed .analytics-group-chevron {
+      transform: rotate(-135deg);
+    }
+
+    .analytics-group-body {
+      padding: var(--space-md);
+    }
+
+    .analytics-group.collapsed .analytics-group-body {
+      display: none;
+    }
+
+    .analytics-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+    }
+
+    .analytics-mini-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+    }
+
+    .analytics-mini-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .mini-card-title {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* Mini Luck Meter */
+    .mini-luck-value {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: var(--space-xs);
+    }
+
+    .mini-luck-value.positive { color: var(--win); }
+    .mini-luck-value.negative { color: var(--loss); }
+    .mini-luck-value.neutral { color: var(--gray-400); }
+
+    .mini-luck-container {
+      position: relative;
+      height: 20px;
+      background: var(--gray-800);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: var(--space-xs);
+    }
+
+    .mini-luck-center {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--gray-500);
+      z-index: 2;
+    }
+
+    .mini-luck-fill {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      border-radius: 2px;
+      z-index: 1;
+    }
+
+    .mini-luck-fill.positive {
+      background: linear-gradient(90deg, var(--win), #43a047);
+      left: 50%;
+    }
+
+    .mini-luck-fill.negative {
+      background: linear-gradient(90deg, #e53935, var(--loss));
+    }
+
+    .mini-luck-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.55rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .mini-luck-context {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--gray-800);
+      font-size: 0.75rem;
+    }
+
+    .mini-luck-context-label { color: var(--gray-500); }
+    .mini-luck-context-value { color: var(--gray-200); font-weight: 600; }
+
+    /* Mini Radar */
+    .mini-radar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 160px;
+    }
+
+    .mini-radar svg text {
+      font-family: var(--font-display);
+    }
+
+    /* Passing Quality Bars */
+    .passing-bar-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .passing-bar-label {
+      font-size: 0.7rem;
+      color: var(--gray-400);
+      min-width: 50px;
+      text-align: right;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .passing-bar-track {
+      flex: 1;
+      height: 14px;
+      background: var(--gray-800);
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .passing-bar-fill {
+      height: 100%;
+      border-radius: 7px;
+      transition: width 0.4s ease;
+    }
+
+    .passing-bar-fill.actual {
+      background: var(--gold);
+    }
+
+    .passing-bar-fill.expected {
+      background: var(--gray-500);
+    }
+
+    .passing-bar-pct {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-200);
+      min-width: 36px;
+    }
+
+    /* Touch Share Bars */
+    .touch-bar-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: 6px;
+    }
+
+    .touch-bar-name {
+      font-size: 0.75rem;
+      color: var(--gray-200);
+      min-width: 100px;
+      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .touch-bar-track {
+      flex: 1;
+      height: 12px;
+      background: var(--gray-800);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .touch-bar-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 6px;
+      transition: width 0.4s ease;
+    }
+
+    .touch-bar-pct {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--gold);
+      min-width: 32px;
+    }
+
+    /* g+ Rows */
+    .gplus-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-sm);
+      margin-bottom: 4px;
+    }
+
+    .gplus-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-100);
+    }
+
+    .gplus-value {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .gplus-value.positive { color: var(--win); }
+    .gplus-value.negative { color: var(--loss); }
+
+    /* Big Number Display */
+    .big-number {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .big-number-unit {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* Shots Display */
+    .shots-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+      text-align: center;
+    }
+
+    .shots-stat-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .shots-stat-label {
+      font-size: 0.65rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* xPoints Section */
+    .xpoints-row {
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+
+    .xpoints-item-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .xpoints-item-label {
+      font-size: 0.65rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* GK Stats Grid */
+    .gk-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: var(--space-sm);
+      text-align: center;
+    }
+
+    .gk-stat-box {
+      padding: var(--space-sm);
+      background: var(--gray-800);
+      border-radius: var(--radius-sm);
+    }
+
+    .gk-stat-value {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .gk-stat-label {
+      font-size: 0.6rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .gk-name {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-200);
+      margin-bottom: var(--space-sm);
+      text-align: center;
+    }
+
+    /* Analytics No Data */
+    .analytics-no-data {
+      color: var(--gray-500);
+      font-size: 0.8rem;
+      text-align: center;
+      padding: var(--space-md);
+    }
+
+    /* Goal Contributors */
+    .goal-contributor-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-sm);
+      margin-bottom: 4px;
+    }
+
+    .goal-contributor-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-100);
+    }
+
+    .goal-contributor-stats {
+      display: flex;
+      gap: var(--space-md);
+      font-size: 0.75rem;
+    }
+
+    .goal-contributor-stats span {
+      color: var(--gray-300);
+    }
+
+    .goal-contributor-stats .value {
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--gold);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header-content {
@@ -1067,6 +1508,14 @@
       .player-stats {
         width: 100%;
         justify-content: space-between;
+      }
+
+      .analytics-row {
+        grid-template-columns: 1fr;
+      }
+
+      .touch-bar-name {
+        min-width: 70px;
       }
     }
   </style>
@@ -1202,6 +1651,621 @@
     let currentLoadedSeason = null;
     let allOpponentNames = [];
     let insightsCache = {};
+    let matchDetailsCache = {};
+
+    // Match Details: data layer
+    async function loadMatchDetails(season) {
+      if (matchDetailsCache[season]) return matchDetailsCache[season];
+      try {
+        const response = await fetch(`/api/match-details?season=${season}`);
+        if (!response.ok) return null;
+        const data = await response.json();
+        matchDetailsCache[season] = data.games || {};
+        return matchDetailsCache[season];
+      } catch (error) {
+        console.error('Error loading match details:', error);
+        return null;
+      }
+    }
+
+    function findMatchByGameId(gameId) {
+      for (const season of Object.keys(matchesBySeasonCache)) {
+        const matches = matchesBySeasonCache[season];
+        if (!matches) continue;
+        const match = matches.find(m => m.gameId === gameId);
+        if (match) return match;
+      }
+      return null;
+    }
+
+    // Card toggle
+    function toggleMatchCard(card) {
+      const wasExpanded = card.classList.contains('expanded');
+      card.classList.toggle('expanded');
+      if (!wasExpanded && !card.dataset.loaded) {
+        loadAndRenderAnalytics(card);
+      }
+    }
+
+    async function loadAndRenderAnalytics(card) {
+      const analyticsEl = card.querySelector('.match-analytics');
+      const gameId = card.dataset.gameId;
+      const season = card.dataset.season;
+
+      // Show loading
+      analyticsEl.innerHTML = '<div class="loading-spinner--small"></div><span>Loading Analytics</span>';
+      analyticsEl.classList.add('loading-state');
+
+      const games = await loadMatchDetails(season);
+      analyticsEl.classList.remove('loading-state');
+
+      const match = findMatchByGameId(gameId);
+      const details = games ? (games[gameId] || null) : null;
+
+      analyticsEl.innerHTML = renderMatchAnalytics(match, details);
+      card.dataset.loaded = 'true';
+
+      // Attach stopPropagation to group headers
+      analyticsEl.querySelectorAll('.analytics-group-header').forEach(header => {
+        header.addEventListener('click', function(e) {
+          e.stopPropagation();
+          this.parentElement.classList.toggle('collapsed');
+        });
+      });
+    }
+
+    // Main analytics renderer
+    function renderMatchAnalytics(match, details) {
+      if (!match && !details) {
+        return '<div class="analytics-no-data">No analytics data available for this match</div>';
+      }
+
+      const xpassPlayers = details ? details.xpass.filter(p => p.name !== 'Unknown') : [];
+      const goalsAddedPlayers = details ? details.goalsAdded.filter(p => p.name !== 'Unknown') : [];
+      const gkPlayers = details ? details.goalkeeper.filter(p => p.name !== 'Unknown') : [];
+
+      let html = '';
+
+      // Team Performance section
+      html += `
+        <div class="analytics-group">
+          <div class="analytics-group-header">
+            <span class="analytics-group-title">Team Performance</span>
+            <div class="analytics-group-chevron"></div>
+          </div>
+          <div class="analytics-group-body">
+            ${renderTeamPerformance(match, xpassPlayers, goalsAddedPlayers)}
+          </div>
+        </div>
+      `;
+
+      // Player Highlights section
+      html += `
+        <div class="analytics-group">
+          <div class="analytics-group-header">
+            <span class="analytics-group-title">Player Highlights</span>
+            <div class="analytics-group-chevron"></div>
+          </div>
+          <div class="analytics-group-body">
+            ${renderPlayerHighlights(match, xpassPlayers, goalsAddedPlayers)}
+          </div>
+        </div>
+      `;
+
+      // Goalkeeper section (only if data exists)
+      if (gkPlayers.length > 0) {
+        html += `
+          <div class="analytics-group">
+            <div class="analytics-group-header">
+              <span class="analytics-group-title">Goalkeeper</span>
+              <div class="analytics-group-chevron"></div>
+            </div>
+            <div class="analytics-group-body">
+              ${renderGoalkeeperSection(gkPlayers)}
+            </div>
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    // Team Performance (6 mini cards in 3 rows of 2)
+    function renderTeamPerformance(match, xpassPlayers, goalsAddedPlayers) {
+      return `
+        <div class="analytics-row">
+          <div class="analytics-mini-card">
+            <div class="mini-card-title">Goal Luck (Goals vs xG)</div>
+            ${renderMiniLuckMeter(match)}
+          </div>
+          <div class="analytics-mini-card">
+            <div class="mini-card-title">Goals Added Radar</div>
+            ${renderMiniRadarChart(goalsAddedPlayers)}
+          </div>
+        </div>
+        <div class="analytics-row" style="margin-top: var(--space-md);">
+          <div class="analytics-mini-card">
+            <div class="mini-card-title">Passing Quality</div>
+            ${renderPassingQuality(xpassPlayers)}
+          </div>
+          <div class="analytics-mini-card">
+            <div class="mini-card-title">Directness</div>
+            ${renderDirectness(xpassPlayers)}
+          </div>
+        </div>
+        <div class="analytics-row" style="margin-top: var(--space-md);">
+          <div class="analytics-mini-card">
+            <div class="mini-card-title">Shots</div>
+            ${renderShotsSection(match)}
+          </div>
+          <div class="analytics-mini-card">
+            <div class="mini-card-title">Expected Points</div>
+            ${renderXpointsSection(match)}
+          </div>
+        </div>
+      `;
+    }
+
+    // Mini Luck Meter (goals scored vs xG, not points vs xPoints)
+    function renderMiniLuckMeter(match) {
+      if (!match || match.atlXg === null) {
+        return '<div class="analytics-no-data">No xG data</div>';
+      }
+
+      const goalsScored = match.atlScore || 0;
+      const xg = match.atlXg;
+      const value = parseFloat((goalsScored - xg).toFixed(2));
+      const maxScale = Math.max(2, Math.ceil(Math.abs(value)));
+      const clamped = Math.max(-maxScale, Math.min(maxScale, value));
+      const pct = Math.abs(clamped) / maxScale * 50;
+      const isPositive = value >= 0;
+      const colorClass = value > 0 ? 'positive' : value < 0 ? 'negative' : 'neutral';
+      const sign = value > 0 ? '+' : '';
+
+      let fillStyle;
+      if (isPositive) {
+        fillStyle = `left: 50%; width: ${pct}%;`;
+      } else {
+        fillStyle = `left: ${50 - pct}%; width: ${pct}%;`;
+      }
+
+      return `
+        <div class="mini-luck-value ${colorClass}">${sign}${value.toFixed(1)}</div>
+        <div class="mini-luck-container">
+          <div class="mini-luck-center"></div>
+          <div class="mini-luck-fill ${isPositive ? 'positive' : 'negative'}" style="${fillStyle}"></div>
+        </div>
+        <div class="mini-luck-labels">
+          <span>-${maxScale}</span>
+          <span>0</span>
+          <span>+${maxScale}</span>
+        </div>
+        <div class="mini-luck-context">
+          <span><span class="mini-luck-context-label">Goals: </span><span class="mini-luck-context-value">${goalsScored}</span></span>
+          <span><span class="mini-luck-context-label">xG: </span><span class="mini-luck-context-value">${xg.toFixed(2)}</span></span>
+        </div>
+      `;
+    }
+
+    // Mini Radar Chart (aggregate player g+ by action type)
+    function renderMiniRadarChart(goalsAddedPlayers) {
+      if (!goalsAddedPlayers || goalsAddedPlayers.length === 0) {
+        return '<div class="analytics-no-data">No g+ data</div>';
+      }
+
+      const axes = ['Dribbling', 'Passing', 'Shooting', 'Interrupting', 'Receiving'];
+      const shortLabels = ['Drib', 'Pass', 'Shot', 'Int', 'Recv'];
+
+      // Aggregate g+ across all players for the match
+      const totals = {};
+      axes.forEach(a => totals[a] = 0);
+      goalsAddedPlayers.forEach(p => {
+        axes.forEach(a => {
+          if (p.actions && p.actions[a]) {
+            totals[a] += p.actions[a].goalsAdded;
+          }
+        });
+      });
+
+      const values = axes.map(a => parseFloat(totals[a].toFixed(3)));
+
+      const padding = 40;
+      const chartSize = 120;
+      const size = chartSize + padding * 2;
+      const cx = size / 2;
+      const cy = size / 2;
+      const maxRadius = chartSize / 2;
+      const levels = 3;
+
+      const absMax = Math.max(0.1, ...values.map(Math.abs));
+      const scale = maxRadius / absMax;
+
+      const angleOffset = -Math.PI / 2;
+      function getPoint(index, radius) {
+        const angle = (2 * Math.PI / axes.length) * index + angleOffset;
+        return {
+          x: cx + radius * Math.cos(angle),
+          y: cy + radius * Math.sin(angle)
+        };
+      }
+
+      let gridLines = '';
+      for (let l = 1; l <= levels; l++) {
+        const r = (maxRadius / levels) * l;
+        const ringPoints = axes.map((_, i) => {
+          const p = getPoint(i, r);
+          return `${p.x},${p.y}`;
+        }).join(' ');
+        gridLines += `<polygon points="${ringPoints}" fill="none" stroke="#333" stroke-width="0.5"/>`;
+      }
+
+      let axisLines = '';
+      axes.forEach((_, i) => {
+        const p = getPoint(i, maxRadius);
+        axisLines += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#333" stroke-width="0.5"/>`;
+      });
+
+      const dataPoints = values.map((v, i) => {
+        const r = Math.max(0, v) * scale;
+        const p = getPoint(i, r);
+        return `${p.x},${p.y}`;
+      }).join(' ');
+
+      const labelOffset = 16;
+      let labels = '';
+      axes.forEach((_, i) => {
+        const p = getPoint(i, maxRadius + labelOffset);
+        const val = values[i];
+        const anchor = Math.abs(p.x - cx) < 5 ? 'middle' : p.x > cx ? 'start' : 'end';
+        labels += `<text x="${p.x}" y="${p.y}" text-anchor="${anchor}" dominant-baseline="middle" fill="#aaa" font-size="9" font-weight="500">${shortLabels[i]}</text>`;
+        labels += `<text x="${p.x}" y="${p.y + 11}" text-anchor="${anchor}" dominant-baseline="middle" fill="#c9a227" font-size="8" font-weight="600">${val >= 0 ? '+' : ''}${val.toFixed(2)}</text>`;
+      });
+
+      return `
+        <div class="mini-radar">
+          <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+            ${gridLines}
+            ${axisLines}
+            <polygon points="${dataPoints}" fill="rgba(201,162,39,0.2)" stroke="#c9a227" stroke-width="1.5"/>
+            ${labels}
+          </svg>
+        </div>
+      `;
+    }
+
+    // Passing Quality (actual vs xPass completion)
+    function renderPassingQuality(xpassPlayers) {
+      if (!xpassPlayers || xpassPlayers.length === 0) {
+        return '<div class="analytics-no-data">No passing data</div>';
+      }
+
+      // Weighted average by attempted passes
+      let totalPasses = 0;
+      let weightedActual = 0;
+      let weightedExpected = 0;
+      xpassPlayers.forEach(p => {
+        const passes = p.attemptedPasses || 0;
+        totalPasses += passes;
+        weightedActual += (p.passCompletion || 0) * passes;
+        weightedExpected += (p.xpassCompletion || 0) * passes;
+      });
+
+      if (totalPasses === 0) {
+        return '<div class="analytics-no-data">No passing data</div>';
+      }
+
+      const actualPct = (weightedActual / totalPasses) * 100;
+      const expectedPct = (weightedExpected / totalPasses) * 100;
+      const diff = actualPct - expectedPct;
+      const diffColor = diff >= 0 ? 'var(--win)' : 'var(--loss)';
+      const diffSign = diff >= 0 ? '+' : '';
+
+      return `
+        <div class="passing-bar-row">
+          <span class="passing-bar-label">Actual</span>
+          <div class="passing-bar-track">
+            <div class="passing-bar-fill actual" style="width: ${actualPct}%"></div>
+          </div>
+          <span class="passing-bar-pct">${actualPct.toFixed(1)}%</span>
+        </div>
+        <div class="passing-bar-row">
+          <span class="passing-bar-label">xPass</span>
+          <div class="passing-bar-track">
+            <div class="passing-bar-fill expected" style="width: ${expectedPct}%"></div>
+          </div>
+          <span class="passing-bar-pct">${expectedPct.toFixed(1)}%</span>
+        </div>
+        <div style="text-align: center; margin-top: var(--space-xs); font-size: 0.75rem;">
+          <span style="color: ${diffColor}; font-weight: 600;">${diffSign}${diff.toFixed(1)}%</span>
+          <span style="color: var(--gray-500);"> vs expected</span>
+        </div>
+      `;
+    }
+
+    // Directness (weighted avg vertical distance)
+    function renderDirectness(xpassPlayers) {
+      if (!xpassPlayers || xpassPlayers.length === 0) {
+        return '<div class="analytics-no-data">No passing data</div>';
+      }
+
+      let totalPasses = 0;
+      let weightedDistance = 0;
+      xpassPlayers.forEach(p => {
+        const passes = p.attemptedPasses || 0;
+        totalPasses += passes;
+        weightedDistance += (p.avgVerticalDistance || 0) * passes;
+      });
+
+      if (totalPasses === 0) {
+        return '<div class="analytics-no-data">No passing data</div>';
+      }
+
+      const avgDistance = weightedDistance / totalPasses;
+
+      return `
+        <div class="big-number">${avgDistance.toFixed(1)}
+          <span class="big-number-unit">Avg Vertical Yards per Pass</span>
+        </div>
+      `;
+    }
+
+    // Shots section
+    function renderShotsSection(match) {
+      if (!match || !match.players || match.players.length === 0) {
+        return '<div class="analytics-no-data">No shot data</div>';
+      }
+
+      let totalShots = 0;
+      let totalOnTarget = 0;
+      match.players.forEach(p => {
+        totalShots += (p.shots || 0);
+        totalOnTarget += (p.shotsOnTarget || 0);
+      });
+
+      const accuracy = totalShots > 0 ? ((totalOnTarget / totalShots) * 100).toFixed(0) : 0;
+
+      return `
+        <div class="shots-grid">
+          <div>
+            <div class="shots-stat-value">${totalShots}</div>
+            <div class="shots-stat-label">Total Shots</div>
+          </div>
+          <div>
+            <div class="shots-stat-value">${totalOnTarget}</div>
+            <div class="shots-stat-label">On Target</div>
+          </div>
+          <div>
+            <div class="shots-stat-value">${accuracy}%</div>
+            <div class="shots-stat-label">Accuracy</div>
+          </div>
+          <div>
+            <div class="shots-stat-value">${match.atlScore || 0}</div>
+            <div class="shots-stat-label">Goals</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // xPoints section
+    function renderXpointsSection(match) {
+      if (!match || match.atlXpoints === null) {
+        return '<div class="analytics-no-data">No xPoints data</div>';
+      }
+
+      const actualPoints = match.result === 'W' ? 3 : match.result === 'D' ? 1 : 0;
+      const diff = actualPoints - match.atlXpoints;
+      const diffColor = diff >= 0 ? 'var(--win)' : 'var(--loss)';
+      const diffSign = diff >= 0 ? '+' : '';
+
+      return `
+        <div class="xpoints-row">
+          <div>
+            <div class="xpoints-item-value" style="color: var(--gold);">${actualPoints}</div>
+            <div class="xpoints-item-label">Actual Pts</div>
+          </div>
+          <div>
+            <div class="xpoints-item-value" style="color: var(--gray-300);">${match.atlXpoints.toFixed(1)}</div>
+            <div class="xpoints-item-label">xPoints</div>
+          </div>
+          <div>
+            <div class="xpoints-item-value" style="color: ${diffColor};">${diffSign}${diff.toFixed(1)}</div>
+            <div class="xpoints-item-label">Diff</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Player Highlights (4 full-width cards)
+    function renderPlayerHighlights(match, xpassPlayers, goalsAddedPlayers) {
+      return `
+        <div class="analytics-row">
+          <div class="analytics-mini-card full-width">
+            <div class="mini-card-title">Touch Share</div>
+            ${renderTouchShare(xpassPlayers)}
+          </div>
+        </div>
+        <div class="analytics-row" style="margin-top: var(--space-md);">
+          <div class="analytics-mini-card full-width">
+            <div class="mini-card-title">Goal Contributors</div>
+            ${renderGoalContributors(match)}
+          </div>
+        </div>
+        <div class="analytics-row" style="margin-top: var(--space-md);">
+          <div class="analytics-mini-card full-width">
+            <div class="mini-card-title">Top g+ Contributors</div>
+            ${renderGplusContributors(goalsAddedPlayers)}
+          </div>
+        </div>
+        <div class="analytics-row" style="margin-top: var(--space-md);">
+          <div class="analytics-mini-card full-width">
+            <div class="mini-card-title">Best Passers (vs Expected)</div>
+            ${renderKeyPassers(xpassPlayers)}
+          </div>
+        </div>
+      `;
+    }
+
+    // Touch Share (top 5 by touch share)
+    function renderTouchShare(xpassPlayers) {
+      if (!xpassPlayers || xpassPlayers.length === 0) {
+        return '<div class="analytics-no-data">No touch data</div>';
+      }
+
+      const sorted = [...xpassPlayers]
+        .filter(p => p.touchShare > 0)
+        .sort((a, b) => b.touchShare - a.touchShare)
+        .slice(0, 5);
+
+      if (sorted.length === 0) {
+        return '<div class="analytics-no-data">No touch data</div>';
+      }
+
+      const maxShare = sorted[0].touchShare;
+
+      return sorted.map(p => {
+        const pct = (p.touchShare * 100).toFixed(1);
+        const barWidth = (p.touchShare / maxShare) * 100;
+        return `
+          <div class="touch-bar-row">
+            <span class="touch-bar-name">${p.name}</span>
+            <div class="touch-bar-track">
+              <div class="touch-bar-fill" style="width: ${barWidth}%"></div>
+            </div>
+            <span class="touch-bar-pct">${pct}%</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Goal Contributors (from existing player data)
+    function renderGoalContributors(match) {
+      if (!match || !match.players || match.players.length === 0) {
+        return '<div class="analytics-no-data">No player data</div>';
+      }
+
+      const contributors = match.players.filter(p => (p.goals > 0) || (p.assists > 0));
+
+      if (contributors.length === 0) {
+        return '<div class="analytics-no-data">No goals or assists in this match</div>';
+      }
+
+      return contributors.map(p => {
+        const stats = [];
+        if (p.goals > 0) stats.push(`<span>${p.goals}G</span> <span class="value">(${p.xg ? p.xg.toFixed(2) : '0.00'} xG)</span>`);
+        if (p.assists > 0) stats.push(`<span>${p.assists}A</span> <span class="value">(${p.xa ? p.xa.toFixed(2) : '0.00'} xA)</span>`);
+        return `
+          <div class="goal-contributor-row">
+            <span class="goal-contributor-name">${p.name}</span>
+            <div class="goal-contributor-stats">${stats.join(' ')}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // g+ Contributors (top 5 by total goals_added_raw)
+    function renderGplusContributors(goalsAddedPlayers) {
+      if (!goalsAddedPlayers || goalsAddedPlayers.length === 0) {
+        return '<div class="analytics-no-data">No g+ data</div>';
+      }
+
+      const withTotal = goalsAddedPlayers.map(p => {
+        let total = 0;
+        if (p.actions) {
+          Object.values(p.actions).forEach(a => {
+            total += a.goalsAdded || 0;
+          });
+        }
+        return { name: p.name, total: parseFloat(total.toFixed(3)) };
+      });
+
+      const sorted = withTotal.sort((a, b) => b.total - a.total).slice(0, 5);
+
+      return sorted.map(p => {
+        const sign = p.total >= 0 ? '+' : '';
+        const colorClass = p.total >= 0 ? 'positive' : 'negative';
+        return `
+          <div class="gplus-row">
+            <span class="gplus-name">${p.name}</span>
+            <span class="gplus-value ${colorClass}">${sign}${p.total.toFixed(3)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Key Passers (top 5 by passes over expected, min 5 attempted passes)
+    function renderKeyPassers(xpassPlayers) {
+      if (!xpassPlayers || xpassPlayers.length === 0) {
+        return '<div class="analytics-no-data">No passing data</div>';
+      }
+
+      const qualified = xpassPlayers.filter(p => (p.attemptedPasses || 0) >= 5);
+
+      if (qualified.length === 0) {
+        return '<div class="analytics-no-data">No qualified passers (min 5 attempted)</div>';
+      }
+
+      const sorted = [...qualified]
+        .sort((a, b) => (b.passesOverExpected || 0) - (a.passesOverExpected || 0))
+        .slice(0, 5);
+
+      return sorted.map(p => {
+        const val = p.passesOverExpected || 0;
+        const sign = val >= 0 ? '+' : '';
+        const colorClass = val >= 0 ? 'positive' : 'negative';
+        return `
+          <div class="gplus-row">
+            <span class="gplus-name">${p.name}</span>
+            <span class="gplus-value ${colorClass}">${sign}${val.toFixed(1)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Goalkeeper section
+    function renderGoalkeeperSection(gkPlayers) {
+      if (!gkPlayers || gkPlayers.length === 0) {
+        return '<div class="analytics-no-data">No goalkeeper data</div>';
+      }
+
+      const gk = gkPlayers[0];
+      const saveRate = gk.shotsFaced > 0
+        ? ((gk.saves / gk.shotsFaced) * 100).toFixed(0)
+        : '-';
+      const gMinusXg = gk.goalsMinusXgoals;
+      const gMinusXgColor = gMinusXg !== null
+        ? (gMinusXg <= 0 ? 'var(--win)' : 'var(--loss)')
+        : 'var(--gray-300)';
+
+      return `
+        <div class="gk-name">${gk.name}</div>
+        <div class="gk-stats-grid">
+          <div class="gk-stat-box">
+            <div class="gk-stat-value">${gk.shotsFaced != null ? gk.shotsFaced : '-'}</div>
+            <div class="gk-stat-label">Shots Faced</div>
+          </div>
+          <div class="gk-stat-box">
+            <div class="gk-stat-value">${gk.saves != null ? gk.saves : '-'}</div>
+            <div class="gk-stat-label">Saves</div>
+          </div>
+          <div class="gk-stat-box">
+            <div class="gk-stat-value">${gk.goalsConceded != null ? gk.goalsConceded : '-'}</div>
+            <div class="gk-stat-label">Conceded</div>
+          </div>
+          <div class="gk-stat-box">
+            <div class="gk-stat-value">${saveRate}%</div>
+            <div class="gk-stat-label">Save Rate</div>
+          </div>
+          <div class="gk-stat-box">
+            <div class="gk-stat-value">${gk.xgoalsFaced != null ? gk.xgoalsFaced.toFixed(2) : '-'}</div>
+            <div class="gk-stat-label">xG Faced</div>
+          </div>
+          <div class="gk-stat-box">
+            <div class="gk-stat-value" style="color: ${gMinusXgColor}">${gMinusXg != null ? (gMinusXg >= 0 ? '+' : '') + gMinusXg.toFixed(2) : '-'}</div>
+            <div class="gk-stat-label">Goals - xG</div>
+          </div>
+        </div>
+      `;
+    }
 
     // Normalize opponent name to URL slug (mirrors api/opponent.js)
     function normalizeOpponent(name) {
@@ -1596,7 +2660,7 @@
         const venueText = match.isHome ? 'HOME' : 'AWAY';
 
         return `
-          <article class="match-card ${match.result.toLowerCase()}" onclick="this.classList.toggle('expanded')">
+          <article class="match-card ${match.result.toLowerCase()}" data-game-id="${match.gameId}" data-season="${match.season}" onclick="toggleMatchCard(this)">
             <div class="match-main">
               <div class="match-header">
                 <div class="match-meta">
@@ -1713,6 +2777,7 @@
               </div>
               ` : ''}
             </div>
+            <div class="match-analytics"></div>
           </article>
         `;
       }).join('');
