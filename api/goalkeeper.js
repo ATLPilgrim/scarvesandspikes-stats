@@ -175,7 +175,7 @@ export default async function handler(req, res) {
       return {
         name: playerMap[playerId] || 'Unknown',
         aggregate: {
-          gamesPlayed: record.count_games || 0,
+          gamesPlayed: games.length,
           minutesPlayed: record.minutes_played || 0,
           shotsFaced: record.shots_faced || 0,
           saves: record.saves || 0,

@@ -105,6 +105,11 @@
 
     .nav-link:hover { color: var(--gold-light); }
 
+    .nav-active {
+      color: var(--white);
+      cursor: default;
+    }
+
     /* Hero */
     .hero {
       background: linear-gradient(135deg, var(--burgundy-dark) 0%, var(--gray-950) 50%, var(--gray-900) 100%);
@@ -522,8 +527,8 @@
         <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
       </a>
       <nav class="nav-section">
-        <a href="/" class="nav-link">&larr; Match History</a>
-        <a href="/goalkeeper.html" class="nav-link" style="color: var(--white); cursor: default;">Goalkeepers</a>
+        <a href="/" class="nav-link">Match History</a>
+        <span class="nav-link nav-active">Goalkeepers</span>
       </nav>
     </div>
   </header>
@@ -571,8 +576,8 @@
       const now = new Date();
       const year = now.getFullYear();
       const month = now.getMonth();
-      // MLS season typically starts in Feb, so before Feb use previous year
-      return month < 1 ? year - 1 : year;
+      // MLS season typically starts in late Feb, so before March use previous year
+      return month < 2 ? year - 1 : year;
     }
 
     function formatDate(dateStr) {
@@ -613,19 +618,22 @@
         if (s === currentSeason) opt.selected = true;
         selector.appendChild(opt);
       });
-      selector.addEventListener('change', async () => {
-        const season = parseInt(selector.value);
-        document.getElementById('heroSeasonLabel').textContent = season + ' Season';
-        document.getElementById('content').innerHTML = `
-          <div class="loading">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Loading Goalkeeper Data</p>
-          </div>
-        `;
-        const data = await loadGoalkeeperData(season);
-        renderPage(data);
-      });
     }
+
+    // Attach change handler once (outside populateSeasonSelector to avoid stacking)
+    document.getElementById('seasonSelector').addEventListener('change', async () => {
+      const selector = document.getElementById('seasonSelector');
+      const season = parseInt(selector.value);
+      document.getElementById('heroSeasonLabel').textContent = season + ' Season';
+      document.getElementById('content').innerHTML = `
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Loading Goalkeeper Data</p>
+        </div>
+      `;
+      const data = await loadGoalkeeperData(season);
+      renderPage(data);
+    });
 
     function renderPage(data) {
       const content = document.getElementById('content');
