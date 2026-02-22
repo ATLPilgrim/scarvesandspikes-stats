@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=2000'),
       fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=3000'),
       ...seasons.map(season =>
-        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}`)
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}&split_by_games=true`)
       )
     ]);
 
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
       const ps = playerStats[pid];
       ps.seasons.add(record._season);
-      ps.appearances += record.games_played || 0;
+      ps.appearances += 1;
       ps.goals += record.goals || 0;
       ps.assists += record.primary_assists || 0;
       ps.minutes += record.minutes_played || 0;
