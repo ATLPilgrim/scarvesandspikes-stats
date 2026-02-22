@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     } else {
       // If no season requested, use current year unless it's early in the year (before March)
       // when the new season hasn't started yet
-      const defaultSeason = (new Date().getMonth() < 2) ? currentYear - 1 : currentYear;
+      const defaultSeason = currentYear;
       seasons = [requestedSeason || defaultSeason];
     }
 

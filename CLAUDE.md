@@ -16,8 +16,8 @@ Atlanta United match history and analytics dashboard. Displays complete match re
 
 ## URLs
 
-- **Main stats page:** `https://scarvesandspikes-stats.vercel.app/`
-- **Opponent page:** `https://scarvesandspikes-stats.vercel.app/opponent.html?team={slug}`
+- **Main stats page:** `https://stats.scarvesandspikes.com/`
+- **Opponent page:** `https://stats.scarvesandspikes.com/opponent.html?team={slug}`
 - **API endpoints** (`/api/matches`, `/api/opponent`) return raw JSON — they are not user-facing pages.
 
 ## Development

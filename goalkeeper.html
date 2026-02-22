@@ -574,11 +574,7 @@
     let gkDataCache = {};
 
     function getCurrentSeason() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth();
-      // MLS season typically starts in late Feb, so before March use previous year
-      return month < 2 ? year - 1 : year;
+      return new Date().getFullYear();
     }
 
     function formatDate(dateStr) {
@@ -911,7 +907,7 @@
 
     async function init() {
       const defaultSeason = getCurrentSeason();
-      const availableSeasons = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+      const availableSeasons = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
 
       document.getElementById('heroSeasonLabel').textContent = defaultSeason + ' Season';
       populateSeasonSelector(availableSeasons, defaultSeason);

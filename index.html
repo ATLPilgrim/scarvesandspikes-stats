@@ -3021,9 +3021,7 @@
     // Initialize
     async function init() {
       try {
-        const defaultSeason = new Date().getMonth() < 2
-          ? new Date().getFullYear() - 1
-          : new Date().getFullYear();
+        const defaultSeason = new Date().getFullYear();
 
         const matches = await loadSeason(defaultSeason);
 

@@ -7,10 +7,10 @@ export default async function handler(req, res) {
 
   try {
     const atlantaId = 'KAqBN0Vqbg';
-    const baseUrl = 'https://scarvesandspikes-stats.vercel.app';
+    const baseUrl = 'https://stats.scarvesandspikes.com';
     
     // Fetch all teams Atlanta has played
-    const seasons = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
+    const seasons = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026'];
     
     const [teamsRes, ...seasonResponses] = await Promise.all([
       fetch('https://app.americansocceranalysis.com/api/v1/mls/teams'),

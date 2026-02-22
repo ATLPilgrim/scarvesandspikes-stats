@@ -195,7 +195,7 @@ export default async function handler(req, res) {
     goalkeepers.sort((a, b) => b.aggregate.minutesPlayed - a.aggregate.minutesPlayed);
 
     // Available seasons
-    const availableSeasons = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+    const availableSeasons = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
 
     res.status(200).json({
       season: season,
