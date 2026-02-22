@@ -224,47 +224,44 @@
       margin-bottom: var(--space-md);
     }
 
-    /* Manager Stints */
-    .manager-stints {
+    /* Manager Cards */
+    .manager-list {
       display: flex;
+      flex-direction: column;
       gap: var(--space-md);
-      overflow-x: auto;
-      padding-bottom: var(--space-sm);
-      -webkit-overflow-scrolling: touch;
     }
 
-    .manager-stints::-webkit-scrollbar { height: 4px; }
-    .manager-stints::-webkit-scrollbar-track { background: var(--gray-900); }
-    .manager-stints::-webkit-scrollbar-thumb { background: var(--gray-700); border-radius: 2px; }
-
-    .manager-stint {
-      flex: 0 0 auto;
-      min-width: 160px;
+    .manager-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: var(--space-md);
       background: var(--gray-800);
       border: 1px solid var(--gray-700);
       border-radius: var(--radius-md);
-      padding: var(--space-md);
-      text-align: center;
+      padding: var(--space-md) var(--space-lg);
     }
 
-    .manager-stint-name {
+    .manager-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .manager-card-name {
       font-family: var(--font-display);
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 600;
       color: var(--white);
-      margin-bottom: var(--space-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
     }
 
-    .manager-stint-tenure {
-      font-size: 0.75rem;
-      color: var(--gray-400);
-      margin-bottom: var(--space-sm);
-    }
-
-    .manager-stint-badge {
+    .manager-card-badge {
       display: inline-block;
       font-family: var(--font-display);
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -272,26 +269,43 @@
       background: var(--gold);
       color: var(--black);
       border-radius: var(--radius-sm);
-      margin-bottom: var(--space-sm);
+      vertical-align: middle;
     }
 
-    .manager-stint-record {
-      font-family: var(--font-display);
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--gray-100);
-      margin-bottom: var(--space-xs);
-    }
-
-    .manager-stint-stats {
-      display: flex;
-      justify-content: center;
-      gap: var(--space-md);
+    .manager-card-tenure {
       font-size: 0.75rem;
       color: var(--gray-400);
     }
 
-    .manager-stint-stat-label {
+    .manager-card-stats {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .manager-card-record {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-100);
+    }
+
+    .manager-card-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 48px;
+    }
+
+    .manager-card-stat-value {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .manager-card-stat-label {
       font-size: 0.6rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -554,6 +568,15 @@
         grid-template-columns: 1fr;
       }
 
+      .manager-card {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+      }
+
+      .manager-card-stats {
+        justify-content: flex-start;
+      }
+
       .venue-split {
         grid-template-columns: 1fr;
       }
@@ -610,9 +633,17 @@
   <script>
     const safeNum = (val) => (typeof val === 'number' && !isNaN(val)) ? val : 0;
 
+    function parseYear(dateStr) {
+      if (!dateStr) return null;
+      const d = new Date(dateStr.replace(' UTC', 'Z').replace(' ', 'T'));
+      return isNaN(d.getTime()) ? null : d.getFullYear();
+    }
+
     function computeManagerStints(matches) {
       const sorted = [...matches].sort((a, b) => new Date(a.date) - new Date(b.date));
-      const stints = [];
+      const TATA = 'Gerardo Martino';
+      // First pass: collect raw stints
+      const rawStints = [];
       let current = null;
       let nullCount = 0;
 
@@ -624,22 +655,61 @@
         if (!current || current.manager !== match.atlManager) {
           current = {
             manager: match.atlManager,
-            startDate: match.date,
-            endDate: match.date,
-            startYear: new Date(match.date).getFullYear(),
-            endYear: new Date(match.date).getFullYear(),
+            startYear: parseYear(match.date),
+            endYear: parseYear(match.date),
             wins: 0, draws: 0, losses: 0
           };
-          stints.push(current);
+          rawStints.push(current);
         }
-        current.endDate = match.date;
-        current.endYear = new Date(match.date).getFullYear();
+        current.endYear = parseYear(match.date);
         if (match.result === 'W') current.wins++;
         else if (match.result === 'D') current.draws++;
         else if (match.result === 'L') current.losses++;
       }
 
-      return { stints, nullCount };
+      // Second pass: consolidate by name (except Tata gets separate entries)
+      const consolidated = [];
+      const merged = {};
+      let tataCount = 0;
+
+      for (const stint of rawStints) {
+        if (stint.manager === TATA) {
+          tataCount++;
+          consolidated.push({
+            ...stint,
+            label: tataCount === 1 ? `${TATA} (1st stint)` : `${TATA} (2nd stint)`,
+            order: consolidated.length
+          });
+        } else {
+          if (merged[stint.manager]) {
+            const m = merged[stint.manager];
+            m.endYear = stint.endYear;
+            m.wins += stint.wins;
+            m.draws += stint.draws;
+            m.losses += stint.losses;
+          } else {
+            const entry = {
+              ...stint,
+              label: stint.manager,
+              order: consolidated.length
+            };
+            merged[stint.manager] = entry;
+            consolidated.push(entry);
+          }
+        }
+      }
+
+      // Sort chronologically by first appearance
+      consolidated.sort((a, b) => a.order - b.order);
+
+      // Mark the last entry as current
+      const lastStint = rawStints[rawStints.length - 1];
+      if (lastStint) {
+        const lastConsolidated = consolidated[consolidated.length - 1];
+        if (lastConsolidated) lastConsolidated.isCurrent = true;
+      }
+
+      return { managers: consolidated, nullCount };
     }
 
     function computeSeasonStats(matches) {
@@ -745,32 +815,31 @@
     }
 
     function renderManagerRecords(data) {
-      const { stints, nullCount } = data;
-      const reversed = [...stints].reverse();
+      const { managers, nullCount } = data;
 
       let html = '<div class="club-stats-grid--full club-stats-card"><div class="club-stats-card-title">Manager Records</div>';
-      html += '<div class="manager-stints">';
+      html += '<div class="manager-list">';
 
-      reversed.forEach((stint, i) => {
-        const total = stint.wins + stint.draws + stint.losses;
-        const winPct = total ? ((stint.wins / total) * 100).toFixed(1) : '0.0';
-        const ppg = total ? ((stint.wins * 3 + stint.draws) / total).toFixed(2) : '0.00';
-        const tenure = stint.startYear === stint.endYear
-          ? `${stint.startYear}`
-          : `${stint.startYear}-${stint.endYear}`;
-        const isCurrent = i === 0;
+      for (const mgr of managers) {
+        const total = mgr.wins + mgr.draws + mgr.losses;
+        const winPct = total ? ((mgr.wins / total) * 100).toFixed(1) : '0.0';
+        const ppg = total ? ((mgr.wins * 3 + mgr.draws) / total).toFixed(2) : '0.00';
+        const tenure = mgr.isCurrent
+          ? (mgr.startYear ? `${mgr.startYear}-present` : '')
+          : (mgr.startYear === mgr.endYear ? `${mgr.startYear}` : `${mgr.startYear}-${mgr.endYear}`);
 
-        html += `<div class="manager-stint">`;
-        html += `<div class="manager-stint-name">${stint.manager}</div>`;
-        html += `<div class="manager-stint-tenure">${tenure}</div>`;
-        if (isCurrent) html += `<div class="manager-stint-badge">Current</div>`;
-        html += `<div class="manager-stint-record">${stint.wins}W-${stint.draws}D-${stint.losses}L</div>`;
-        html += `<div class="manager-stint-stats">`;
-        html += `<div><div class="manager-stint-stat-label">Win%</div>${winPct}%</div>`;
-        html += `<div><div class="manager-stint-stat-label">PPG</div>${ppg}</div>`;
+        html += `<div class="manager-card">`;
+        html += `<div class="manager-card-info">`;
+        html += `<div class="manager-card-name">${mgr.label}${mgr.isCurrent ? ' <span class="manager-card-badge">Current</span>' : ''}</div>`;
+        html += `<div class="manager-card-tenure">${tenure}</div>`;
+        html += `</div>`;
+        html += `<div class="manager-card-stats">`;
+        html += `<div class="manager-card-record">${mgr.wins}W-${mgr.draws}D-${mgr.losses}L</div>`;
+        html += `<div class="manager-card-stat"><div class="manager-card-stat-value">${winPct}%</div><div class="manager-card-stat-label">Win%</div></div>`;
+        html += `<div class="manager-card-stat"><div class="manager-card-stat-value">${ppg}</div><div class="manager-card-stat-label">PPG</div></div>`;
         html += `</div>`;
         html += `</div>`;
-      });
+      }
 
       html += '</div>';
       if (nullCount > 0) {
