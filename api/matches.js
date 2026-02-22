@@ -200,6 +200,7 @@ export default async function handler(req, res) {
         isHome: isHome,
         opponent: opponent.name,
         opponentAbbr: opponent.abbreviation,
+        opponentId: opponentId,
         atlScore: atlScore,
         oppScore: oppScore,
         result: result,
