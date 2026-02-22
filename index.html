@@ -984,6 +984,34 @@
       font-family: var(--font-display);
     }
 
+    /* Zone g+ Pitch Map */
+    .pitch-map-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pitch-map-container svg text {
+      font-family: var(--font-display);
+    }
+
+    .pitch-map-legend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+      font-size: 0.7rem;
+      color: var(--gray-400);
+    }
+
+    .pitch-map-legend-gradient {
+      width: 120px;
+      height: 12px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(90deg, #e53935, #333, #43a047);
+    }
+
     /* Insights Loading & Empty */
     .insights-loading {
       display: flex;
@@ -1696,6 +1724,7 @@
     let currentLoadedSeason = null;
     function setupRandomOpponentLink() {} // No longer needed, opponents page handles this
     let insightsCache = {};
+    let zoneGplusCache = {};
     let matchDetailsCache = {};
     let opponentDetailsCache = {};
 
@@ -2846,7 +2875,7 @@
       document.getElementById('insightsSection').classList.remove('visible');
     }
 
-    function renderInsights(data, season) {
+    function renderInsights(data, season, zoneData) {
       const section = document.getElementById('insightsSection');
       const content = document.getElementById('insightsContent');
       const label = document.getElementById('insightsSeasonLabel');
@@ -2867,6 +2896,8 @@
         ? renderRadarChart(data.radarData)
         : '<div class="insights-no-data">No goals added data available for this season</div>';
 
+      const pitchCard = renderPitchMap(zoneData);
+
       content.innerHTML = `
         <div class="insights-grid">
           <div class="insights-card">
@@ -2878,6 +2909,11 @@
             <div class="insights-card-title">Goals Added (g+) Radar</div>
             <div class="insights-explainer">Team's goals added contribution by action type. Larger area = stronger overall performance.</div>
             ${radarCard}
+          </div>
+          <div class="insights-card" style="grid-column: 1 / -1;">
+            <div class="insights-card-title">Zone g+ Pitch Map</div>
+            <div class="insights-explainer">Shows where on the pitch Atlanta creates or loses value. Greener = more goals added in that zone.</div>
+            ${pitchCard}
           </div>
         </div>
       `;
@@ -3014,6 +3050,143 @@
             <polygon points="${dataPoints}" fill="rgba(201,162,39,0.2)" stroke="#c9a227" stroke-width="2"/>
             ${labels}
           </svg>
+        </div>
+      `;
+    }
+
+    // Zone g+ Pitch Map
+    async function loadZoneGplus(season) {
+      if (zoneGplusCache[season]) return zoneGplusCache[season];
+      try {
+        const response = await fetch(`/api/zone-gplus?season=${season}`);
+        if (!response.ok) return null;
+        const data = await response.json();
+        zoneGplusCache[season] = data;
+        return data;
+      } catch (error) {
+        console.error('Error loading zone g+ data:', error);
+        return null;
+      }
+    }
+
+    function renderPitchMap(zoneData) {
+      if (!zoneData || !zoneData.zones) {
+        return '<div class="insights-no-data">No zone data available for this season</div>';
+      }
+
+      const zones = zoneData.zones;
+
+      // Find max absolute net value for color scaling
+      let absMax = 0;
+      for (let z = 1; z <= 30; z++) {
+        if (zones[z] && zones[z].net != null) {
+          absMax = Math.max(absMax, Math.abs(zones[z].net));
+        }
+      }
+      if (absMax === 0) absMax = 1;
+
+      // SVG dimensions
+      const pitchW = 360;
+      const pitchH = 240;
+      const pad = 10;
+      const svgW = pitchW + pad * 2;
+      const svgH = pitchH + pad * 2 + 30; // extra for labels
+
+      // Zone grid: 6 cols x 5 rows, numbered column-by-column
+      // Col 1 (zones 1-5) = defensive, Col 6 (zones 26-30) = attacking
+      // Atlanta attacks left-to-right
+      const cols = 6;
+      const rows = 5;
+      const cellW = pitchW / cols;
+      const cellH = pitchH / rows;
+
+      function zoneToGrid(z) {
+        const col = Math.floor((z - 1) / rows);
+        const row = (z - 1) % rows;
+        return { col, row };
+      }
+
+      function gplusColor(net) {
+        if (net == null) return 'rgba(50,50,50,0.5)';
+        const t = Math.min(1, Math.abs(net) / absMax);
+        const alpha = 0.2 + t * 0.7;
+        if (net > 0) {
+          // Green shades
+          const r = Math.round(67 - t * 30);
+          const g = Math.round(160 + t * 60);
+          const b = Math.round(71 - t * 20);
+          return `rgba(${r},${g},${b},${alpha})`;
+        } else if (net < 0) {
+          // Red shades
+          const r = Math.round(229 + t * 20);
+          const g = Math.round(57 - t * 30);
+          const b = Math.round(53 - t * 20);
+          return `rgba(${r},${g},${b},${alpha})`;
+        }
+        return 'rgba(50,50,50,0.3)';
+      }
+
+      // Build pitch outline and field markings
+      let fieldMarkings = `
+        <rect x="${pad}" y="${pad}" width="${pitchW}" height="${pitchH}" fill="none" stroke="#555" stroke-width="1.5" rx="2"/>
+        <line x1="${pad + pitchW / 2}" y1="${pad}" x2="${pad + pitchW / 2}" y2="${pad + pitchH}" stroke="#555" stroke-width="1"/>
+        <circle cx="${pad + pitchW / 2}" cy="${pad + pitchH / 2}" r="30" fill="none" stroke="#555" stroke-width="1"/>
+        <circle cx="${pad + pitchW / 2}" cy="${pad + pitchH / 2}" r="2" fill="#555"/>
+      `;
+
+      // Left penalty box (defensive)
+      const penW = 50;
+      const penH = 130;
+      const penY = pad + (pitchH - penH) / 2;
+      fieldMarkings += `<rect x="${pad}" y="${penY}" width="${penW}" height="${penH}" fill="none" stroke="#555" stroke-width="1"/>`;
+      // Left goal box
+      const goalW = 18;
+      const goalH = 60;
+      const goalY = pad + (pitchH - goalH) / 2;
+      fieldMarkings += `<rect x="${pad}" y="${goalY}" width="${goalW}" height="${goalH}" fill="none" stroke="#555" stroke-width="1"/>`;
+
+      // Right penalty box (attacking)
+      fieldMarkings += `<rect x="${pad + pitchW - penW}" y="${penY}" width="${penW}" height="${penH}" fill="none" stroke="#555" stroke-width="1"/>`;
+      // Right goal box
+      fieldMarkings += `<rect x="${pad + pitchW - goalW}" y="${goalY}" width="${goalW}" height="${goalH}" fill="none" stroke="#555" stroke-width="1"/>`;
+
+      // Build zone rectangles
+      let zoneRects = '';
+      for (let z = 1; z <= 30; z++) {
+        const { col, row } = zoneToGrid(z);
+        const x = pad + col * cellW;
+        const y = pad + row * cellH;
+        const data = zones[z];
+        const net = data ? data.net : null;
+        const color = gplusColor(net);
+        const netStr = net != null ? (net >= 0 ? '+' : '') + net.toFixed(2) : '—';
+
+        zoneRects += `
+          <rect x="${x + 1}" y="${y + 1}" width="${cellW - 2}" height="${cellH - 2}" fill="${color}" rx="3" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+          <text x="${x + cellW / 2}" y="${y + cellH / 2 + 1}" text-anchor="middle" dominant-baseline="middle" fill="white" font-size="11" font-weight="600" opacity="0.9">${netStr}</text>
+        `;
+      }
+
+      // Direction labels
+      const labelY = pad + pitchH + 18;
+      const labels = `
+        <text x="${pad + 8}" y="${labelY}" fill="#666" font-size="9" text-transform="uppercase" letter-spacing="0.1em">DEF</text>
+        <text x="${pad + pitchW - 8}" y="${labelY}" text-anchor="end" fill="#666" font-size="9" text-transform="uppercase" letter-spacing="0.1em">ATT</text>
+        <text x="${pad + pitchW / 2}" y="${labelY}" text-anchor="middle" fill="#555" font-size="8">← Defending · Attacking →</text>
+      `;
+
+      return `
+        <div class="pitch-map-container">
+          <svg viewBox="0 0 ${svgW} ${svgH}" width="100%" style="max-width: ${svgW}px;">
+            ${zoneRects}
+            ${fieldMarkings}
+            ${labels}
+          </svg>
+        </div>
+        <div class="pitch-map-legend">
+          <span>− g+</span>
+          <div class="pitch-map-legend-gradient"></div>
+          <span>+ g+</span>
         </div>
       `;
     }
@@ -3266,8 +3439,11 @@
           insightsContent.innerHTML = '<div class="insights-loading"><div class="loading-spinner--small"></div><span>Loading Insights</span></div>';
           insightsSection.classList.add('visible');
         }
-        const insightsData = await loadInsights(season);
-        renderInsights(insightsData, season);
+        const [insightsData, zoneData] = await Promise.all([
+          loadInsights(season),
+          loadZoneGplus(season)
+        ]);
+        renderInsights(insightsData, season, zoneData);
       } else {
         hideInsights();
       }
@@ -3288,8 +3464,11 @@
         renderMatches(matches);
 
         // Load season insights for default season
-        const insightsData = await loadInsights(defaultSeason);
-        renderInsights(insightsData, defaultSeason);
+        const [insightsData, zoneData] = await Promise.all([
+          loadInsights(defaultSeason),
+          loadZoneGplus(defaultSeason)
+        ]);
+        renderInsights(insightsData, defaultSeason, zoneData);
 
         // Add filter event listeners
         document.getElementById('seasonFilter').addEventListener('change', applyFilters);
