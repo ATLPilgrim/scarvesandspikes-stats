@@ -1,0 +1,1163 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Profile | Atlanta United | ScarvesAndSpikes.com</title>
+  <meta name="description" content="Atlanta United player analytics with per-season stats, expected goals, goals added radar, and game logs.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Player Profile | Atlanta United | ScarvesAndSpikes.com">
+  <meta property="og:description" content="Atlanta United player analytics with per-season stats, expected goals, goals added radar, and game logs.">
+  <meta property="og:image" content="https://stats.scarvesandspikes.com/badge_community.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Player Profile | Atlanta United | ScarvesAndSpikes.com">
+  <meta name="twitter:description" content="Atlanta United player analytics with per-season stats, expected goals, goals added radar, and game logs.">
+  <meta name="twitter:image" content="https://stats.scarvesandspikes.com/badge_community.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --burgundy: #80000a;
+      --burgundy-dark: #5a0007;
+      --burgundy-light: #a8192a;
+      --gold: #c9a227;
+      --gold-dark: #9a7a1a;
+      --gold-light: #e0bc4a;
+      --black: #0a0a0a;
+      --gray-950: #121212;
+      --gray-900: #1a1a1a;
+      --gray-800: #242424;
+      --gray-700: #333333;
+      --gray-600: #444444;
+      --gray-500: #666666;
+      --gray-400: #888888;
+      --gray-300: #aaaaaa;
+      --gray-200: #cccccc;
+      --gray-100: #e0e0e0;
+      --white: #ffffff;
+      --win: #2e7d32;
+      --loss: #c62828;
+      --draw: #666666;
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'Source Sans 3', sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--gray-100);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      background: linear-gradient(180deg, var(--gray-900) 0%, var(--black) 100%);
+      border-bottom: 1px solid var(--gray-800);
+      padding: var(--space-md) var(--space-lg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .logo-wordmark { height: 32px; width: auto; }
+
+    .nav-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .nav-link {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover { color: var(--gold-light); }
+
+    .nav-active {
+      color: var(--white);
+      cursor: default;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--burgundy-dark) 0%, var(--gray-950) 50%, var(--gray-900) 100%);
+      padding: var(--space-3xl) var(--space-lg);
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: var(--space-sm);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: var(--space-md);
+    }
+
+    .hero-meta {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .position-badge {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+    }
+
+    .position-badge.gk { background: var(--gold); color: var(--black); }
+    .position-badge.d { background: #1565c0; color: var(--white); }
+    .position-badge.m { background: #2e7d32; color: var(--white); }
+    .position-badge.f { background: #c62828; color: var(--white); }
+
+    .hero-record {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--gray-300);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      text-decoration: none;
+      margin-bottom: var(--space-lg);
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--gold-light); }
+
+    /* Season Selector */
+    .season-selector {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-xl);
+    }
+
+    .season-selector select {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--gray-800);
+      color: var(--gold);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-lg);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23c9a227' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    .season-selector select:hover { border-color: var(--gold); }
+
+    /* Analytics Grid */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    /* Stats Card */
+    .stats-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .stats-card-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--gray-800);
+    }
+
+    .insights-explainer {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-bottom: var(--space-lg);
+      line-height: 1.4;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) 0;
+    }
+
+    .stats-label {
+      font-size: 0.9rem;
+      color: var(--gray-300);
+    }
+
+    .stats-value {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .stats-value.win { color: var(--win); }
+    .stats-value.loss { color: var(--loss); }
+
+    /* xG Performance Meter */
+    .xg-meter-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: var(--space-sm);
+    }
+
+    .xg-meter-value.positive { color: var(--win); }
+    .xg-meter-value.negative { color: var(--loss); }
+    .xg-meter-value.neutral { color: var(--gray-400); }
+
+    .xg-meter-container {
+      position: relative;
+      height: 32px;
+      background: var(--gray-800);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: var(--space-sm);
+    }
+
+    .xg-meter-center {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--gray-500);
+      z-index: 2;
+    }
+
+    .xg-meter-fill {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      border-radius: var(--radius-sm);
+      z-index: 1;
+      transition: width 0.6s ease, left 0.6s ease;
+    }
+
+    .xg-meter-fill.positive {
+      background: linear-gradient(90deg, #43a047, var(--win));
+      right: 50%;
+    }
+
+    .xg-meter-fill.negative {
+      background: linear-gradient(90deg, var(--loss), #e53935);
+      left: 50%;
+    }
+
+    .xg-meter-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .xg-meter-context {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-sm);
+      margin-top: var(--space-lg);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--gray-800);
+    }
+
+    .xg-meter-context-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .xg-meter-context-label { color: var(--gray-500); }
+    .xg-meter-context-value { color: var(--gray-200); font-weight: 600; }
+
+    /* Radar Chart */
+    .radar-chart {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+    }
+
+    .radar-chart svg text {
+      font-family: var(--font-display);
+    }
+
+    /* Game Log */
+    .game-log {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .game-log-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-sm);
+    }
+
+    .game-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border-left: 4px solid var(--gray-500);
+      gap: var(--space-md);
+    }
+
+    .game-row.win { border-left-color: var(--win); }
+    .game-row.loss { border-left-color: var(--loss); }
+    .game-row.draw { border-left-color: var(--gray-500); }
+
+    .game-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 140px;
+    }
+
+    .game-date {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-400);
+    }
+
+    .game-matchup {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-100);
+    }
+
+    .game-matchup span { color: var(--gold); }
+
+    .game-stats {
+      display: flex;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .game-stat {
+      text-align: center;
+    }
+
+    .game-stat-value {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .game-stat-value.good { color: var(--win); }
+    .game-stat-value.bad { color: var(--loss); }
+
+    .game-stat-label {
+      font-size: 0.55rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Loading & Error States */
+    .loading, .error-state {
+      text-align: center;
+      padding: var(--space-3xl);
+      color: var(--gray-400);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--gray-800);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      margin-top: var(--space-md);
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .no-data-message {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 0.9rem;
+      padding: var(--space-2xl);
+    }
+
+    .error-state a { color: var(--gold); }
+
+    /* Footer */
+    .site-footer {
+      background: var(--gray-950);
+      border-top: 1px solid var(--gray-800);
+      padding: var(--space-2xl) var(--space-lg);
+      margin-top: var(--space-3xl);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .footer-logo { width: 140px; height: auto; opacity: 0.8; }
+
+    .footer-text { font-size: 0.875rem; color: var(--gray-500); max-width: 400px; }
+
+    .footer-link { color: var(--gold); text-decoration: none; }
+    .footer-link:hover { text-decoration: underline; }
+
+    .footer-credit { font-size: 0.75rem; color: var(--gray-600); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content { flex-direction: column; gap: var(--space-sm); }
+      .analytics-grid { grid-template-columns: 1fr; }
+      .game-row { flex-direction: column; align-items: flex-start; }
+      .game-stats { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-content">
+      <a href="https://scarvesandspikes.com" class="logo-link">
+        <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
+      </a>
+      <nav class="nav-section">
+        <a href="/" class="nav-link">Match History</a>
+        <a href="/goalkeeper.html" class="nav-link">Goalkeepers</a>
+        <a href="/players.html" class="nav-link nav-active">Players</a>
+        <a href="/opponent.html" class="nav-link">Opponents</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-subtitle">Player Profile</p>
+      <h1 class="hero-title" id="heroName"></h1>
+      <div class="hero-meta" id="heroMeta"></div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container">
+    <a href="/players.html" class="back-link">&larr; Back to All Players</a>
+
+    <!-- Season Selector -->
+    <div class="season-selector">
+      <select id="seasonSelector"></select>
+    </div>
+
+    <!-- Content Area -->
+    <div id="content">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading Player Data</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <img src="/badge_community.png" alt="Scarves and Spikes" class="footer-logo">
+      <p class="footer-text">
+        Built by <a href="https://scarvesandspikes.com" class="footer-link">ScarvesAndSpikes.com</a> for Atlanta United supporters who love diving deep into the numbers.
+      </p>
+      <p class="footer-credit">Data provided by <a href="https://americansocceranalysis.com" class="footer-link" target="_blank" rel="noopener">American Soccer Analysis</a></p>
+    </div>
+  </footer>
+
+  <script>
+    let playerDataCache = {};
+    let playerInfo = null;
+
+    function getSlug() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    function mapPosition(pos) {
+      if (!pos) return null;
+      const p = pos.toUpperCase();
+      if (p === 'GK') return 'GK';
+      if (['CB', 'FB', 'LB', 'RB'].includes(p)) return 'D';
+      if (['CM', 'DM', 'AM', 'W', 'LW', 'RW', 'WM', 'WF'].includes(p)) return 'M';
+      if (['ST', 'CF', 'FW'].includes(p)) return 'F';
+      return null;
+    }
+
+    function mapPositionLabel(pos) {
+      const map = {
+        'GK': 'Goalkeeper', 'CB': 'Center Back', 'FB': 'Full Back', 'LB': 'Left Back', 'RB': 'Right Back',
+        'CM': 'Central Midfielder', 'DM': 'Defensive Midfielder', 'AM': 'Attacking Midfielder',
+        'W': 'Winger', 'LW': 'Left Winger', 'RW': 'Right Winger', 'WM': 'Wide Midfielder', 'WF': 'Wing Forward',
+        'ST': 'Striker', 'CF': 'Center Forward', 'FW': 'Forward'
+      };
+      return map[pos] || pos || 'Unknown';
+    }
+
+    function formatDateLong(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr + 'T12:00:00');
+      if (isNaN(date.getTime())) return '-';
+      return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+
+    function isGK(position) {
+      return position === 'GK';
+    }
+
+    async function loadPlayerData(slug, season) {
+      const cacheKey = season || 'default';
+      if (playerDataCache[cacheKey]) return playerDataCache[cacheKey];
+      try {
+        const url = season
+          ? `/api/player-detail?slug=${slug}&season=${season}`
+          : `/api/player-detail?slug=${slug}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+          if (res.status === 404) return null;
+          throw new Error('Failed to fetch');
+        }
+        const data = await res.json();
+        playerDataCache[cacheKey] = data;
+        return data;
+      } catch (error) {
+        console.error('Error loading player data:', error);
+        return null;
+      }
+    }
+
+    function updateHero(player) {
+      document.getElementById('heroName').textContent = player.name;
+      document.title = `${player.name} | Atlanta United | ScarvesAndSpikes.com`;
+
+      const group = mapPosition(player.position);
+      const posClass = group ? group.toLowerCase() : '';
+      const posLabel = mapPositionLabel(player.position);
+      const career = player.career;
+
+      document.getElementById('heroMeta').innerHTML = `
+        <span class="position-badge ${posClass}">${posLabel}</span>
+        <span class="hero-record">${career.appearances} Apps | ${career.goals} Goals | ${player.seasonsRange}</span>
+      `;
+    }
+
+    function populateSeasonSelector(seasons, currentSeason) {
+      const selector = document.getElementById('seasonSelector');
+      selector.innerHTML = '';
+      seasons.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s + ' Season';
+        if (s === currentSeason) opt.selected = true;
+        selector.appendChild(opt);
+      });
+    }
+
+    function renderPage(data) {
+      const content = document.getElementById('content');
+      if (!data) {
+        content.innerHTML = '<div class="no-data-message">No data available for this season.</div>';
+        return;
+      }
+
+      const gk = isGK(data.player.position);
+      content.innerHTML = `
+        <div class="analytics-grid">
+          ${renderStatsCard(data, gk)}
+          ${renderXgMeter(data, gk)}
+          ${renderRadarChart(data, gk)}
+        </div>
+        ${renderGameLog(data, gk)}
+      `;
+    }
+
+    function renderStatsCard(data, gk) {
+      const agg = data.aggregate;
+
+      if (gk && agg.gk) {
+        const gkStats = agg.gk;
+        const goalsPrevented = gkStats.goalsPrevented;
+        const gpColor = goalsPrevented !== null
+          ? (goalsPrevented <= 0 ? 'win' : 'loss')
+          : '';
+
+        return `
+          <div class="stats-card">
+            <div class="stats-card-title">Season Stats</div>
+            <div class="insights-explainer">Goalkeeper stats for this season. Negative goals prevented means the keeper saved more than expected.</div>
+            <div class="stats-row">
+              <span class="stats-label">Appearances</span>
+              <span class="stats-value">${agg.appearances}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Minutes</span>
+              <span class="stats-value">${agg.minutes.toLocaleString()}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Shots Faced</span>
+              <span class="stats-value">${gkStats.shotsFaced}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Saves</span>
+              <span class="stats-value">${gkStats.saves}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Goals Conceded</span>
+              <span class="stats-value">${gkStats.goalsConceded}</span>
+            </div>
+            <div class="stats-row">
+              <span class="stats-label">Save %</span>
+              <span class="stats-value">${gkStats.savePercentage}%</span>
+            </div>
+            ${gkStats.xgoalsFaced != null ? `
+            <div class="stats-row">
+              <span class="stats-label">xG Faced</span>
+              <span class="stats-value">${gkStats.xgoalsFaced}</span>
+            </div>
+            ` : ''}
+            ${goalsPrevented != null ? `
+            <div class="stats-row">
+              <span class="stats-label">Goals Prevented</span>
+              <span class="stats-value ${gpColor}">${goalsPrevented >= 0 ? '+' : ''}${goalsPrevented.toFixed(2)}</span>
+            </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      // Outfield stats
+      const gMinusXg = agg.goalsMinusXgoals;
+      const gxgColor = gMinusXg > 0 ? 'win' : gMinusXg < 0 ? 'loss' : '';
+
+      return `
+        <div class="stats-card">
+          <div class="stats-card-title">Season Stats</div>
+          <div class="insights-explainer">Season aggregate stats including expected goals (xG) and expected assists (xA).</div>
+          <div class="stats-row">
+            <span class="stats-label">Appearances</span>
+            <span class="stats-value">${agg.appearances}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Minutes</span>
+            <span class="stats-value">${agg.minutes.toLocaleString()}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Goals</span>
+            <span class="stats-value">${agg.goals}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">xG</span>
+            <span class="stats-value">${agg.xgoals}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">G - xG</span>
+            <span class="stats-value ${gxgColor}">${gMinusXg >= 0 ? '+' : ''}${gMinusXg.toFixed(2)}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Shots</span>
+            <span class="stats-value">${agg.shots}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Shots on Target</span>
+            <span class="stats-value">${agg.shotsOnTarget}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Assists</span>
+            <span class="stats-value">${agg.assists}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">xA</span>
+            <span class="stats-value">${agg.xassists}</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">Key Passes</span>
+            <span class="stats-value">${agg.keyPasses}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderXgMeter(data, gk) {
+      const agg = data.aggregate;
+
+      if (gk && agg.gk) {
+        // Shot-stopping ratio meter (same as goalkeeper.html)
+        const gkStats = agg.gk;
+        if (gkStats.xgoalsFaced == null || gkStats.shotsFaced === 0) {
+          return `
+            <div class="stats-card">
+              <div class="stats-card-title">Shot-stopping Ratio</div>
+              <div class="no-data-message">No ratio data available</div>
+            </div>
+          `;
+        }
+
+        const ratio = gkStats.goalsConceded / gkStats.xgoalsFaced;
+        const clamped = Math.max(0, Math.min(2, ratio));
+        const dist = Math.abs(clamped - 1.0);
+        const pct = dist / 1.0 * 50;
+        const isOutperform = ratio < 1.0;
+        const colorClass = ratio < 0.98 ? 'positive' : ratio > 1.02 ? 'negative' : 'neutral';
+
+        let fillStyle, fillClass;
+        if (isOutperform) {
+          fillClass = 'positive';
+          fillStyle = `right: 50%; width: ${pct}%;`;
+        } else {
+          fillClass = 'negative';
+          fillStyle = `left: 50%; width: ${pct}%;`;
+        }
+
+        return `
+          <div class="stats-card">
+            <div class="stats-card-title">Shot-stopping Ratio</div>
+            <div class="insights-explainer">Goals conceded as a ratio of expected goals. Below 1.0 = outperforming expectations.</div>
+            <div class="xg-meter-value ${colorClass}">${ratio.toFixed(3)}</div>
+            <div class="xg-meter-container">
+              <div class="xg-meter-center"></div>
+              <div class="xg-meter-fill ${fillClass}" style="${fillStyle}"></div>
+            </div>
+            <div class="xg-meter-labels">
+              <span>Outperform (0.0)</span>
+              <span>1.0</span>
+              <span>Underperform (2.0)</span>
+            </div>
+            <div class="xg-meter-context">
+              <div class="xg-meter-context-item">
+                <span class="xg-meter-context-label">Goals Conceded</span>
+                <span class="xg-meter-context-value">${gkStats.goalsConceded}</span>
+              </div>
+              <div class="xg-meter-context-item">
+                <span class="xg-meter-context-label">xG Faced</span>
+                <span class="xg-meter-context-value">${gkStats.xgoalsFaced.toFixed(1)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Outfield: Goals vs xG meter
+      const diff = agg.goalsMinusXgoals;
+      const maxDiff = 8;
+      const clampedDiff = Math.max(-maxDiff, Math.min(maxDiff, diff));
+      const pct = (Math.abs(clampedDiff) / maxDiff) * 50;
+      const isPositive = diff >= 0;
+      const colorClass = diff > 0.5 ? 'positive' : diff < -0.5 ? 'negative' : 'neutral';
+
+      let fillStyle, fillClass;
+      if (isPositive) {
+        fillClass = 'positive';
+        fillStyle = `right: 50%; width: ${pct}%;`;
+      } else {
+        fillClass = 'negative';
+        fillStyle = `left: 50%; width: ${pct}%;`;
+      }
+
+      return `
+        <div class="stats-card">
+          <div class="stats-card-title">xG Performance</div>
+          <div class="insights-explainer">Goals minus expected goals. Positive = outscoring expectations, negative = underperforming.</div>
+          <div class="xg-meter-value ${colorClass}">${diff >= 0 ? '+' : ''}${diff.toFixed(2)}</div>
+          <div class="xg-meter-container">
+            <div class="xg-meter-center"></div>
+            <div class="xg-meter-fill ${fillClass}" style="${fillStyle}"></div>
+          </div>
+          <div class="xg-meter-labels">
+            <span>Under xG</span>
+            <span>0</span>
+            <span>Over xG</span>
+          </div>
+          <div class="xg-meter-context">
+            <div class="xg-meter-context-item">
+              <span class="xg-meter-context-label">Goals</span>
+              <span class="xg-meter-context-value">${agg.goals}</span>
+            </div>
+            <div class="xg-meter-context-item">
+              <span class="xg-meter-context-label">xG</span>
+              <span class="xg-meter-context-value">${agg.xgoals.toFixed(1)}</span>
+            </div>
+            <div class="xg-meter-context-item">
+              <span class="xg-meter-context-label">Assists</span>
+              <span class="xg-meter-context-value">${agg.assists}</span>
+            </div>
+            <div class="xg-meter-context-item">
+              <span class="xg-meter-context-label">xA</span>
+              <span class="xg-meter-context-value">${agg.xassists.toFixed(1)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRadarChart(data, gk) {
+      const gaData = data.aggregate.goalsAdded;
+      const axes = gk
+        ? ['Claiming', 'Fielding', 'Handling', 'Passing', 'Shotstopping', 'Sweeping']
+        : ['Dribbling', 'Shooting', 'Passing', 'Receiving', 'Interrupting'];
+
+      const values = axes.map(a => {
+        const d = gaData[a];
+        return d ? d.raw : 0;
+      });
+
+      if (values.every(v => v === 0) && Object.keys(gaData).length === 0) {
+        return `
+          <div class="stats-card">
+            <div class="stats-card-title">Goals Added (g+) Radar</div>
+            <div class="no-data-message">No goals added data available</div>
+          </div>
+        `;
+      }
+
+      const padding = 60;
+      const chartSize = 200;
+      const size = chartSize + padding * 2;
+      const cx = size / 2;
+      const cy = size / 2;
+      const maxRadius = chartSize / 2;
+      const levels = 4;
+      const numAxes = axes.length;
+
+      const absMax = Math.max(0.1, ...values.map(Math.abs));
+
+      const angleOffset = -Math.PI / 2;
+      function getPoint(index, radius) {
+        const angle = (2 * Math.PI / numAxes) * index + angleOffset;
+        return {
+          x: cx + radius * Math.cos(angle),
+          y: cy + radius * Math.sin(angle)
+        };
+      }
+
+      let gridLines = '';
+      for (let l = 1; l <= levels; l++) {
+        const r = (maxRadius / levels) * l;
+        const ringPoints = axes.map((_, i) => {
+          const p = getPoint(i, r);
+          return `${p.x},${p.y}`;
+        }).join(' ');
+        gridLines += `<polygon points="${ringPoints}" fill="none" stroke="#333" stroke-width="0.5"/>`;
+      }
+
+      // Dashed zero-reference ring at midpoint
+      const zeroR = maxRadius / 2;
+      const zeroPoints = axes.map((_, i) => {
+        const p = getPoint(i, zeroR);
+        return `${p.x},${p.y}`;
+      }).join(' ');
+      gridLines += `<polygon points="${zeroPoints}" fill="none" stroke="#555" stroke-width="1" stroke-dasharray="4,4"/>`;
+
+      let axisLines = '';
+      axes.forEach((_, i) => {
+        const p = getPoint(i, maxRadius);
+        axisLines += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#333" stroke-width="0.5"/>`;
+      });
+
+      const dataPoints = values.map((v, i) => {
+        const clamped = Math.max(-absMax, Math.min(absMax, v));
+        const r = ((clamped + absMax) / (2 * absMax)) * maxRadius;
+        const p = getPoint(i, r);
+        return `${p.x},${p.y}`;
+      }).join(' ');
+
+      const labelOffset = 22;
+      let labels = '';
+      axes.forEach((axis, i) => {
+        const p = getPoint(i, maxRadius + labelOffset);
+        const val = values[i];
+        const anchor = Math.abs(p.x - cx) < 5 ? 'middle' : p.x > cx ? 'start' : 'end';
+        labels += `<text x="${p.x}" y="${p.y}" text-anchor="${anchor}" dominant-baseline="middle" fill="#aaa" font-size="11" font-weight="500">${axis}</text>`;
+        labels += `<text x="${p.x}" y="${p.y + 14}" text-anchor="${anchor}" dominant-baseline="middle" fill="#c9a227" font-size="10" font-weight="600">${val >= 0 ? '+' : ''}${val.toFixed(2)}</text>`;
+      });
+
+      const explainer = gk
+        ? 'Goals Added (g+) measures contribution across six GK action types. Larger area = stronger overall performance.'
+        : 'Goals Added (g+) measures contribution across five outfield action types. Larger area = stronger overall performance.';
+
+      return `
+        <div class="stats-card">
+          <div class="stats-card-title">Goals Added (g+) Radar</div>
+          <div class="insights-explainer">${explainer}</div>
+          <div class="radar-chart">
+            <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+              ${gridLines}
+              ${axisLines}
+              <polygon points="${dataPoints}" fill="rgba(201,162,39,0.2)" stroke="#c9a227" stroke-width="2"/>
+              ${labels}
+            </svg>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGameLog(data, gk) {
+      if (!data.games || data.games.length === 0) return '';
+
+      const rows = data.games.map(game => {
+        const resultClass = game.result === 'W' ? 'win' : game.result === 'L' ? 'loss' : 'draw';
+        const scoreText = game.isHome
+          ? `<span>${game.atlScore}</span> - ${game.oppScore}`
+          : `${game.oppScore} - <span>${game.atlScore}</span>`;
+        const venueLabel = game.isHome ? 'vs' : 'at';
+
+        if (gk && game.gk) {
+          const gp = game.gk.goalsMinusXgoals;
+          const gpColor = gp !== null ? (gp <= 0 ? 'good' : 'bad') : '';
+          const gpText = gp !== null ? (gp >= 0 ? '+' : '') + gp.toFixed(2) : '-';
+          const gaTotal = game.gk.goalsAddedTotal != null ? (game.gk.goalsAddedTotal >= 0 ? '+' : '') + game.gk.goalsAddedTotal.toFixed(2) : '-';
+          const gaTotalColor = game.gk.goalsAddedTotal != null ? (game.gk.goalsAddedTotal >= 0 ? 'good' : 'bad') : '';
+
+          return `
+            <div class="game-row ${resultClass}">
+              <div class="game-info">
+                <div class="game-date">${formatDateLong(game.date)}</div>
+                <div class="game-matchup">${venueLabel} ${game.opponent} ${scoreText}</div>
+              </div>
+              <div class="game-stats">
+                <div class="game-stat">
+                  <div class="game-stat-value">${game.minutes}'</div>
+                  <div class="game-stat-label">Min</div>
+                </div>
+                <div class="game-stat">
+                  <div class="game-stat-value">${game.gk.saves}</div>
+                  <div class="game-stat-label">Saves</div>
+                </div>
+                <div class="game-stat">
+                  <div class="game-stat-value">${game.gk.goalsConceded}</div>
+                  <div class="game-stat-label">GA</div>
+                </div>
+                <div class="game-stat">
+                  <div class="game-stat-value ${gpColor}">${gpText}</div>
+                  <div class="game-stat-label">Goals Prev.</div>
+                </div>
+                <div class="game-stat">
+                  <div class="game-stat-value ${gaTotalColor}">${gaTotal}</div>
+                  <div class="game-stat-label">g+</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Outfield game row
+        const gaTotal = game.goalsAddedTotal != null ? (game.goalsAddedTotal >= 0 ? '+' : '') + game.goalsAddedTotal.toFixed(2) : '-';
+        const gaTotalColor = game.goalsAddedTotal != null ? (game.goalsAddedTotal >= 0 ? 'good' : 'bad') : '';
+
+        return `
+          <div class="game-row ${resultClass}">
+            <div class="game-info">
+              <div class="game-date">${formatDateLong(game.date)}</div>
+              <div class="game-matchup">${venueLabel} ${game.opponent} ${scoreText}</div>
+            </div>
+            <div class="game-stats">
+              <div class="game-stat">
+                <div class="game-stat-value">${game.minutes}'</div>
+                <div class="game-stat-label">Min</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-value">${game.goals}</div>
+                <div class="game-stat-label">G</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-value">${game.xgoals.toFixed(1)}</div>
+                <div class="game-stat-label">xG</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-value">${game.assists}</div>
+                <div class="game-stat-label">A</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-value">${game.xassists.toFixed(1)}</div>
+                <div class="game-stat-label">xA</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-value">${game.keyPasses}</div>
+                <div class="game-stat-label">KP</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-value ${gaTotalColor}">${gaTotal}</div>
+                <div class="game-stat-label">g+</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="game-log">
+          <div class="game-log-title">Game Log</div>
+          ${rows}
+        </div>
+      `;
+    }
+
+    // Season selector change handler
+    document.getElementById('seasonSelector').addEventListener('change', async () => {
+      const slug = getSlug();
+      const season = document.getElementById('seasonSelector').value;
+      document.getElementById('content').innerHTML = `
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p class="loading-text">Loading Player Data</p>
+        </div>
+      `;
+      const data = await loadPlayerData(slug, season);
+      renderPage(data);
+    });
+
+    async function init() {
+      const slug = getSlug();
+      if (!slug) {
+        window.location.href = '/players.html';
+        return;
+      }
+
+      const data = await loadPlayerData(slug);
+      if (!data) {
+        document.getElementById('content').innerHTML = `
+          <div class="error-state">
+            <p>Player not found.</p>
+            <p><a href="/players.html">Back to All Players</a></p>
+          </div>
+        `;
+        document.getElementById('heroName').textContent = 'Player Not Found';
+        return;
+      }
+
+      playerInfo = data.player;
+      updateHero(playerInfo);
+      populateSeasonSelector(data.availableSeasons, data.season);
+      renderPage(data);
+    }
+
+    init();
+  </script>
+</body>
+</html>
