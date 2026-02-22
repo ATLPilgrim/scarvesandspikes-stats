@@ -3349,7 +3349,7 @@
                   ${match.players.slice(0, 5).map(p => `
                     <div class="player-row">
                       <div class="player-info">
-                        <span class="player-name">${p.name}</span>
+                        <a href="/player.html?id=${playerSlug(p.name)}" class="player-link player-name">${p.name}</a>
                         <span class="player-position">${p.position || ''}</span>
                       </div>
                       <div class="player-stats">
