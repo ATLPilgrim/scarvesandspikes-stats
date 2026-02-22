@@ -276,17 +276,9 @@
       border: 1px solid var(--gray-800);
       border-radius: var(--radius-lg);
       padding: var(--space-lg);
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.2s, transform 0.2s;
       display: flex;
       flex-direction: column;
       gap: var(--space-md);
-    }
-
-    .player-card:hover {
-      border-color: var(--gold-dark);
-      transform: translateY(-2px);
     }
 
     .player-card-header {
@@ -538,7 +530,7 @@
         const nineties = Math.round(p.minutes / 90);
 
         return `
-          <a href="/player.html?id=${p.slug}" class="player-card">
+          <div class="player-card">
             <div class="player-card-header">
               <div class="player-name">${p.name}</div>
               <span class="position-badge ${posClass}">${posLabel}</span>
@@ -562,7 +554,7 @@
               </div>
             </div>
             <div class="player-seasons">${p.seasonsRange}</div>
-          </a>
+          </div>
         `;
       }).join('')}</div>`;
     }
