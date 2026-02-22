@@ -59,6 +59,10 @@ Frontend pages fetch from local `/api/` endpoints. Those serverless functions ag
 - Typography: Oswald (display), Source Sans 3 (body) via Google Fonts
 - Responsive layout using flexbox and grid
 
+### Google Search Console
+
+The Google Search Console verification meta tag (`google-site-verification`) must be preserved in the `<head>` of all HTML pages. Do not remove or modify it.
+
 ### xG Verdict Logic
 
 - **"Robbed"** = Loss where Atlanta United had xG advantage (xgDiff >= 0.5)

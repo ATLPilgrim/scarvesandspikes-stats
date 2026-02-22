@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- IMPORTANT: Do not remove - Google Search Console verification -->
   <meta name="google-site-verification" content="ALloYlPiQ2UmdhEjprptX-nfJll_34v-FQygShLrDo8" />
+  <!-- End Google verification -->
   <title>Atlanta United Players | ScarvesAndSpikes.com</title>
   <meta name="description" content="Complete roster of every Atlanta United player since 2017 with career appearances, goals, assists, and xG analytics.">
   <link rel="canonical" href="https://stats.scarvesandspikes.com/players.html">
@@ -629,6 +631,22 @@
     /* Responsive */
     @media (max-width: 768px) {
       .header-content { flex-direction: column; gap: var(--space-sm); }
+
+      .nav-section {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: var(--space-md);
+        padding-bottom: var(--space-xs);
+      }
+
+      .nav-section::-webkit-scrollbar { height: 0; display: none; }
+
+      .nav-link { white-space: nowrap; font-size: 0.75rem; }
+
+      .player-search-input { width: 120px; font-size: 0.75rem; }
+      .player-search-input:focus { width: 150px; }
+
       .filters-bar { flex-direction: column; align-items: stretch; }
       .search-input { min-width: unset; }
       .position-filters { justify-content: center; }

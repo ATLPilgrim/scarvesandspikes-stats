@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- IMPORTANT: Do not remove - Google Search Console verification -->
   <meta name="google-site-verification" content="ALloYlPiQ2UmdhEjprptX-nfJll_34v-FQygShLrDo8" />
+  <!-- End Google verification -->
   <title>Player Profile | Atlanta United | ScarvesAndSpikes.com</title>
   <meta name="description" content="Atlanta United player analytics with per-season stats, expected goals, goals added radar, and game logs.">
   <meta property="og:type" content="website">
@@ -731,6 +733,22 @@
     /* Responsive */
     @media (max-width: 768px) {
       .header-content { flex-direction: column; gap: var(--space-sm); }
+
+      .nav-section {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: var(--space-md);
+        padding-bottom: var(--space-xs);
+      }
+
+      .nav-section::-webkit-scrollbar { height: 0; display: none; }
+
+      .nav-link { white-space: nowrap; font-size: 0.75rem; }
+
+      .player-search-input { width: 120px; font-size: 0.75rem; }
+      .player-search-input:focus { width: 150px; }
+
       .analytics-grid { grid-template-columns: 1fr; }
       .game-row { flex-direction: column; align-items: flex-start; }
       .game-stats { width: 100%; justify-content: space-between; }
