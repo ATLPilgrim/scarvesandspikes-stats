@@ -728,12 +728,80 @@
         padding: var(--space-2xl) var(--space-md);
       }
 
+      .container {
+        padding: var(--space-lg) var(--space-md);
+      }
+
       .club-stats-grid {
         grid-template-columns: 1fr;
       }
 
+      /* Manager carousel: scroll-snap for natural touch swiping */
+      .manager-stints {
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 var(--space-md);
+        padding-bottom: var(--space-md);
+      }
+
+      .manager-stint {
+        scroll-snap-align: start;
+        min-width: 140px;
+        padding: var(--space-md) var(--space-sm);
+      }
+
+      .manager-stint-name { font-size: 0.9rem; }
+      .manager-stint-record { font-size: 1rem; }
+
+      /* Venue: stack vertically */
       .venue-split {
         grid-template-columns: 1fr;
+      }
+
+      /* Season table: tighter padding, smaller font */
+      .season-table {
+        font-size: 0.75rem;
+        min-width: 500px;
+      }
+
+      .season-table th {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.6rem;
+      }
+
+      .season-table td {
+        padding: var(--space-xs) var(--space-sm);
+      }
+
+      .season-table-wrapper {
+        margin: 0 calc(-1 * var(--space-sm));
+        padding: 0 var(--space-sm);
+      }
+
+      /* Streaks: allow wrapping on narrow screens */
+      .streak-record {
+        flex-wrap: wrap;
+        gap: var(--space-xs);
+      }
+
+      .streak-record-label {
+        width: 100%;
+        font-size: 0.7rem;
+      }
+
+      .streak-record-value { font-size: 0.8rem; }
+      .streak-record-dates { margin-left: 0; }
+
+      /* On This Day: stack match rows */
+      .otd-match {
+        flex-wrap: wrap;
+        gap: var(--space-xs) var(--space-sm);
+      }
+
+      .otd-detail { min-width: unset; }
+
+      /* Cards: slightly less padding */
+      .club-stats-card {
+        padding: var(--space-md);
       }
     }
   </style>
