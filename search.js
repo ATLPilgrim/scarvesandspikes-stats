@@ -4,6 +4,7 @@
   var playerCache = null;
   var debounceTimer = null;
   var isLoading = false;
+  var pendingCallbacks = [];
 
   function normalizeAccents(str) {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -34,6 +35,7 @@
     if (playerCache) { callback(playerCache); return; }
     var cached = getCachedPlayers();
     if (cached) { playerCache = cached; callback(cached); return; }
+    pendingCallbacks.push(callback);
     if (isLoading) return;
     isLoading = true;
     fetch('/api/players')
@@ -42,9 +44,14 @@
         playerCache = data.players;
         setCachedPlayers(data.players);
         isLoading = false;
-        callback(playerCache);
+        var cbs = pendingCallbacks.slice();
+        pendingCallbacks = [];
+        cbs.forEach(function(cb) { cb(playerCache); });
       })
-      .catch(function() { isLoading = false; });
+      .catch(function() {
+        isLoading = false;
+        pendingCallbacks = [];
+      });
   }
 
   function searchPlayers(players, query) {
@@ -72,9 +79,15 @@
     return startsWithName.concat(startsWithLast, contains).slice(0, 8);
   }
 
-  function renderDropdown(results, dropdown) {
-    if (results.length === 0) {
+  function renderDropdown(results, dropdown, query) {
+    if (!query || query.length < 2) {
       dropdown.style.display = 'none';
+      return;
+    }
+
+    if (results.length === 0) {
+      dropdown.innerHTML = '<div class="player-search-empty">No players found</div>';
+      dropdown.style.display = 'block';
       return;
     }
 
@@ -93,6 +106,11 @@
     dropdown.style.display = 'block';
   }
 
+  function showLoading(dropdown) {
+    dropdown.innerHTML = '<div class="player-search-empty">Searching...</div>';
+    dropdown.style.display = 'block';
+  }
+
   function init() {
     var wrapper = document.querySelector('.player-search');
     if (!wrapper) return;
@@ -103,12 +121,17 @@
 
     function doSearch() {
       var query = input.value.trim();
+      if (query.length < 2) {
+        dropdown.style.display = 'none';
+        return;
+      }
       if (!playerCache) {
+        showLoading(dropdown);
         loadPlayers(function() { doSearch(); });
         return;
       }
       var results = searchPlayers(playerCache, query);
-      renderDropdown(results, dropdown);
+      renderDropdown(results, dropdown, query);
     }
 
     input.addEventListener('focus', function() {
@@ -118,7 +141,7 @@
 
     input.addEventListener('input', function() {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(doSearch, 200);
+      debounceTimer = setTimeout(doSearch, 300);
     });
 
     input.addEventListener('keydown', function(e) {

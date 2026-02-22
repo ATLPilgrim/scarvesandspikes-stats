@@ -597,17 +597,86 @@
       white-space: nowrap;
     }
 
+    .player-search-empty {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      text-align: center;
+    }
+
     /* Career Highlights */
-    .career-highlights {
+    .career-highlights-section {
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: var(--space-xl);
+      display: none;
+    }
+
+    .career-highlights-section.visible { display: block; }
+
+    .career-highlights-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--gray-900);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .career-highlights-header:hover { background: var(--gray-800); }
+
+    .career-highlights-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+
+    .career-highlights-subtitle {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      margin-left: var(--space-sm);
+      text-transform: none;
+      letter-spacing: normal;
+      font-family: var(--font-body);
+      font-weight: 400;
+    }
+
+    .career-highlights-chevron {
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid var(--gray-400);
+      border-bottom: 2px solid var(--gray-400);
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .career-highlights-section.collapsed .career-highlights-chevron {
+      transform: rotate(-135deg);
+    }
+
+    .career-highlights-body {
+      padding: var(--space-md);
+    }
+
+    .career-highlights-section.collapsed .career-highlights-body {
+      display: none;
+    }
+
+    .career-highlights-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: var(--space-md);
-      margin-bottom: var(--space-xl);
     }
 
     .career-highlight-card {
-      background: var(--gray-900);
-      border: 1px solid var(--gray-800);
+      background: var(--gray-800);
+      border: 1px solid var(--gray-700);
       border-top: 3px solid var(--gold);
       border-radius: var(--radius-md);
       padding: var(--space-md);
@@ -638,13 +707,33 @@
       margin-top: var(--space-xs);
     }
 
+    .career-highlights-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-lg);
+      color: var(--gray-500);
+      font-size: 0.85rem;
+    }
+
+    .career-highlights-loading .mini-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--gray-700);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header-content { flex-direction: column; gap: var(--space-sm); }
       .analytics-grid { grid-template-columns: 1fr; }
       .game-row { flex-direction: column; align-items: flex-start; }
       .game-stats { width: 100%; justify-content: space-between; }
-      .career-highlights { grid-template-columns: repeat(2, 1fr); }
+      .career-highlights-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -688,7 +777,18 @@
     </div>
 
     <!-- Career Highlights -->
-    <div id="careerHighlights"></div>
+    <div class="career-highlights-section collapsed" id="careerHighlightsSection">
+      <div class="career-highlights-header" id="careerHighlightsHeader">
+        <span class="career-highlights-title">Career Highlights <span class="career-highlights-subtitle">All-Time with Atlanta United</span></span>
+        <div class="career-highlights-chevron"></div>
+      </div>
+      <div class="career-highlights-body" id="careerHighlightsBody">
+        <div class="career-highlights-loading">
+          <span class="mini-spinner"></span>
+          Loading career data...
+        </div>
+      </div>
+    </div>
 
     <!-- Content Area -->
     <div id="content">
@@ -1311,9 +1411,13 @@
     }
 
     function renderCareerHighlights(highlights) {
-      if (highlights.length === 0) return;
-      const container = document.getElementById('careerHighlights');
-      container.innerHTML = '<div class="career-highlights">' + highlights.map(h => `
+      const section = document.getElementById('careerHighlightsSection');
+      const body = document.getElementById('careerHighlightsBody');
+      if (highlights.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+      body.innerHTML = '<div class="career-highlights-grid">' + highlights.map(h => `
         <div class="career-highlight-card">
           <div class="career-highlight-label">${h.label}</div>
           <div class="career-highlight-value">${h.value}</div>
@@ -1360,13 +1464,26 @@
       populateSeasonSelector(data.availableSeasons, data.season);
       renderPage(data);
 
-      // Background-fetch all seasons for career highlights (skip if single season)
+      // Career highlights: show collapsible section and background-fetch (skip single season)
       if (data.availableSeasons.length > 1) {
+        const highlightsSection = document.getElementById('careerHighlightsSection');
+        highlightsSection.classList.add('visible');
+
+        // Wire up collapsible toggle
+        document.getElementById('careerHighlightsHeader').addEventListener('click', () => {
+          highlightsSection.classList.toggle('collapsed');
+        });
+
+        // Background-fetch all seasons
         loadAllSeasons(slug, data.availableSeasons).then(allData => {
           const gk = isGK(playerInfo.position);
           const highlights = computeCareerHighlights(allData, gk);
           renderCareerHighlights(highlights);
-        }).catch(err => console.error('Career highlights error:', err));
+        }).catch(err => {
+          console.error('Career highlights error:', err);
+          document.getElementById('careerHighlightsBody').innerHTML =
+            '<div class="career-highlights-loading">Failed to load career data.</div>';
+        });
       }
     }
 
