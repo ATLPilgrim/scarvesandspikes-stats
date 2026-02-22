@@ -1464,6 +1464,15 @@
       letter-spacing: 0.05em;
     }
 
+    .player-link {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .player-link:hover {
+      color: var(--gold);
+    }
+
     .gk-name {
       font-family: var(--font-display);
       font-size: 0.9rem;
@@ -2361,7 +2370,7 @@
         const barWidth = (p.touchShare / maxShare) * 100;
         return `
           <div class="touch-bar-row">
-            <span class="touch-bar-name">${p.name}</span>
+            <a href="/player.html?id=${playerSlug(p.name)}" class="player-link touch-bar-name">${p.name}</a>
             <div class="touch-bar-track">
               <div class="touch-bar-fill" style="width: ${barWidth}%"></div>
             </div>
@@ -2389,7 +2398,7 @@
         if (p.assists > 0) stats.push(`<span>${p.assists}A</span> <span class="value">(${p.xa ? p.xa.toFixed(2) : '0.00'} xA)</span>`);
         return `
           <div class="goal-contributor-row">
-            <span class="goal-contributor-name">${p.name}</span>
+            <a href="/player.html?id=${playerSlug(p.name)}" class="player-link goal-contributor-name">${p.name}</a>
             <div class="goal-contributor-stats">${stats.join(' ')}</div>
           </div>
         `;
@@ -2419,7 +2428,7 @@
         const colorClass = p.total >= 0 ? 'positive' : 'negative';
         return `
           <div class="gplus-row">
-            <span class="gplus-name">${p.name}</span>
+            <a href="/player.html?id=${playerSlug(p.name)}" class="player-link gplus-name">${p.name}</a>
             <span class="gplus-value ${colorClass}">${sign}${p.total.toFixed(3)}</span>
           </div>
         `;
@@ -2448,7 +2457,7 @@
         const colorClass = val >= 0 ? 'positive' : 'negative';
         return `
           <div class="gplus-row">
-            <span class="gplus-name">${p.name}</span>
+            <a href="/player.html?id=${playerSlug(p.name)}" class="player-link gplus-name">${p.name}</a>
             <span class="gplus-value ${colorClass}">${sign}${val.toFixed(1)}</span>
           </div>
         `;
@@ -2466,7 +2475,7 @@
         : 'var(--gray-300)';
 
       return `
-        <div class="gk-name">${gk.name}</div>
+        <div class="gk-name"><a href="/player.html?id=${playerSlug(gk.name)}" class="player-link">${gk.name}</a></div>
         <div class="gk-stats-grid">
           <div class="gk-stat-box">
             <div class="gk-stat-value">${gk.shotsFaced != null ? gk.shotsFaced : '-'}</div>
@@ -2710,6 +2719,14 @@
           </svg>
         </div>
       `;
+    }
+
+    // Generate player slug for player detail page links (mirrors api/players.js)
+    function playerSlug(name) {
+      return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
     }
 
     // Normalize opponent name to URL slug (mirrors api/opponent.js)
