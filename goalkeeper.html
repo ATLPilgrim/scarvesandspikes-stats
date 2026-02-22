@@ -527,6 +527,69 @@
 
     .footer-credit { font-size: 0.75rem; color: var(--gray-600); }
 
+    /* Player Search */
+    .player-search {
+      position: relative;
+    }
+
+    .player-search-input {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      background: var(--gray-800);
+      color: var(--gray-100);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs) var(--space-md);
+      width: 160px;
+      outline: none;
+      transition: border-color 0.2s, width 0.2s;
+    }
+
+    .player-search-input::placeholder { color: var(--gray-500); }
+    .player-search-input:focus { border-color: var(--gold); width: 200px; }
+
+    .player-search-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: var(--space-xs);
+      width: 260px;
+      background: var(--gray-900);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .player-search-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) var(--space-md);
+      text-decoration: none;
+      color: var(--gray-200);
+      transition: background 0.15s;
+      gap: var(--space-sm);
+    }
+
+    .player-search-item:hover { background: var(--gray-800); }
+
+    .player-search-name {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .player-search-meta {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header-content { flex-direction: column; gap: var(--space-sm); }
@@ -549,6 +612,10 @@
         <a href="/players.html" class="nav-link">Players</a>
         <a href="/opponent.html" class="nav-link">Opponents</a>
         <a href="/history.html" class="nav-link">History</a>
+        <div class="player-search">
+          <input type="text" class="player-search-input" placeholder="Search players...">
+          <div class="player-search-dropdown"></div>
+        </div>
       </nav>
     </div>
   </header>
@@ -957,5 +1024,6 @@
 
     init();
   </script>
+  <script src="/search.js"></script>
 </body>
 </html>

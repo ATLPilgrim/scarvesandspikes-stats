@@ -539,6 +539,159 @@
       color: var(--gray-400);
     }
 
+    /* Player Search */
+    .player-search {
+      position: relative;
+    }
+
+    .player-search-input {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      background: var(--gray-800);
+      color: var(--gray-100);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs) var(--space-md);
+      width: 160px;
+      outline: none;
+      transition: border-color 0.2s, width 0.2s;
+    }
+
+    .player-search-input::placeholder { color: var(--gray-500); }
+    .player-search-input:focus { border-color: var(--gold); width: 200px; }
+
+    .player-search-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: var(--space-xs);
+      width: 260px;
+      background: var(--gray-900);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .player-search-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) var(--space-md);
+      text-decoration: none;
+      color: var(--gray-200);
+      transition: background 0.15s;
+      gap: var(--space-sm);
+    }
+
+    .player-search-item:hover { background: var(--gray-800); }
+
+    .player-search-name {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .player-search-meta {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+
+    /* On This Day */
+    .on-this-day {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-left: 4px solid var(--gold);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .on-this-day-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-bottom: var(--space-md);
+    }
+
+    .on-this-day-empty {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+    }
+
+    .on-this-day-matches {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .otd-match {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--gray-800);
+      border-radius: var(--radius-sm);
+      flex-wrap: wrap;
+    }
+
+    .otd-year {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      min-width: 40px;
+    }
+
+    .otd-detail {
+      font-size: 0.9rem;
+      color: var(--gray-200);
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .otd-score {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .otd-result-badge {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      color: var(--white);
+    }
+
+    .otd-result-badge.win { background: var(--win); }
+    .otd-result-badge.loss { background: var(--loss); }
+    .otd-result-badge.draw { background: var(--draw); }
+
+    .otd-playoff-badge {
+      font-family: var(--font-display);
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      background: var(--gold);
+      color: var(--black);
+      border-radius: var(--radius-sm);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header-content {
@@ -573,6 +726,10 @@
         <a href="/players.html" class="nav-link">Players</a>
         <a href="/opponent.html" class="nav-link">Opponents</a>
         <span class="nav-link nav-active">History</span>
+        <div class="player-search">
+          <input type="text" class="player-search-input" placeholder="Search players...">
+          <div class="player-search-dropdown"></div>
+        </div>
       </nav>
     </div>
   </header>
@@ -930,6 +1087,55 @@
       return html;
     }
 
+    function renderOnThisDay(matches) {
+      const today = new Date();
+      const todayMonth = today.getMonth();
+      const todayDay = today.getDate();
+
+      const todayMatches = matches.filter(m => {
+        if (!m.date) return false;
+        const d = new Date(m.date.replace(' UTC', 'Z').replace(' ', 'T'));
+        return !isNaN(d.getTime()) && d.getMonth() === todayMonth && d.getDate() === todayDay;
+      }).sort((a, b) => {
+        const da = new Date(a.date.replace(' UTC', 'Z').replace(' ', 'T'));
+        const db = new Date(b.date.replace(' UTC', 'Z').replace(' ', 'T'));
+        return db - da;
+      });
+
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+
+      let html = '<div class="on-this-day">';
+      html += `<div class="on-this-day-title">On This Day — ${monthNames[todayMonth]} ${todayDay}</div>`;
+
+      if (todayMatches.length === 0) {
+        html += '<div class="on-this-day-empty">No matches on this day in club history.</div>';
+      } else {
+        html += '<div class="on-this-day-matches">';
+        for (const m of todayMatches) {
+          const d = new Date(m.date.replace(' UTC', 'Z').replace(' ', 'T'));
+          const year = d.getFullYear();
+          const venue = m.isHome ? 'vs' : 'at';
+          const resultClass = m.result === 'W' ? 'win' : m.result === 'L' ? 'loss' : 'draw';
+          const isPlayoff = m.competition && m.competition.toLowerCase().includes('playoff');
+          const isCup = m.competition && (m.competition.toLowerCase().includes('cup') || m.competition.toLowerCase().includes('open'));
+
+          html += '<div class="otd-match">';
+          html += `<span class="otd-year">${year}</span>`;
+          html += `<span class="otd-detail">${venue} ${m.opponent}</span>`;
+          html += `<span class="otd-score">${m.atlScore}-${m.oppScore}</span>`;
+          html += `<span class="otd-result-badge ${resultClass}">${m.result}</span>`;
+          if (isPlayoff) html += '<span class="otd-playoff-badge">Playoff</span>';
+          else if (isCup) html += '<span class="otd-playoff-badge">Cup</span>';
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+
+      html += '</div>';
+      return html;
+    }
+
     function renderHistory(matches) {
       const managerData = computeManagerStints(matches);
       const seasonData = computeSeasonStats(matches);
@@ -937,14 +1143,13 @@
       const streakData = computeStreaks(matches);
 
       const container = document.getElementById('content');
-      let html = '<div class="club-stats-grid">';
+      let html = renderOnThisDay(matches);
+      html += '<div class="club-stats-grid">';
       html += renderManagerRecords(managerData);
       html += renderVenueStats(venueData);
       html += renderStreakTrackers(streakData);
       html += renderSeasonHistory(seasonData);
       html += '</div>';
-
-      /* Placeholder for future "On This Day" section */
 
       container.innerHTML = html;
 
@@ -973,5 +1178,6 @@
 
     init();
   </script>
+  <script src="/search.js"></script>
 </body>
 </html>

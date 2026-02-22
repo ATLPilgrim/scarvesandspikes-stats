@@ -534,12 +534,117 @@
 
     .footer-credit { font-size: 0.75rem; color: var(--gray-600); }
 
+    /* Player Search */
+    .player-search {
+      position: relative;
+    }
+
+    .player-search-input {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      background: var(--gray-800);
+      color: var(--gray-100);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs) var(--space-md);
+      width: 160px;
+      outline: none;
+      transition: border-color 0.2s, width 0.2s;
+    }
+
+    .player-search-input::placeholder { color: var(--gray-500); }
+    .player-search-input:focus { border-color: var(--gold); width: 200px; }
+
+    .player-search-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: var(--space-xs);
+      width: 260px;
+      background: var(--gray-900);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .player-search-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) var(--space-md);
+      text-decoration: none;
+      color: var(--gray-200);
+      transition: background 0.15s;
+      gap: var(--space-sm);
+    }
+
+    .player-search-item:hover { background: var(--gray-800); }
+
+    .player-search-name {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .player-search-meta {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+
+    /* Career Highlights */
+    .career-highlights {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .career-highlight-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-top: 3px solid var(--gold);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+    }
+
+    .career-highlight-label {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-xs);
+    }
+
+    .career-highlight-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1.2;
+    }
+
+    .career-highlight-season {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-top: var(--space-xs);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header-content { flex-direction: column; gap: var(--space-sm); }
       .analytics-grid { grid-template-columns: 1fr; }
       .game-row { flex-direction: column; align-items: flex-start; }
       .game-stats { width: 100%; justify-content: space-between; }
+      .career-highlights { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -556,6 +661,10 @@
         <a href="/players.html" class="nav-link nav-active">Players</a>
         <a href="/opponent.html" class="nav-link">Opponents</a>
         <a href="/history.html" class="nav-link">History</a>
+        <div class="player-search">
+          <input type="text" class="player-search-input" placeholder="Search players...">
+          <div class="player-search-dropdown"></div>
+        </div>
       </nav>
     </div>
   </header>
@@ -577,6 +686,9 @@
     <div class="season-selector">
       <select id="seasonSelector"></select>
     </div>
+
+    <!-- Career Highlights -->
+    <div id="careerHighlights"></div>
 
     <!-- Content Area -->
     <div id="content">
@@ -1134,6 +1246,82 @@
       `;
     }
 
+    async function loadAllSeasons(slug, availableSeasons) {
+      const fetches = availableSeasons.map(s => loadPlayerData(slug, s));
+      return Promise.all(fetches);
+    }
+
+    function computeCareerHighlights(allSeasonData, gk) {
+      const highlights = [];
+      const valid = allSeasonData.filter(d => d && d.aggregate);
+
+      if (gk) {
+        // Best Save %
+        let bestSavePct = { value: -1, season: null };
+        let bestGoalsPrevented = { value: Infinity, season: null };
+        let mostApps = { value: 0, season: null };
+
+        for (const d of valid) {
+          const agg = d.aggregate;
+          if (agg.gk) {
+            if (agg.gk.savePercentage > bestSavePct.value) {
+              bestSavePct = { value: agg.gk.savePercentage, season: d.season };
+            }
+            if (agg.gk.goalsPrevented != null && agg.gk.goalsPrevented < bestGoalsPrevented.value) {
+              bestGoalsPrevented = { value: agg.gk.goalsPrevented, season: d.season };
+            }
+          }
+          if (agg.appearances > mostApps.value) {
+            mostApps = { value: agg.appearances, season: d.season };
+          }
+        }
+
+        if (bestSavePct.season != null) highlights.push({ label: 'Best Save %', value: bestSavePct.value + '%', season: bestSavePct.season });
+        if (bestGoalsPrevented.season != null && bestGoalsPrevented.value !== Infinity) highlights.push({ label: 'Most Goals Prevented', value: (bestGoalsPrevented.value >= 0 ? '+' : '') + bestGoalsPrevented.value.toFixed(1), season: bestGoalsPrevented.season });
+        if (mostApps.season != null) highlights.push({ label: 'Most Appearances', value: mostApps.value, season: mostApps.season });
+      } else {
+        let mostGoals = { value: 0, season: null };
+        let mostAssists = { value: 0, season: null };
+        let bestGPlus = { value: -Infinity, season: null };
+        let mostApps = { value: 0, season: null };
+
+        for (const d of valid) {
+          const agg = d.aggregate;
+          if (agg.goals > mostGoals.value) {
+            mostGoals = { value: agg.goals, season: d.season };
+          }
+          if (agg.assists > mostAssists.value) {
+            mostAssists = { value: agg.assists, season: d.season };
+          }
+          if (agg.totalGoalsAdded != null && agg.totalGoalsAdded > bestGPlus.value) {
+            bestGPlus = { value: agg.totalGoalsAdded, season: d.season };
+          }
+          if (agg.appearances > mostApps.value) {
+            mostApps = { value: agg.appearances, season: d.season };
+          }
+        }
+
+        if (mostGoals.season != null && mostGoals.value > 0) highlights.push({ label: 'Most Goals', value: mostGoals.value, season: mostGoals.season });
+        if (mostAssists.season != null && mostAssists.value > 0) highlights.push({ label: 'Most Assists', value: mostAssists.value, season: mostAssists.season });
+        if (bestGPlus.season != null && bestGPlus.value !== -Infinity) highlights.push({ label: 'Best g+', value: (bestGPlus.value >= 0 ? '+' : '') + bestGPlus.value.toFixed(2), season: bestGPlus.season });
+        if (mostApps.season != null) highlights.push({ label: 'Most Appearances', value: mostApps.value, season: mostApps.season });
+      }
+
+      return highlights;
+    }
+
+    function renderCareerHighlights(highlights) {
+      if (highlights.length === 0) return;
+      const container = document.getElementById('careerHighlights');
+      container.innerHTML = '<div class="career-highlights">' + highlights.map(h => `
+        <div class="career-highlight-card">
+          <div class="career-highlight-label">${h.label}</div>
+          <div class="career-highlight-value">${h.value}</div>
+          <div class="career-highlight-season">${h.season} Season</div>
+        </div>
+      `).join('') + '</div>';
+    }
+
     // Season selector change handler
     document.getElementById('seasonSelector').addEventListener('change', async () => {
       const slug = getSlug();
@@ -1171,9 +1359,19 @@
       updateHero(playerInfo);
       populateSeasonSelector(data.availableSeasons, data.season);
       renderPage(data);
+
+      // Background-fetch all seasons for career highlights (skip if single season)
+      if (data.availableSeasons.length > 1) {
+        loadAllSeasons(slug, data.availableSeasons).then(allData => {
+          const gk = isGK(playerInfo.position);
+          const highlights = computeCareerHighlights(allData, gk);
+          renderCareerHighlights(highlights);
+        }).catch(err => console.error('Career highlights error:', err));
+      }
     }
 
     init();
   </script>
+  <script src="/search.js"></script>
 </body>
 </html>

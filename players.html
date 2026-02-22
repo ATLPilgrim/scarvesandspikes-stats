@@ -416,6 +416,208 @@
 
     .footer-credit { font-size: 0.75rem; color: var(--gray-600); }
 
+    /* Player Search */
+    .player-search {
+      position: relative;
+    }
+
+    .player-search-input {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      background: var(--gray-800);
+      color: var(--gray-100);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs) var(--space-md);
+      width: 160px;
+      outline: none;
+      transition: border-color 0.2s, width 0.2s;
+    }
+
+    .player-search-input::placeholder { color: var(--gray-500); }
+    .player-search-input:focus { border-color: var(--gold); width: 200px; }
+
+    .player-search-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: var(--space-xs);
+      width: 260px;
+      background: var(--gray-900);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .player-search-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) var(--space-md);
+      text-decoration: none;
+      color: var(--gray-200);
+      transition: background 0.15s;
+      gap: var(--space-sm);
+    }
+
+    .player-search-item:hover { background: var(--gray-800); }
+
+    .player-search-name {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .player-search-meta {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+
+    /* Compare Section */
+    .compare-section {
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: var(--space-xl);
+      display: none;
+    }
+
+    .compare-section.visible { display: block; }
+
+    .compare-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--gray-900);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .compare-header:hover { background: var(--gray-800); }
+
+    .compare-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+
+    .compare-chevron {
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid var(--gray-400);
+      border-bottom: 2px solid var(--gray-400);
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+    }
+
+    .compare-section.collapsed .compare-chevron {
+      transform: rotate(-135deg);
+    }
+
+    .compare-body {
+      padding: var(--space-lg);
+    }
+
+    .compare-section.collapsed .compare-body {
+      display: none;
+    }
+
+    .compare-selectors {
+      display: flex;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      align-items: center;
+    }
+
+    .compare-select {
+      flex: 1;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      background: var(--gray-800);
+      color: var(--gray-100);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23c9a227' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 28px;
+    }
+
+    .compare-select:hover { border-color: var(--gold); }
+
+    .compare-vs {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .compare-table th {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-400);
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--gray-700);
+    }
+
+    .compare-table th:first-child { text-align: left; }
+    .compare-table th:nth-child(2),
+    .compare-table th:nth-child(3) { text-align: right; }
+
+    .compare-table td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--gray-800);
+      color: var(--gray-200);
+    }
+
+    .compare-table td:first-child {
+      text-align: left;
+      color: var(--gray-400);
+      font-size: 0.8rem;
+    }
+
+    .compare-table td:nth-child(2),
+    .compare-table td:nth-child(3) {
+      text-align: right;
+      font-family: var(--font-display);
+      font-weight: 600;
+    }
+
+    .compare-table td.highlight {
+      color: var(--gold);
+    }
+
+    .compare-empty {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 0.9rem;
+      padding: var(--space-lg);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .header-content { flex-direction: column; gap: var(--space-sm); }
@@ -423,6 +625,7 @@
       .search-input { min-width: unset; }
       .position-filters { justify-content: center; }
       .player-grid { grid-template-columns: 1fr; }
+      .compare-selectors { flex-direction: column; }
     }
   </style>
 </head>
@@ -439,6 +642,10 @@
         <span class="nav-link nav-active">Players</span>
         <a href="/opponent.html" class="nav-link">Opponents</a>
         <a href="/history.html" class="nav-link">History</a>
+        <div class="player-search">
+          <input type="text" class="player-search-input" placeholder="Search players...">
+          <div class="player-search-dropdown"></div>
+        </div>
       </nav>
     </div>
   </header>
@@ -469,6 +676,28 @@
       </select>
       <div class="results-count" id="resultsCount"></div>
       <div class="filter-note" id="filterNote"></div>
+    </div>
+
+    <!-- Compare Players -->
+    <div class="compare-section collapsed" id="compareSection">
+      <div class="compare-header" id="compareHeader">
+        <span class="compare-title">Compare Players</span>
+        <div class="compare-chevron"></div>
+      </div>
+      <div class="compare-body">
+        <div class="compare-selectors">
+          <select class="compare-select" id="comparePlayerA">
+            <option value="">Select Player</option>
+          </select>
+          <span class="compare-vs">vs</span>
+          <select class="compare-select" id="comparePlayerB">
+            <option value="">Select Player</option>
+          </select>
+        </div>
+        <div id="compareResults">
+          <div class="compare-empty">Select two players to compare stats.</div>
+        </div>
+      </div>
     </div>
 
     <!-- Content Area -->
@@ -611,6 +840,76 @@
       applyFilters();
     });
 
+    function populateCompareDropdowns() {
+      const sorted = [...allPlayers].sort((a, b) => a.name.localeCompare(b.name));
+      const optionsHtml = '<option value="">Select Player</option>' +
+        sorted.map(p => `<option value="${p.slug}">${p.name}</option>`).join('');
+      document.getElementById('comparePlayerA').innerHTML = optionsHtml;
+      document.getElementById('comparePlayerB').innerHTML = optionsHtml;
+    }
+
+    function renderComparison() {
+      const slugA = document.getElementById('comparePlayerA').value;
+      const slugB = document.getElementById('comparePlayerB').value;
+      const container = document.getElementById('compareResults');
+
+      if (!slugA || !slugB) {
+        container.innerHTML = '<div class="compare-empty">Select two players to compare stats.</div>';
+        return;
+      }
+
+      if (slugA === slugB) {
+        container.innerHTML = '<div class="compare-empty">Select two different players.</div>';
+        return;
+      }
+
+      const pA = allPlayers.find(p => p.slug === slugA);
+      const pB = allPlayers.find(p => p.slug === slugB);
+      if (!pA || !pB) return;
+
+      const ninetiesA = Math.round(pA.minutes / 90);
+      const ninetiesB = Math.round(pB.minutes / 90);
+      const goalsPerA = ninetiesA > 0 ? (pA.goals / ninetiesA).toFixed(2) : '0.00';
+      const goalsPerB = ninetiesB > 0 ? (pB.goals / ninetiesB).toFixed(2) : '0.00';
+      const xgPerA = ninetiesA > 0 ? (pA.xgoals / ninetiesA).toFixed(2) : '0.00';
+      const xgPerB = ninetiesB > 0 ? (pB.xgoals / ninetiesB).toFixed(2) : '0.00';
+
+      const stats = [
+        { label: 'Appearances', a: pA.appearances, b: pB.appearances, higher: 'more' },
+        { label: 'Goals', a: pA.goals, b: pB.goals, higher: 'more' },
+        { label: 'Assists', a: pA.assists, b: pB.assists, higher: 'more' },
+        { label: 'xG', a: pA.xgoals.toFixed(1), b: pB.xgoals.toFixed(1), aRaw: pA.xgoals, bRaw: pB.xgoals, higher: 'more' },
+        { label: 'xA', a: pA.xassists.toFixed(1), b: pB.xassists.toFixed(1), aRaw: pA.xassists, bRaw: pB.xassists, higher: 'more' },
+        { label: 'Minutes', a: pA.minutes.toLocaleString(), b: pB.minutes.toLocaleString(), aRaw: pA.minutes, bRaw: pB.minutes, higher: 'more' },
+        { label: '90s', a: ninetiesA, b: ninetiesB, higher: 'more' },
+        { label: 'Goals/90', a: goalsPerA, b: goalsPerB, aRaw: parseFloat(goalsPerA), bRaw: parseFloat(goalsPerB), higher: 'more' },
+        { label: 'xG/90', a: xgPerA, b: xgPerB, aRaw: parseFloat(xgPerA), bRaw: parseFloat(xgPerB), higher: 'more' }
+      ];
+
+      let html = '<table class="compare-table">';
+      html += `<thead><tr><th>Stat</th><th>${pA.name}</th><th>${pB.name}</th></tr></thead>`;
+      html += '<tbody>';
+
+      for (const s of stats) {
+        const aVal = s.aRaw != null ? s.aRaw : s.a;
+        const bVal = s.bRaw != null ? s.bRaw : s.b;
+        const aHighlight = aVal > bVal ? ' highlight' : '';
+        const bHighlight = bVal > aVal ? ' highlight' : '';
+        html += `<tr><td>${s.label}</td><td class="${aHighlight}">${s.a}</td><td class="${bHighlight}">${s.b}</td></tr>`;
+      }
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // Compare section toggle
+    document.getElementById('compareHeader').addEventListener('click', () => {
+      document.getElementById('compareSection').classList.toggle('collapsed');
+    });
+
+    document.getElementById('comparePlayerA').addEventListener('change', renderComparison);
+    document.getElementById('comparePlayerB').addEventListener('change', renderComparison);
+
     async function init() {
       try {
         const res = await fetch('/api/players');
@@ -635,6 +934,8 @@
 
         // Show filters and render
         document.getElementById('filtersBar').classList.add('visible');
+        populateCompareDropdowns();
+        document.getElementById('compareSection').classList.add('visible');
         applyFilters();
 
       } catch (error) {
@@ -650,5 +951,6 @@
 
     init();
   </script>
+  <script src="/search.js"></script>
 </body>
 </html>
