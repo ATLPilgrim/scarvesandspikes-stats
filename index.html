@@ -1858,18 +1858,23 @@
           </div>
           <div class="analytics-mini-card">
             <div class="mini-card-title">Goals Added Radar</div>
-            ${hasOppGplus ? `
+            ${hasOppGplus ? (() => {
+              const atlVals = aggregateGplus(goalsAddedPlayers);
+              const oppVals = aggregateGplus(oppGoalsAddedPlayers);
+              const shared = computeSharedAbsMax(atlVals, oppVals, 0.05);
+              return `
               <div class="comparison-container">
                 <div class="comparison-side">
                   <div class="comparison-label atl">ATL</div>
-                  ${renderMiniRadarChart(goalsAddedPlayers)}
+                  ${renderMiniRadarChart(goalsAddedPlayers, shared)}
                 </div>
                 <div class="comparison-side">
                   <div class="comparison-label opp">${oppLabel}</div>
-                  ${renderMiniRadarChart(oppGoalsAddedPlayers)}
+                  ${renderMiniRadarChart(oppGoalsAddedPlayers, shared)}
                 </div>
-              </div>
-            ` : renderMiniRadarChart(goalsAddedPlayers)}
+              </div>`;
+            })()
+            : renderMiniRadarChart(goalsAddedPlayers)}
           </div>
         </div>
         <div class="analytics-row" style="margin-top: var(--space-md);">
@@ -1959,7 +1964,39 @@
     }
 
     // Mini Radar Chart (aggregate player g+ by action type)
-    function renderMiniRadarChart(goalsAddedPlayers) {
+    // Helper: aggregate g+ values from player list for radar axes
+    function aggregateGplus(goalsAddedPlayers) {
+      const axes = ['Dribbling', 'Passing', 'Shooting', 'Interrupting', 'Receiving'];
+      const totals = {};
+      axes.forEach(a => totals[a] = 0);
+      if (goalsAddedPlayers) {
+        goalsAddedPlayers.forEach(p => {
+          axes.forEach(a => {
+            if (p.actions && p.actions[a]) {
+              totals[a] += p.actions[a].goalsAdded;
+            }
+          });
+        });
+      }
+      return axes.map(a => parseFloat(totals[a].toFixed(3)));
+    }
+
+    // Helper: aggregate GK g+ values from goalsAdded object for radar axes
+    function aggregateGkGplus(goalsAdded) {
+      const axes = ['Claiming', 'Fielding', 'Handling', 'Passing', 'Shotstopping', 'Sweeping'];
+      return axes.map(a => {
+        const d = goalsAdded ? goalsAdded[a] : null;
+        return d ? d.goalsAdded : 0;
+      });
+    }
+
+    // Helper: compute shared absMax across two value arrays for consistent radar scaling
+    function computeSharedAbsMax(values1, values2, floor) {
+      const allValues = [...values1, ...values2];
+      return Math.max(floor, ...allValues.map(Math.abs));
+    }
+
+    function renderMiniRadarChart(goalsAddedPlayers, sharedAbsMax) {
       if (!goalsAddedPlayers || goalsAddedPlayers.length === 0) {
         return '<div class="analytics-no-data">No g+ data</div>';
       }
@@ -1967,18 +2004,7 @@
       const axes = ['Dribbling', 'Passing', 'Shooting', 'Interrupting', 'Receiving'];
       const shortLabels = ['Drib', 'Pass', 'Shot', 'Int', 'Recv'];
 
-      // Aggregate g+ across all players for the match
-      const totals = {};
-      axes.forEach(a => totals[a] = 0);
-      goalsAddedPlayers.forEach(p => {
-        axes.forEach(a => {
-          if (p.actions && p.actions[a]) {
-            totals[a] += p.actions[a].goalsAdded;
-          }
-        });
-      });
-
-      const values = axes.map(a => parseFloat(totals[a].toFixed(3)));
+      const values = aggregateGplus(goalsAddedPlayers);
 
       const padding = 40;
       const chartSize = 120;
@@ -1989,7 +2015,8 @@
       const levels = 3;
 
       // Zero-centered scale: center = -absMax, middle ring = 0, edge = +absMax
-      const absMax = Math.max(0.05, ...values.map(Math.abs));
+      // Use shared scale if provided for consistent comparison
+      const absMax = sharedAbsMax || Math.max(0.05, ...values.map(Math.abs));
 
       const angleOffset = -Math.PI / 2;
       function getPoint(index, radius) {
@@ -2026,7 +2053,8 @@
 
       // Map values from [-absMax, +absMax] to [0, maxRadius]
       const dataPoints = values.map((v, i) => {
-        const r = ((v + absMax) / (2 * absMax)) * maxRadius;
+        const clamped = Math.max(-absMax, Math.min(absMax, v));
+        const r = ((clamped + absMax) / (2 * absMax)) * maxRadius;
         const p = getPoint(i, r);
         return `${p.x},${p.y}`;
       }).join(' ');
@@ -2464,16 +2492,19 @@
 
       // GK g+ radars: side-by-side
       if (hasAtlGk && hasOppGk) {
+        const atlGkVals = aggregateGkGplus(gk.goalsAdded);
+        const oppGkVals = aggregateGkGplus(oppGk.goalsAdded);
+        const sharedGkScale = computeSharedAbsMax(atlGkVals, oppGkVals, 0.05);
         html += `<div class="analytics-mini-card">
           <div class="mini-card-title">GK Goals Added</div>
           <div class="comparison-container">
             <div class="comparison-side">
               <div class="comparison-label atl">ATL</div>
-              ${renderMiniGkRadar(gk.goalsAdded)}
+              ${renderMiniGkRadar(gk.goalsAdded, sharedGkScale)}
             </div>
             <div class="comparison-side">
               <div class="comparison-label opp">${oppLabel}</div>
-              ${renderMiniGkRadar(oppGk.goalsAdded)}
+              ${renderMiniGkRadar(oppGk.goalsAdded, sharedGkScale)}
             </div>
           </div>
         </div>`;
@@ -2532,17 +2563,14 @@
     }
 
     // Mini GK g+ Radar (6-axis: Claiming, Fielding, Handling, Passing, Shotstopping, Sweeping)
-    function renderMiniGkRadar(goalsAdded) {
+    function renderMiniGkRadar(goalsAdded, sharedAbsMax) {
       if (!goalsAdded) {
         return '<div class="analytics-no-data">No g+ data</div>';
       }
 
       const axes = ['Claiming', 'Fielding', 'Handling', 'Passing', 'Shotstopping', 'Sweeping'];
       const shortLabels = ['Claim', 'Field', 'Hand', 'Pass', 'Shot', 'Sweep'];
-      const values = axes.map(a => {
-        const d = goalsAdded[a];
-        return d ? d.goalsAdded : 0;
-      });
+      const values = aggregateGkGplus(goalsAdded);
 
       if (values.every(v => v === 0) && Object.keys(goalsAdded).length === 0) {
         return '<div class="analytics-no-data">No g+ data</div>';
@@ -2557,7 +2585,8 @@
       const levels = 3;
 
       // Zero-centered scale: center = -absMax, middle ring = 0, edge = +absMax
-      const absMax = Math.max(0.05, ...values.map(Math.abs));
+      // Use shared scale if provided for consistent comparison
+      const absMax = sharedAbsMax || Math.max(0.05, ...values.map(Math.abs));
 
       const angleOffset = -Math.PI / 2;
       function getPoint(index, radius) {
@@ -2594,7 +2623,8 @@
 
       // Map values from [-absMax, +absMax] to [0, maxRadius]
       const dataPoints = values.map((v, i) => {
-        const r = ((v + absMax) / (2 * absMax)) * maxRadius;
+        const clamped = Math.max(-absMax, Math.min(absMax, v));
+        const r = ((clamped + absMax) / (2 * absMax)) * maxRadius;
         const p = getPoint(i, r);
         return `${p.x},${p.y}`;
       }).join(' ');
@@ -2959,7 +2989,8 @@
 
       // Map values from [-absMax, +absMax] to [0, maxRadius]
       const dataPoints = values.map((v, i) => {
-        const r = ((v + absMax) / (2 * absMax)) * maxRadius;
+        const clamped = Math.max(-absMax, Math.min(absMax, v));
+        const r = ((clamped + absMax) / (2 * absMax)) * maxRadius;
         const p = getPoint(i, r);
         return `${p.x},${p.y}`;
       }).join(' ');

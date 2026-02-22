@@ -839,7 +839,8 @@
 
       // Map values from [-absMax, +absMax] to [0, maxRadius]
       const dataPoints = values.map((v, i) => {
-        const r = ((v + absMax) / (2 * absMax)) * maxRadius;
+        const clamped = Math.max(-absMax, Math.min(absMax, v));
+        const r = ((clamped + absMax) / (2 * absMax)) * maxRadius;
         const p = getPoint(i, r);
         return `${p.x},${p.y}`;
       }).join(' ');
