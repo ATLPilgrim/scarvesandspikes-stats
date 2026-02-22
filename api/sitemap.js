@@ -1,5 +1,5 @@
 // Vercel Serverless Function - Dynamic Sitemap
-// Generates XML sitemap with all opponent pages for SEO
+// Generates XML sitemap with all opponent and player pages for SEO
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/xml');
@@ -8,20 +8,41 @@ export default async function handler(req, res) {
   try {
     const atlantaId = 'KAqBN0Vqbg';
     const baseUrl = 'https://stats.scarvesandspikes.com';
-    
+
     // Fetch all teams Atlanta has played
     const seasons = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026'];
-    
-    const [teamsRes, ...seasonResponses] = await Promise.all([
+
+    const [teamsRes, p1Res, p2Res, p3Res, p4Res, ...seasonResponses] = await Promise.all([
       fetch('https://app.americansocceranalysis.com/api/v1/mls/teams'),
-      ...seasons.map(season => 
+      // Player name lookups (paginated)
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=0'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=1000'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=2000'),
+      fetch('https://app.americansocceranalysis.com/api/v1/mls/players?offset=3000'),
+      // Game data per season (for opponents)
+      ...seasons.map(season =>
         fetch(`https://app.americansocceranalysis.com/api/v1/mls/games?team_id=${atlantaId}&season_name=${season}`)
-      )
+      ),
     ]);
+
+    // Fetch player xgoals per season (for player slugs)
+    const xgoalsResponses = await Promise.all(
+      seasons.map(season =>
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}`)
+      )
+    );
 
     const teams = await teamsRes.json();
     const teamMap = {};
     teams.forEach(t => { teamMap[t.team_id] = t.team_name; });
+
+    // Build player name lookup
+    const [p1, p2, p3, p4] = await Promise.all([
+      p1Res.json(), p2Res.json(), p3Res.json(), p4Res.json()
+    ]);
+    const allPlayerData = [...p1, ...p2, ...p3, ...p4];
+    const playerMap = {};
+    allPlayerData.forEach(p => { playerMap[p.player_id] = p.player_name; });
 
     // Collect all unique opponents
     const opponentIds = new Set();
@@ -31,6 +52,13 @@ export default async function handler(req, res) {
         const oppId = game.home_team_id === atlantaId ? game.away_team_id : game.home_team_id;
         opponentIds.add(oppId);
       });
+    }
+
+    // Collect all unique Atlanta player IDs
+    const playerIds = new Set();
+    for (const response of xgoalsResponses) {
+      const records = await response.json();
+      records.forEach(r => { playerIds.add(r.player_id); });
     }
 
     // Normalize opponent name to URL slug
@@ -46,6 +74,14 @@ export default async function handler(req, res) {
         .replace(/-cf$/, '');
     };
 
+    // Player slug normalization (must match players.js)
+    const normalizePlayerName = (name) => {
+      return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
+    };
+
     // Build opponent list
     const opponents = Array.from(opponentIds)
       .map(id => ({
@@ -55,9 +91,26 @@ export default async function handler(req, res) {
       .filter(o => o.name !== 'Unknown')
       .sort((a, b) => a.name.localeCompare(b.name));
 
+    // Build player list with collision-safe slugs
+    const slugCounts = {};
+    const players = Array.from(playerIds)
+      .map(id => playerMap[id])
+      .filter(name => name && name !== 'Unknown')
+      .sort()
+      .map(name => {
+        let baseSlug = normalizePlayerName(name);
+        if (!slugCounts[baseSlug]) {
+          slugCounts[baseSlug] = 1;
+        } else {
+          slugCounts[baseSlug]++;
+          baseSlug = `${baseSlug}-${slugCounts[baseSlug]}`;
+        }
+        return { name, slug: baseSlug };
+      });
+
     // Generate sitemap XML
     const today = new Date().toISOString().split('T')[0];
-    
+
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -73,6 +126,12 @@ export default async function handler(req, res) {
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>${baseUrl}/players.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>${baseUrl}/opponent.html</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
@@ -83,6 +142,12 @@ ${opponents.map(o => `  <url>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>`).join('\n')}
+${players.map(p => `  <url>
+    <loc>${baseUrl}/player.html?id=${p.slug}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>`).join('\n')}
 </urlset>`;
 
