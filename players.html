@@ -264,6 +264,15 @@
       width: 100%;
     }
 
+    .filter-note {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      width: 100%;
+      display: none;
+    }
+
+    .filter-note.visible { display: block; }
+
     /* Player Grid */
     .player-grid {
       display: grid;
@@ -450,6 +459,7 @@
         <option value="all">All Seasons</option>
       </select>
       <div class="results-count" id="resultsCount"></div>
+      <div class="filter-note" id="filterNote"></div>
     </div>
 
     <!-- Content Area -->
@@ -562,6 +572,14 @@
     function applyFilters() {
       const filtered = filterPlayers();
       renderCards(filtered);
+
+      const note = document.getElementById('filterNote');
+      if (activeSeason !== 'all') {
+        note.textContent = 'Only players with minutes played are shown for individual seasons.';
+        note.classList.add('visible');
+      } else {
+        note.classList.remove('visible');
+      }
     }
 
     // Event listeners
