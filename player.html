@@ -269,6 +269,13 @@
       line-height: 1.4;
     }
 
+    .radar-key-metrics {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      text-align: center;
+      margin-top: var(--space-sm);
+    }
+
     .stats-row {
       display: flex;
       justify-content: space-between;
@@ -999,6 +1006,15 @@
         ? 'Goals Added (g+) measures contribution across six GK action types. Larger area = stronger overall performance.'
         : 'Goals Added (g+) measures contribution across five outfield action types. Larger area = stronger overall performance.';
 
+      const posGroup = mapPosition(data.player.position);
+      const keyMetrics = {
+        'GK': 'Key metrics: Claiming, Sweeping, Shotstopping',
+        'D': 'Key metrics: Interrupting, Receiving',
+        'M': 'Key metrics: Passing, Receiving, Interrupting',
+        'F': 'Key metrics: Shooting, Receiving, Dribbling'
+      };
+      const keyMetricsHint = keyMetrics[posGroup] || '';
+
       return `
         <div class="stats-card">
           <div class="stats-card-title">Goals Added (g+) Radar</div>
@@ -1011,6 +1027,7 @@
               ${labels}
             </svg>
           </div>
+          ${keyMetricsHint ? `<div class="radar-key-metrics">${keyMetricsHint}</div>` : ''}
         </div>
       `;
     }
