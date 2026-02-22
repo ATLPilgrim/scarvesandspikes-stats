@@ -334,12 +334,10 @@
 
     .xg-meter-fill.positive {
       background: linear-gradient(90deg, #43a047, var(--win));
-      right: 50%;
     }
 
     .xg-meter-fill.negative {
       background: linear-gradient(90deg, var(--loss), #e53935);
-      left: 50%;
     }
 
     .xg-meter-labels {
@@ -829,10 +827,10 @@
         let fillStyle, fillClass;
         if (isOutperform) {
           fillClass = 'positive';
-          fillStyle = `right: 50%; width: ${pct}%;`;
+          fillStyle = `left: 50%; width: ${pct}%;`;
         } else {
           fillClass = 'negative';
-          fillStyle = `left: 50%; width: ${pct}%;`;
+          fillStyle = `left: ${50 - pct}%; width: ${pct}%;`;
         }
 
         return `
@@ -845,9 +843,9 @@
               <div class="xg-meter-fill ${fillClass}" style="${fillStyle}"></div>
             </div>
             <div class="xg-meter-labels">
-              <span>Outperform (0.0)</span>
-              <span>1.0</span>
               <span>Underperform (2.0)</span>
+              <span>1.0</span>
+              <span>Outperform (0.0)</span>
             </div>
             <div class="xg-meter-context">
               <div class="xg-meter-context-item">
@@ -874,10 +872,10 @@
       let fillStyle, fillClass;
       if (isPositive) {
         fillClass = 'positive';
-        fillStyle = `right: 50%; width: ${pct}%;`;
+        fillStyle = `left: 50%; width: ${pct}%;`;
       } else {
         fillClass = 'negative';
-        fillStyle = `left: 50%; width: ${pct}%;`;
+        fillStyle = `left: ${50 - pct}%; width: ${pct}%;`;
       }
 
       return `

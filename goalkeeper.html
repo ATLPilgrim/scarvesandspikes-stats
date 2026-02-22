@@ -315,12 +315,10 @@
 
     .gk-luck-fill.outperform {
       background: linear-gradient(90deg, #43a047, var(--win));
-      right: 50%;
     }
 
     .gk-luck-fill.underperform {
       background: linear-gradient(90deg, var(--loss), #e53935);
-      left: 50%;
     }
 
     .gk-luck-value {
@@ -741,13 +739,13 @@
 
       let fillStyle, fillClass;
       if (isOutperform) {
-        // Fill goes left from center
+        // Fill goes right from center (good = right)
         fillClass = 'outperform';
-        fillStyle = `right: 50%; width: ${pct}%;`;
-      } else {
-        // Fill goes right from center
-        fillClass = 'underperform';
         fillStyle = `left: 50%; width: ${pct}%;`;
+      } else {
+        // Fill goes left from center (bad = left)
+        fillClass = 'underperform';
+        fillStyle = `left: ${50 - pct}%; width: ${pct}%;`;
       }
 
       return `
@@ -760,9 +758,9 @@
             <div class="gk-luck-fill ${fillClass}" style="${fillStyle}"></div>
           </div>
           <div class="gk-luck-labels">
-            <span>Outperform (0.0)</span>
-            <span>1.0</span>
             <span>Underperform (2.0)</span>
+            <span>1.0</span>
+            <span>Outperform (0.0)</span>
           </div>
           <div class="gk-luck-context">
             <div class="gk-luck-context-item">
