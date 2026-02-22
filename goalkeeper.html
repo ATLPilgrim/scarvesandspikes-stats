@@ -801,8 +801,8 @@
       const maxRadius = chartSize / 2;
       const levels = 4;
 
-      const absMax = Math.max(0.5, ...values.map(Math.abs));
-      const scale = maxRadius / absMax;
+      // Zero-centered scale: center = -absMax, middle ring = 0, edge = +absMax
+      const absMax = Math.max(0.1, ...values.map(Math.abs));
 
       const angleOffset = -Math.PI / 2;
       function getPoint(index, radius) {
@@ -823,14 +823,23 @@
         gridLines += `<polygon points="${ringPoints}" fill="none" stroke="#333" stroke-width="0.5"/>`;
       }
 
+      // Dashed zero-reference ring at midpoint
+      const zeroR = maxRadius / 2;
+      const zeroPoints = axes.map((_, i) => {
+        const p = getPoint(i, zeroR);
+        return `${p.x},${p.y}`;
+      }).join(' ');
+      gridLines += `<polygon points="${zeroPoints}" fill="none" stroke="#555" stroke-width="1" stroke-dasharray="4,4"/>`;
+
       let axisLines = '';
       axes.forEach((_, i) => {
         const p = getPoint(i, maxRadius);
         axisLines += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="#333" stroke-width="0.5"/>`;
       });
 
+      // Map values from [-absMax, +absMax] to [0, maxRadius]
       const dataPoints = values.map((v, i) => {
-        const r = Math.max(0, v) * scale;
+        const r = ((v + absMax) / (2 * absMax)) * maxRadius;
         const p = getPoint(i, r);
         return `${p.x},${p.y}`;
       }).join(' ');
