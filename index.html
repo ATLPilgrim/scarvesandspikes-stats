@@ -1558,299 +1558,35 @@
       color: var(--gray-300);
     }
 
-    /* Club Stats Section */
-    .club-stats-section {
+    /* Current Form */
+    .current-form {
       display: none;
-      margin-bottom: var(--space-xl);
-    }
-
-    .club-stats-section.visible {
-      display: block;
-    }
-
-    .club-stats-header {
-      display: flex;
       align-items: center;
-      gap: var(--space-md);
-      margin-bottom: var(--space-lg);
-    }
-
-    .club-stats-badge {
-      font-family: var(--font-display);
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: var(--space-xs) var(--space-sm);
-      background: var(--burgundy);
-      color: var(--white);
-      border-radius: var(--radius-sm);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .club-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-lg);
-    }
-
-    .club-stats-grid--full {
-      grid-column: 1 / -1;
-    }
-
-    .club-stats-card {
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xl);
+      padding: var(--space-md) var(--space-lg);
       background: var(--gray-900);
       border: 1px solid var(--gray-800);
       border-radius: var(--radius-lg);
-      padding: var(--space-lg);
     }
 
-    .club-stats-card-title {
+    .current-form.visible {
+      display: inline-flex;
+    }
+
+    .current-form-label {
       font-family: var(--font-display);
-      font-size: 0.875rem;
+      font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       color: var(--gray-400);
-      margin-bottom: var(--space-md);
     }
 
-    /* Manager Stints */
-    .manager-stints {
-      display: flex;
-      gap: var(--space-md);
-      overflow-x: auto;
-      padding-bottom: var(--space-sm);
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .manager-stints::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    .manager-stints::-webkit-scrollbar-track {
-      background: var(--gray-900);
-    }
-
-    .manager-stints::-webkit-scrollbar-thumb {
-      background: var(--gray-700);
-      border-radius: 2px;
-    }
-
-    .manager-stint {
-      flex: 0 0 auto;
-      min-width: 160px;
-      background: var(--gray-800);
-      border: 1px solid var(--gray-700);
-      border-radius: var(--radius-md);
-      padding: var(--space-md);
-      text-align: center;
-    }
-
-    .manager-stint-name {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--white);
-      margin-bottom: var(--space-xs);
-    }
-
-    .manager-stint-tenure {
-      font-size: 0.75rem;
-      color: var(--gray-400);
-      margin-bottom: var(--space-sm);
-    }
-
-    .manager-stint-badge {
-      display: inline-block;
-      font-family: var(--font-display);
-      font-size: 0.6rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 2px 6px;
-      background: var(--gold);
-      color: var(--black);
-      border-radius: var(--radius-sm);
-      margin-bottom: var(--space-sm);
-    }
-
-    .manager-stint-record {
+    .current-form-value {
       font-family: var(--font-display);
       font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--gray-100);
-      margin-bottom: var(--space-xs);
-    }
-
-    .manager-stint-stats {
-      display: flex;
-      justify-content: center;
-      gap: var(--space-md);
-      font-size: 0.75rem;
-      color: var(--gray-400);
-    }
-
-    .manager-stint-stat-label {
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--gray-500);
-    }
-
-    .manager-null-note {
-      font-size: 0.7rem;
-      color: var(--gray-500);
-      margin-top: var(--space-sm);
-      font-style: italic;
-    }
-
-    /* Season History Table */
-    .season-table-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .season-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      min-width: 600px;
-    }
-
-    .season-table th {
-      font-family: var(--font-display);
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--gray-400);
-      padding: var(--space-sm) var(--space-md);
-      text-align: right;
-      border-bottom: 1px solid var(--gray-700);
-      white-space: nowrap;
-    }
-
-    .season-table th:first-child {
-      text-align: left;
-    }
-
-    .season-table td {
-      padding: var(--space-sm) var(--space-md);
-      text-align: right;
-      border-bottom: 1px solid var(--gray-800);
-      white-space: nowrap;
-      color: var(--gray-200);
-    }
-
-    .season-table td:first-child {
-      text-align: left;
-      font-family: var(--font-display);
-      font-weight: 600;
-      color: var(--white);
-    }
-
-    .season-table tr:hover td {
-      background: var(--gray-800);
-    }
-
-    .luck-positive {
-      color: #43a047;
-    }
-
-    .luck-negative {
-      color: #e53935;
-    }
-
-    /* Venue Split */
-    .venue-split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-md);
-    }
-
-    .venue-block {
-      text-align: center;
-      padding: var(--space-md);
-      background: var(--gray-800);
-      border-radius: var(--radius-md);
-    }
-
-    .venue-block-label {
-      font-family: var(--font-display);
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--gray-400);
-      margin-bottom: var(--space-sm);
-    }
-
-    .venue-block-record {
-      font-family: var(--font-display);
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--white);
-      margin-bottom: var(--space-xs);
-    }
-
-    .venue-block-winpct {
-      font-size: 0.85rem;
-      color: var(--gold);
-    }
-
-    /* Streak Trackers */
-    .current-streak {
-      text-align: center;
-      margin-bottom: var(--space-lg);
-    }
-
-    .current-streak-label {
-      font-family: var(--font-display);
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--gray-400);
-      margin-bottom: var(--space-xs);
-    }
-
-    .current-streak-value {
-      font-family: var(--font-display);
-      font-size: 2rem;
       font-weight: 700;
-    }
-
-    .streak-records {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-sm);
-    }
-
-    .streak-record {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-sm) var(--space-md);
-      background: var(--gray-800);
-      border-radius: var(--radius-sm);
-    }
-
-    .streak-record-label {
-      font-size: 0.75rem;
-      color: var(--gray-400);
-    }
-
-    .streak-record-value {
-      font-family: var(--font-display);
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: var(--white);
-    }
-
-    .streak-record-dates {
-      font-size: 0.65rem;
-      color: var(--gray-500);
-      margin-left: var(--space-sm);
     }
 
     /* Responsive */
@@ -1924,14 +1660,6 @@
       .comparison-container {
         grid-template-columns: 1fr;
       }
-
-      .club-stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .venue-split {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
 </head>
@@ -1947,6 +1675,7 @@
         <a href="/goalkeeper.html" class="nav-link">Goalkeepers</a>
         <a href="/players.html" class="nav-link">Players</a>
         <a href="/opponent.html" class="nav-link">Opponents</a>
+        <a href="/history.html" class="nav-link">History</a>
       </nav>
     </div>
   </header>
@@ -1965,14 +1694,8 @@
     <!-- Summary Stats -->
     <div id="summary" class="summary"></div>
 
-    <!-- Club Stats -->
-    <section id="clubStatsSection" class="club-stats-section">
-      <div class="club-stats-header">
-        <h2 class="insights-title">Club Stats</h2>
-        <span class="club-stats-badge">All-Time</span>
-      </div>
-      <div id="clubStatsContent" class="club-stats-content"></div>
-    </section>
+    <!-- Current Form -->
+    <div id="currentForm" class="current-form"></div>
 
     <!-- Season Insights -->
     <section id="insightsSection" class="insights-section">
@@ -3740,329 +3463,27 @@
       return data.matches;
     }
 
-    // ── Club Stats ──
-    let clubStatsRendered = false;
-
-    function computeManagerStints(matches) {
-      const sorted = [...matches].sort((a, b) => new Date(a.date) - new Date(b.date));
-      const stints = [];
-      let current = null;
-      let nullCount = 0;
-
-      for (const match of sorted) {
-        if (!match.atlManager) {
-          nullCount++;
-          continue;
-        }
-        if (!current || current.manager !== match.atlManager) {
-          current = {
-            manager: match.atlManager,
-            startDate: match.date,
-            endDate: match.date,
-            startYear: new Date(match.date).getFullYear(),
-            endYear: new Date(match.date).getFullYear(),
-            wins: 0, draws: 0, losses: 0
-          };
-          stints.push(current);
-        }
-        current.endDate = match.date;
-        current.endYear = new Date(match.date).getFullYear();
-        if (match.result === 'W') current.wins++;
-        else if (match.result === 'D') current.draws++;
-        else if (match.result === 'L') current.losses++;
+    // ── Current Form ──
+    function renderCurrentForm(matches) {
+      const el = document.getElementById('currentForm');
+      if (!matches || matches.length === 0) {
+        el.classList.remove('visible');
+        return;
       }
 
-      return { stints, nullCount };
-    }
-
-    function computeSeasonStats(matches) {
-      const seasonMap = {};
-      for (const m of matches) {
-        if (!seasonMap[m.season]) {
-          seasonMap[m.season] = { season: m.season, w: 0, d: 0, l: 0, gf: 0, ga: 0, xg: 0, xga: 0, xpts: 0 };
-        }
-        const s = seasonMap[m.season];
-        if (m.result === 'W') s.w++;
-        else if (m.result === 'D') s.d++;
-        else if (m.result === 'L') s.l++;
-        s.gf += m.atlScore || 0;
-        s.ga += m.oppScore || 0;
-        s.xg += m.atlXg || 0;
-        s.xga += m.oppXg || 0;
-        if (m.atlXpoints != null) s.xpts += m.atlXpoints;
-      }
-      return Object.values(seasonMap).sort((a, b) => b.season - a.season);
-    }
-
-    function computeVenueStats(matches) {
-      const home = { w: 0, d: 0, l: 0 };
-      const away = { w: 0, d: 0, l: 0 };
-      for (const m of matches) {
-        const bucket = m.isHome ? home : away;
-        if (m.result === 'W') bucket.w++;
-        else if (m.result === 'D') bucket.d++;
-        else if (m.result === 'L') bucket.l++;
-      }
-      const total = (b) => b.w + b.d + b.l;
-      home.winPct = total(home) ? ((home.w / total(home)) * 100).toFixed(1) : '0.0';
-      away.winPct = total(away) ? ((away.w / total(away)) * 100).toFixed(1) : '0.0';
-      return { home, away };
-    }
-
-    function computeStreaks(matches) {
-      const sorted = [...matches].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-      let longestWin = { length: 0, startDate: null, endDate: null };
-      let longestUnbeaten = { length: 0, startDate: null, endDate: null };
-      let longestWinless = { length: 0, startDate: null, endDate: null };
-
-      let curWin = { length: 0, startDate: null, endDate: null };
-      let curUnbeaten = { length: 0, startDate: null, endDate: null };
-      let curWinless = { length: 0, startDate: null, endDate: null };
-
-      for (const m of sorted) {
-        // Win streak
-        if (m.result === 'W') {
-          if (curWin.length === 0) curWin.startDate = m.date;
-          curWin.length++;
-          curWin.endDate = m.date;
-        } else {
-          if (curWin.length > longestWin.length) longestWin = { ...curWin };
-          curWin = { length: 0, startDate: null, endDate: null };
-        }
-
-        // Unbeaten streak (W or D)
-        if (m.result === 'W' || m.result === 'D') {
-          if (curUnbeaten.length === 0) curUnbeaten.startDate = m.date;
-          curUnbeaten.length++;
-          curUnbeaten.endDate = m.date;
-        } else {
-          if (curUnbeaten.length > longestUnbeaten.length) longestUnbeaten = { ...curUnbeaten };
-          curUnbeaten = { length: 0, startDate: null, endDate: null };
-        }
-
-        // Winless streak (D or L)
-        if (m.result === 'D' || m.result === 'L') {
-          if (curWinless.length === 0) curWinless.startDate = m.date;
-          curWinless.length++;
-          curWinless.endDate = m.date;
-        } else {
-          if (curWinless.length > longestWinless.length) longestWinless = { ...curWinless };
-          curWinless = { length: 0, startDate: null, endDate: null };
-        }
-      }
-
-      // Final checks
-      if (curWin.length > longestWin.length) longestWin = { ...curWin };
-      if (curUnbeaten.length > longestUnbeaten.length) longestUnbeaten = { ...curUnbeaten };
-      if (curWinless.length > longestWinless.length) longestWinless = { ...curWinless };
-
-      // Current streak: use last match's result and count backwards
-      let currentType = null;
+      const sorted = [...matches].sort((a, b) => new Date(b.date) - new Date(a.date));
+      let currentType = sorted[0].result;
       let currentLength = 0;
-      for (let i = sorted.length - 1; i >= 0; i--) {
-        const r = sorted[i].result;
-        if (currentType === null) currentType = r;
-        if (r === currentType) currentLength++;
+      for (const m of sorted) {
+        if (m.result === currentType) currentLength++;
         else break;
       }
 
-      return {
-        current: { type: currentType, length: currentLength },
-        longestWin,
-        longestUnbeaten,
-        longestWinless
-      };
-    }
-
-    function formatShortDate(dateStr) {
-      if (!dateStr) return '';
-      const d = new Date(dateStr.replace(' UTC', 'Z').replace(' ', 'T'));
-      if (isNaN(d.getTime())) return '';
-      return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    }
-
-    function renderManagerRecords(data) {
-      const { stints, nullCount } = data;
-      const reversed = [...stints].reverse(); // most recent first
-      const lastIndex = reversed.length - 1;
-
-      let html = '<div class="club-stats-grid--full club-stats-card"><div class="club-stats-card-title">Manager Records</div>';
-      html += '<div class="manager-stints">';
-
-      reversed.forEach((stint, i) => {
-        const total = stint.wins + stint.draws + stint.losses;
-        const winPct = total ? ((stint.wins / total) * 100).toFixed(1) : '0.0';
-        const ppg = total ? ((stint.wins * 3 + stint.draws) / total).toFixed(2) : '0.00';
-        const tenure = stint.startYear === stint.endYear
-          ? `${stint.startYear}`
-          : `${stint.startYear}-${stint.endYear}`;
-        const isCurrent = i === 0;
-
-        html += `<div class="manager-stint">`;
-        html += `<div class="manager-stint-name">${stint.manager}</div>`;
-        html += `<div class="manager-stint-tenure">${tenure}</div>`;
-        if (isCurrent) html += `<div class="manager-stint-badge">Current</div>`;
-        html += `<div class="manager-stint-record">${stint.wins}W-${stint.draws}D-${stint.losses}L</div>`;
-        html += `<div class="manager-stint-stats">`;
-        html += `<div><div class="manager-stint-stat-label">Win%</div>${winPct}%</div>`;
-        html += `<div><div class="manager-stint-stat-label">PPG</div>${ppg}</div>`;
-        html += `</div>`;
-        html += `</div>`;
-      });
-
-      html += '</div>';
-      if (nullCount > 0) {
-        html += `<div class="manager-null-note">${nullCount} match${nullCount > 1 ? 'es' : ''} excluded (no manager data)</div>`;
-      }
-      html += '</div>';
-      return html;
-    }
-
-    function renderSeasonHistory(seasons) {
-      let html = '<div class="club-stats-grid--full">';
-      html += '<div class="analytics-group">';
-      html += '<div class="analytics-group-header">';
-      html += '<span class="analytics-group-title">Season History</span>';
-      html += '<div class="analytics-group-chevron"></div>';
-      html += '</div>';
-      html += '<div class="analytics-group-body">';
-      html += '<div class="season-table-wrapper"><table class="season-table">';
-      html += '<thead><tr><th>Season</th><th>W-D-L</th><th>GF</th><th>GA</th><th>xG</th><th>xGA</th><th>Pts</th><th>xPts</th><th>Luck</th></tr></thead>';
-      html += '<tbody>';
-
-      for (const s of seasons) {
-        const pts = s.w * 3 + s.d;
-        const xPts = s.xpts;
-        const luck = pts - xPts;
-        const luckClass = luck > 0 ? 'luck-positive' : luck < 0 ? 'luck-negative' : '';
-        const luckStr = (luck > 0 ? '+' : '') + luck.toFixed(1);
-
-        html += '<tr>';
-        html += `<td>${s.season}</td>`;
-        html += `<td>${s.w}-${s.d}-${s.l}</td>`;
-        html += `<td>${s.gf}</td>`;
-        html += `<td>${s.ga}</td>`;
-        html += `<td>${s.xg.toFixed(1)}</td>`;
-        html += `<td>${s.xga.toFixed(1)}</td>`;
-        html += `<td>${pts}</td>`;
-        html += `<td>${xPts.toFixed(1)}</td>`;
-        html += `<td class="${luckClass}">${luckStr}</td>`;
-        html += '</tr>';
-      }
-
-      html += '</tbody></table></div>';
-      html += '</div></div></div>';
-      return html;
-    }
-
-    function renderVenueStats(data) {
-      const { home, away } = data;
-      let html = '<div class="club-stats-card">';
-      html += '<div class="club-stats-card-title">Home vs Away</div>';
-      html += '<div class="venue-split">';
-
-      html += '<div class="venue-block">';
-      html += '<div class="venue-block-label">Home</div>';
-      html += `<div class="venue-block-record">${home.w}W-${home.d}D-${home.l}L</div>`;
-      html += `<div class="venue-block-winpct">${home.winPct}% Win Rate</div>`;
-      html += '</div>';
-
-      html += '<div class="venue-block">';
-      html += '<div class="venue-block-label">Away</div>';
-      html += `<div class="venue-block-record">${away.w}W-${away.d}D-${away.l}L</div>`;
-      html += `<div class="venue-block-winpct">${away.winPct}% Win Rate</div>`;
-      html += '</div>';
-
-      html += '</div></div>';
-      return html;
-    }
-
-    function renderStreakTrackers(data) {
-      const { current, longestWin, longestUnbeaten, longestWinless } = data;
       const colorMap = { W: 'var(--win)', L: 'var(--loss)', D: 'var(--draw)' };
       const labelMap = { W: 'W', L: 'L', D: 'D' };
 
-      let html = '<div class="club-stats-card">';
-      html += '<div class="club-stats-card-title">Streaks</div>';
-
-      html += '<div class="current-streak">';
-      html += '<div class="current-streak-label">Current Streak</div>';
-      html += `<div class="current-streak-value" style="color: ${colorMap[current.type] || 'var(--gray-300)'};">${labelMap[current.type] || '-'}${current.length}</div>`;
-      html += '</div>';
-
-      html += '<div class="streak-records">';
-
-      const formatRange = (s) => {
-        if (!s.startDate) return '';
-        return `${formatShortDate(s.startDate)} - ${formatShortDate(s.endDate)}`;
-      };
-
-      html += `<div class="streak-record">
-        <span class="streak-record-label">Longest Win Streak</span>
-        <span><span class="streak-record-value">${longestWin.length} matches</span><span class="streak-record-dates">${formatRange(longestWin)}</span></span>
-      </div>`;
-
-      html += `<div class="streak-record">
-        <span class="streak-record-label">Longest Unbeaten</span>
-        <span><span class="streak-record-value">${longestUnbeaten.length} matches</span><span class="streak-record-dates">${formatRange(longestUnbeaten)}</span></span>
-      </div>`;
-
-      html += `<div class="streak-record">
-        <span class="streak-record-label">Longest Winless</span>
-        <span><span class="streak-record-value">${longestWinless.length} matches</span><span class="streak-record-dates">${formatRange(longestWinless)}</span></span>
-      </div>`;
-
-      html += '</div></div>';
-      return html;
-    }
-
-    function renderClubStats(matches) {
-      const managerData = computeManagerStints(matches);
-      const seasonData = computeSeasonStats(matches);
-      const venueData = computeVenueStats(matches);
-      const streakData = computeStreaks(matches);
-
-      const container = document.getElementById('clubStatsContent');
-      let html = '<div class="club-stats-grid">';
-      html += renderManagerRecords(managerData);
-      html += renderVenueStats(venueData);
-      html += renderStreakTrackers(streakData);
-      html += renderSeasonHistory(seasonData);
-      html += '</div>';
-
-      container.innerHTML = html;
-
-      // Wire up collapsible headers within club stats
-      container.querySelectorAll('.analytics-group-header').forEach(header => {
-        header.addEventListener('click', function() {
-          this.parentElement.classList.toggle('collapsed');
-        });
-      });
-
-      document.getElementById('clubStatsSection').classList.add('visible');
-      clubStatsRendered = true;
-    }
-
-    async function loadClubStats() {
-      if (clubStatsRendered) return;
-      try {
-        const section = document.getElementById('clubStatsSection');
-        const content = document.getElementById('clubStatsContent');
-        content.innerHTML = '<div class="insights-loading"><div class="loading-spinner--small"></div><span>Loading Club Stats</span></div>';
-        section.classList.add('visible');
-
-        let matches;
-        if (matchesBySeasonCache['all']) {
-          matches = matchesBySeasonCache['all'];
-        } else {
-          matches = await loadAllSeasons();
-        }
-
-        renderClubStats(matches);
-      } catch (error) {
-        console.error('Error loading club stats:', error);
-      }
+      el.innerHTML = `<span class="current-form-label">Current Form</span><span class="current-form-value" style="color: ${colorMap[currentType] || 'var(--gray-300)'};">${labelMap[currentType] || '-'}${currentLength}</span>`;
+      el.classList.add('visible');
     }
 
     // Apply filters
@@ -4120,6 +3541,7 @@
       filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       updateSummary(filtered);
+      renderCurrentForm(filtered);
       updateH2H(matches, opponent);
       renderMatches(filtered);
 
@@ -4153,6 +3575,7 @@
         populateOpponentFilter(matches);
         setupRandomOpponentLink(matches);
         updateSummary(matches);
+        renderCurrentForm(matches);
         renderMatches(matches);
 
         // Load season insights for default season
@@ -4169,9 +3592,6 @@
         document.getElementById('verdictFilter').addEventListener('change', applyFilters);
         document.getElementById('compFilter').addEventListener('change', applyFilters);
         document.getElementById('opponentFilter').addEventListener('change', applyFilters);
-
-        // Load club stats (fire-and-forget, doesn't block initial render)
-        loadClubStats();
 
       } catch (error) {
         console.error('Error:', error);

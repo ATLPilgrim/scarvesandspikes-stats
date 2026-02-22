@@ -1,0 +1,925 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlanta United Club History | ScarvesAndSpikes.com</title>
+  <meta name="description" content="Atlanta United all-time club history with manager records, season-by-season stats, venue splits, and streak records from 2017 to present.">
+  <link rel="canonical" href="https://stats.scarvesandspikes.com/history.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Atlanta United Club History | ScarvesAndSpikes.com">
+  <meta property="og:description" content="Atlanta United all-time club history with manager records, season-by-season stats, venue splits, and streak records from 2017 to present.">
+  <meta property="og:url" content="https://stats.scarvesandspikes.com/history.html">
+  <meta property="og:image" content="https://stats.scarvesandspikes.com/badge_community.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Atlanta United Club History | ScarvesAndSpikes.com">
+  <meta name="twitter:description" content="Atlanta United all-time club history with manager records, season-by-season stats, and streak records.">
+  <meta name="twitter:image" content="https://stats.scarvesandspikes.com/badge_community.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --burgundy: #80000a;
+      --burgundy-dark: #5a0007;
+      --burgundy-light: #a8192a;
+      --gold: #c9a227;
+      --gold-dark: #9a7a1a;
+      --gold-light: #e0bc4a;
+      --black: #0a0a0a;
+      --gray-950: #121212;
+      --gray-900: #1a1a1a;
+      --gray-800: #242424;
+      --gray-700: #333333;
+      --gray-600: #444444;
+      --gray-500: #666666;
+      --gray-400: #888888;
+      --gray-300: #aaaaaa;
+      --gray-200: #cccccc;
+      --gray-100: #e0e0e0;
+      --white: #ffffff;
+      --win: #2e7d32;
+      --loss: #c62828;
+      --draw: #666666;
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'Source Sans 3', sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--gray-100);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      background: linear-gradient(180deg, var(--gray-900) 0%, var(--black) 100%);
+      border-bottom: 1px solid var(--gray-800);
+      padding: var(--space-md) var(--space-lg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .logo-wordmark { height: 32px; width: auto; }
+
+    .nav-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .nav-link {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover { color: var(--gold-light); }
+
+    .nav-active {
+      color: var(--white);
+      cursor: default;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--burgundy-dark) 0%, var(--gray-950) 50%, var(--gray-900) 100%);
+      padding: var(--space-3xl) var(--space-lg);
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: var(--space-sm);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 1.1;
+      margin-bottom: var(--space-md);
+    }
+
+    .hero-title span { color: var(--gold); }
+
+    .hero-description {
+      font-size: 1.125rem;
+      color: var(--gray-300);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: var(--space-3xl);
+      color: var(--gray-400);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--gray-800);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      margin-top: var(--space-md);
+      font-family: var(--font-display);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Club Stats Grid */
+    .club-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+    }
+
+    .club-stats-grid--full {
+      grid-column: 1 / -1;
+    }
+
+    .club-stats-card {
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .club-stats-card-title {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-md);
+    }
+
+    /* Manager Stints */
+    .manager-stints {
+      display: flex;
+      gap: var(--space-md);
+      overflow-x: auto;
+      padding-bottom: var(--space-sm);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .manager-stints::-webkit-scrollbar { height: 4px; }
+    .manager-stints::-webkit-scrollbar-track { background: var(--gray-900); }
+    .manager-stints::-webkit-scrollbar-thumb { background: var(--gray-700); border-radius: 2px; }
+
+    .manager-stint {
+      flex: 0 0 auto;
+      min-width: 160px;
+      background: var(--gray-800);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+    }
+
+    .manager-stint-name {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: var(--space-xs);
+    }
+
+    .manager-stint-tenure {
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      margin-bottom: var(--space-sm);
+    }
+
+    .manager-stint-badge {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 6px;
+      background: var(--gold);
+      color: var(--black);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .manager-stint-record {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-100);
+      margin-bottom: var(--space-xs);
+    }
+
+    .manager-stint-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      font-size: 0.75rem;
+      color: var(--gray-400);
+    }
+
+    .manager-stint-stat-label {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+    }
+
+    .manager-null-note {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      margin-top: var(--space-sm);
+      font-style: italic;
+    }
+
+    /* Season History Table */
+    .season-table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .season-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 600px;
+    }
+
+    .season-table th {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-400);
+      padding: var(--space-sm) var(--space-md);
+      text-align: right;
+      border-bottom: 1px solid var(--gray-700);
+      white-space: nowrap;
+    }
+
+    .season-table th:first-child { text-align: left; }
+
+    .season-table td {
+      padding: var(--space-sm) var(--space-md);
+      text-align: right;
+      border-bottom: 1px solid var(--gray-800);
+      white-space: nowrap;
+      color: var(--gray-200);
+    }
+
+    .season-table td:first-child {
+      text-align: left;
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .season-table tr:hover td { background: var(--gray-800); }
+
+    .luck-positive { color: #43a047; }
+    .luck-negative { color: #e53935; }
+
+    /* Venue Split */
+    .venue-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+    }
+
+    .venue-block {
+      text-align: center;
+      padding: var(--space-md);
+      background: var(--gray-800);
+      border-radius: var(--radius-md);
+    }
+
+    .venue-block-label {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-sm);
+    }
+
+    .venue-block-record {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: var(--space-xs);
+    }
+
+    .venue-block-winpct {
+      font-size: 0.85rem;
+      color: var(--gold);
+    }
+
+    /* Streak Trackers */
+    .current-streak {
+      text-align: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .current-streak-label {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-xs);
+    }
+
+    .current-streak-value {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .streak-records {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .streak-record {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--gray-800);
+      border-radius: var(--radius-sm);
+    }
+
+    .streak-record-label {
+      font-size: 0.75rem;
+      color: var(--gray-400);
+    }
+
+    .streak-record-value {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--white);
+    }
+
+    .streak-record-dates {
+      font-size: 0.65rem;
+      color: var(--gray-500);
+      margin-left: var(--space-sm);
+    }
+
+    /* Collapsible Analytics Group */
+    .analytics-group {
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .analytics-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--gray-900);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .analytics-group-header:hover { background: var(--gray-800); }
+
+    .analytics-group-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+
+    .analytics-group-chevron {
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid var(--gray-400);
+      border-bottom: 2px solid var(--gray-400);
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+    }
+
+    .analytics-group.collapsed .analytics-group-chevron {
+      transform: rotate(-135deg);
+    }
+
+    .analytics-group-body {
+      padding: var(--space-md);
+    }
+
+    .analytics-group.collapsed .analytics-group-body {
+      display: none;
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--gray-950);
+      border-top: 1px solid var(--gray-800);
+      padding: var(--space-2xl) var(--space-lg);
+      margin-top: var(--space-3xl);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .footer-logo { width: 140px; height: auto; opacity: 0.8; }
+
+    .footer-text {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      max-width: 400px;
+    }
+
+    .footer-link {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .footer-link:hover { text-decoration: underline; }
+
+    .footer-credit {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-3xl);
+      color: var(--gray-400);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      .hero {
+        padding: var(--space-2xl) var(--space-md);
+      }
+
+      .club-stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .venue-split {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-content">
+      <a href="https://scarvesandspikes.com" class="logo-link">
+        <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
+      </a>
+      <nav class="nav-section">
+        <a href="/" class="nav-link">Match History</a>
+        <a href="/goalkeeper.html" class="nav-link">Goalkeepers</a>
+        <a href="/players.html" class="nav-link">Players</a>
+        <a href="/opponent.html" class="nav-link">Opponents</a>
+        <span class="nav-link nav-active">History</span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-subtitle">All-Time Record Book</p>
+      <h1 class="hero-title">Club <span>History</span></h1>
+      <p class="hero-description">Complete records from 2017 to present</p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container">
+    <div id="content">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading Club History</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <img src="/badge_community.png" alt="Scarves and Spikes" class="footer-logo">
+      <p class="footer-text">
+        Built by <a href="https://scarvesandspikes.com" class="footer-link">ScarvesAndSpikes.com</a> for Atlanta United supporters who love diving deep into the numbers.
+      </p>
+      <p class="footer-credit">Data provided by <a href="https://americansocceranalysis.com" class="footer-link" target="_blank" rel="noopener">American Soccer Analysis</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const safeNum = (val) => (typeof val === 'number' && !isNaN(val)) ? val : 0;
+
+    function computeManagerStints(matches) {
+      const sorted = [...matches].sort((a, b) => new Date(a.date) - new Date(b.date));
+      const stints = [];
+      let current = null;
+      let nullCount = 0;
+
+      for (const match of sorted) {
+        if (!match.atlManager) {
+          nullCount++;
+          continue;
+        }
+        if (!current || current.manager !== match.atlManager) {
+          current = {
+            manager: match.atlManager,
+            startDate: match.date,
+            endDate: match.date,
+            startYear: new Date(match.date).getFullYear(),
+            endYear: new Date(match.date).getFullYear(),
+            wins: 0, draws: 0, losses: 0
+          };
+          stints.push(current);
+        }
+        current.endDate = match.date;
+        current.endYear = new Date(match.date).getFullYear();
+        if (match.result === 'W') current.wins++;
+        else if (match.result === 'D') current.draws++;
+        else if (match.result === 'L') current.losses++;
+      }
+
+      return { stints, nullCount };
+    }
+
+    function computeSeasonStats(matches) {
+      const seasonMap = {};
+      for (const m of matches) {
+        if (!seasonMap[m.season]) {
+          seasonMap[m.season] = { season: m.season, w: 0, d: 0, l: 0, gf: 0, ga: 0, xg: 0, xga: 0, xpts: 0 };
+        }
+        const s = seasonMap[m.season];
+        if (m.result === 'W') s.w++;
+        else if (m.result === 'D') s.d++;
+        else if (m.result === 'L') s.l++;
+        s.gf += safeNum(m.atlScore);
+        s.ga += safeNum(m.oppScore);
+        s.xg += safeNum(m.atlXg);
+        s.xga += safeNum(m.oppXg);
+        s.xpts += safeNum(m.atlXpoints);
+      }
+      return Object.values(seasonMap).sort((a, b) => b.season - a.season);
+    }
+
+    function computeVenueStats(matches) {
+      const home = { w: 0, d: 0, l: 0 };
+      const away = { w: 0, d: 0, l: 0 };
+      for (const m of matches) {
+        const bucket = m.isHome ? home : away;
+        if (m.result === 'W') bucket.w++;
+        else if (m.result === 'D') bucket.d++;
+        else if (m.result === 'L') bucket.l++;
+      }
+      const total = (b) => b.w + b.d + b.l;
+      home.winPct = total(home) ? ((home.w / total(home)) * 100).toFixed(1) : '0.0';
+      away.winPct = total(away) ? ((away.w / total(away)) * 100).toFixed(1) : '0.0';
+      return { home, away };
+    }
+
+    function computeStreaks(matches) {
+      const sorted = [...matches].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      let longestWin = { length: 0, startDate: null, endDate: null };
+      let longestUnbeaten = { length: 0, startDate: null, endDate: null };
+      let longestWinless = { length: 0, startDate: null, endDate: null };
+
+      let curWin = { length: 0, startDate: null, endDate: null };
+      let curUnbeaten = { length: 0, startDate: null, endDate: null };
+      let curWinless = { length: 0, startDate: null, endDate: null };
+
+      for (const m of sorted) {
+        if (m.result === 'W') {
+          if (curWin.length === 0) curWin.startDate = m.date;
+          curWin.length++;
+          curWin.endDate = m.date;
+        } else {
+          if (curWin.length > longestWin.length) longestWin = { ...curWin };
+          curWin = { length: 0, startDate: null, endDate: null };
+        }
+
+        if (m.result === 'W' || m.result === 'D') {
+          if (curUnbeaten.length === 0) curUnbeaten.startDate = m.date;
+          curUnbeaten.length++;
+          curUnbeaten.endDate = m.date;
+        } else {
+          if (curUnbeaten.length > longestUnbeaten.length) longestUnbeaten = { ...curUnbeaten };
+          curUnbeaten = { length: 0, startDate: null, endDate: null };
+        }
+
+        if (m.result === 'D' || m.result === 'L') {
+          if (curWinless.length === 0) curWinless.startDate = m.date;
+          curWinless.length++;
+          curWinless.endDate = m.date;
+        } else {
+          if (curWinless.length > longestWinless.length) longestWinless = { ...curWinless };
+          curWinless = { length: 0, startDate: null, endDate: null };
+        }
+      }
+
+      if (curWin.length > longestWin.length) longestWin = { ...curWin };
+      if (curUnbeaten.length > longestUnbeaten.length) longestUnbeaten = { ...curUnbeaten };
+      if (curWinless.length > longestWinless.length) longestWinless = { ...curWinless };
+
+      let currentType = null;
+      let currentLength = 0;
+      for (let i = sorted.length - 1; i >= 0; i--) {
+        const r = sorted[i].result;
+        if (currentType === null) currentType = r;
+        if (r === currentType) currentLength++;
+        else break;
+      }
+
+      return {
+        current: { type: currentType, length: currentLength },
+        longestWin,
+        longestUnbeaten,
+        longestWinless
+      };
+    }
+
+    function formatShortDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr.replace(' UTC', 'Z').replace(' ', 'T'));
+      if (isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    }
+
+    function renderManagerRecords(data) {
+      const { stints, nullCount } = data;
+      const reversed = [...stints].reverse();
+
+      let html = '<div class="club-stats-grid--full club-stats-card"><div class="club-stats-card-title">Manager Records</div>';
+      html += '<div class="manager-stints">';
+
+      reversed.forEach((stint, i) => {
+        const total = stint.wins + stint.draws + stint.losses;
+        const winPct = total ? ((stint.wins / total) * 100).toFixed(1) : '0.0';
+        const ppg = total ? ((stint.wins * 3 + stint.draws) / total).toFixed(2) : '0.00';
+        const tenure = stint.startYear === stint.endYear
+          ? `${stint.startYear}`
+          : `${stint.startYear}-${stint.endYear}`;
+        const isCurrent = i === 0;
+
+        html += `<div class="manager-stint">`;
+        html += `<div class="manager-stint-name">${stint.manager}</div>`;
+        html += `<div class="manager-stint-tenure">${tenure}</div>`;
+        if (isCurrent) html += `<div class="manager-stint-badge">Current</div>`;
+        html += `<div class="manager-stint-record">${stint.wins}W-${stint.draws}D-${stint.losses}L</div>`;
+        html += `<div class="manager-stint-stats">`;
+        html += `<div><div class="manager-stint-stat-label">Win%</div>${winPct}%</div>`;
+        html += `<div><div class="manager-stint-stat-label">PPG</div>${ppg}</div>`;
+        html += `</div>`;
+        html += `</div>`;
+      });
+
+      html += '</div>';
+      if (nullCount > 0) {
+        html += `<div class="manager-null-note">${nullCount} match${nullCount > 1 ? 'es' : ''} excluded (no manager data)</div>`;
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function renderSeasonHistory(seasons) {
+      let html = '<div class="club-stats-grid--full">';
+      html += '<div class="analytics-group">';
+      html += '<div class="analytics-group-header">';
+      html += '<span class="analytics-group-title">Season History</span>';
+      html += '<div class="analytics-group-chevron"></div>';
+      html += '</div>';
+      html += '<div class="analytics-group-body">';
+      html += '<div class="season-table-wrapper"><table class="season-table">';
+      html += '<thead><tr><th>Season</th><th>W-D-L</th><th>GF</th><th>GA</th><th>xG</th><th>xGA</th><th>Pts</th><th>xPts</th><th>Luck</th></tr></thead>';
+      html += '<tbody>';
+
+      for (const s of seasons) {
+        const pts = s.w * 3 + s.d;
+        const xPts = s.xpts;
+        const luck = pts - xPts;
+        const luckClass = luck > 0 ? 'luck-positive' : luck < 0 ? 'luck-negative' : '';
+        const luckStr = (luck > 0 ? '+' : '') + luck.toFixed(1);
+
+        html += '<tr>';
+        html += `<td>${s.season}</td>`;
+        html += `<td>${s.w}-${s.d}-${s.l}</td>`;
+        html += `<td>${s.gf}</td>`;
+        html += `<td>${s.ga}</td>`;
+        html += `<td>${s.xg.toFixed(1)}</td>`;
+        html += `<td>${s.xga.toFixed(1)}</td>`;
+        html += `<td>${pts}</td>`;
+        html += `<td>${xPts.toFixed(1)}</td>`;
+        html += `<td class="${luckClass}">${luckStr}</td>`;
+        html += '</tr>';
+      }
+
+      html += '</tbody></table></div>';
+      html += '</div></div></div>';
+      return html;
+    }
+
+    function renderVenueStats(data) {
+      const { home, away } = data;
+      let html = '<div class="club-stats-card">';
+      html += '<div class="club-stats-card-title">Home vs Away</div>';
+      html += '<div class="venue-split">';
+
+      html += '<div class="venue-block">';
+      html += '<div class="venue-block-label">Home</div>';
+      html += `<div class="venue-block-record">${home.w}W-${home.d}D-${home.l}L</div>`;
+      html += `<div class="venue-block-winpct">${home.winPct}% Win Rate</div>`;
+      html += '</div>';
+
+      html += '<div class="venue-block">';
+      html += '<div class="venue-block-label">Away</div>';
+      html += `<div class="venue-block-record">${away.w}W-${away.d}D-${away.l}L</div>`;
+      html += `<div class="venue-block-winpct">${away.winPct}% Win Rate</div>`;
+      html += '</div>';
+
+      html += '</div></div>';
+      return html;
+    }
+
+    function renderStreakTrackers(data) {
+      const { current, longestWin, longestUnbeaten, longestWinless } = data;
+      const colorMap = { W: 'var(--win)', L: 'var(--loss)', D: 'var(--draw)' };
+      const labelMap = { W: 'W', L: 'L', D: 'D' };
+
+      let html = '<div class="club-stats-card">';
+      html += '<div class="club-stats-card-title">Streaks</div>';
+
+      html += '<div class="current-streak">';
+      html += '<div class="current-streak-label">Current Streak</div>';
+      html += `<div class="current-streak-value" style="color: ${colorMap[current.type] || 'var(--gray-300)'};">${labelMap[current.type] || '-'}${current.length}</div>`;
+      html += '</div>';
+
+      html += '<div class="streak-records">';
+
+      const formatRange = (s) => {
+        if (!s.startDate) return '';
+        return `${formatShortDate(s.startDate)} - ${formatShortDate(s.endDate)}`;
+      };
+
+      html += `<div class="streak-record">
+        <span class="streak-record-label">Longest Win Streak</span>
+        <span><span class="streak-record-value">${longestWin.length} matches</span><span class="streak-record-dates">${formatRange(longestWin)}</span></span>
+      </div>`;
+
+      html += `<div class="streak-record">
+        <span class="streak-record-label">Longest Unbeaten</span>
+        <span><span class="streak-record-value">${longestUnbeaten.length} matches</span><span class="streak-record-dates">${formatRange(longestUnbeaten)}</span></span>
+      </div>`;
+
+      html += `<div class="streak-record">
+        <span class="streak-record-label">Longest Winless</span>
+        <span><span class="streak-record-value">${longestWinless.length} matches</span><span class="streak-record-dates">${formatRange(longestWinless)}</span></span>
+      </div>`;
+
+      html += '</div></div>';
+      return html;
+    }
+
+    function renderHistory(matches) {
+      const managerData = computeManagerStints(matches);
+      const seasonData = computeSeasonStats(matches);
+      const venueData = computeVenueStats(matches);
+      const streakData = computeStreaks(matches);
+
+      const container = document.getElementById('content');
+      let html = '<div class="club-stats-grid">';
+      html += renderManagerRecords(managerData);
+      html += renderVenueStats(venueData);
+      html += renderStreakTrackers(streakData);
+      html += renderSeasonHistory(seasonData);
+      html += '</div>';
+
+      /* Placeholder for future "On This Day" section */
+
+      container.innerHTML = html;
+
+      // Wire up collapsible headers
+      container.querySelectorAll('.analytics-group-header').forEach(header => {
+        header.addEventListener('click', function() {
+          this.parentElement.classList.toggle('collapsed');
+        });
+      });
+    }
+
+    async function init() {
+      try {
+        const response = await fetch('/api/matches?season=all');
+        const data = await response.json();
+        renderHistory(data.matches);
+      } catch (error) {
+        console.error('Error loading history:', error);
+        document.getElementById('content').innerHTML = `
+          <div class="empty-state">
+            <p>Error loading club history. Please try refreshing the page.</p>
+          </div>
+        `;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
