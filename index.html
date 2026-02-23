@@ -1191,7 +1191,15 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--gray-400);
+      margin-bottom: var(--space-xs);
+    }
+
+    .mini-card-desc {
+      font-size: 0.6rem;
+      font-style: italic;
+      color: var(--gray-500);
       margin-bottom: var(--space-sm);
+      line-height: 1.4;
     }
 
     /* Mini Luck Meter */
@@ -2650,6 +2658,7 @@
             <div class="gk-stat-label">Goals - xG</div>
           </div>
         </div>
+        <div class="mini-card-desc" style="margin-top: var(--space-sm);">xG Faced measures expected goals from shots on target — it differs from team xG, which includes all shots.</div>
       `;
     }
 
@@ -2690,6 +2699,7 @@
       if (hasAtlGk && hasOppGk) {
         html += `<div class="analytics-mini-card">
           <div class="mini-card-title">Goals Prevented</div>
+          <div class="mini-card-desc">Actual goals conceded vs expected from shots on target. Green = saved more than expected.</div>
           <div class="comparison-container">
             <div class="comparison-side">
               <div class="comparison-label atl">ATL</div>
@@ -2704,6 +2714,7 @@
       } else if (hasAtlGk) {
         html += `<div class="analytics-mini-card">
           <div class="mini-card-title">Goals Prevented</div>
+          <div class="mini-card-desc">Actual goals conceded vs expected from shots on target. Green = saved more than expected.</div>
           ${renderMiniGkLuckMeter(gk.goalsMinusXgoals, gk.goalsConceded, gk.xgoalsFaced)}
         </div>`;
       }
@@ -2715,6 +2726,7 @@
         const sharedGkScale = computeSharedAbsMax(atlGkVals, oppGkVals, 0.05);
         html += `<div class="analytics-mini-card">
           <div class="mini-card-title">GK Goals Added</div>
+          <div class="mini-card-desc">Goalkeeper's impact by action type vs league average. Larger shape = more positive contribution.</div>
           <div class="comparison-container">
             <div class="comparison-side">
               <div class="comparison-label atl">ATL</div>
@@ -2729,6 +2741,7 @@
       } else if (hasAtlGk) {
         html += `<div class="analytics-mini-card">
           <div class="mini-card-title">GK Goals Added</div>
+          <div class="mini-card-desc">Goalkeeper's impact by action type vs league average. Larger shape = more positive contribution.</div>
           ${renderMiniGkRadar(gk.goalsAdded)}
         </div>`;
       }
@@ -2774,8 +2787,8 @@
           <span>Underperformed</span>
         </div>
         <div class="mini-luck-context">
-          <span><span class="mini-luck-context-label">Conceded: </span><span class="mini-luck-context-value">${goalsConceded != null ? goalsConceded : '-'}</span></span>
-          <span><span class="mini-luck-context-label">xG: </span><span class="mini-luck-context-value">${xgFaced != null ? xgFaced.toFixed(2) : '-'}</span></span>
+          <span><span class="mini-luck-context-label">Goals Conceded: </span><span class="mini-luck-context-value">${goalsConceded != null ? goalsConceded : '-'}</span></span>
+          <span><span class="mini-luck-context-label">xG Faced (SOT): </span><span class="mini-luck-context-value">${xgFaced != null ? xgFaced.toFixed(2) : '-'}</span></span>
         </div>
       `;
     }
