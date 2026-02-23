@@ -1817,6 +1817,7 @@
           <label for="seasonFilter">Season</label>
           <select id="seasonFilter">
             <option value="all">All Seasons</option>
+            <option value="loading" selected disabled>Loading…</option>
           </select>
         </div>
         <div class="filter-group">
@@ -2699,7 +2700,7 @@
       if (hasAtlGk && hasOppGk) {
         html += `<div class="analytics-mini-card">
           <div class="mini-card-title">Goals Prevented</div>
-          <div class="mini-card-desc">Actual goals conceded vs expected from shots on target. Green = saved more than expected.</div>
+          <div class="mini-card-desc">Actual goals conceded vs expected from shots on target. Green = saved more than expected. Each bar reflects that keeper's own performance.</div>
           <div class="comparison-container">
             <div class="comparison-side">
               <div class="comparison-label atl">ATL</div>
