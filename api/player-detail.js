@@ -183,7 +183,7 @@ export default async function handler(req, res) {
       const isHome = game.home_team_id === atlantaId;
       const oppId = isHome ? game.away_team_id : game.home_team_id;
       gameMap[game.game_id] = {
-        date: game.date_time_utc ? game.date_time_utc.split('T')[0] : null,
+        date: game.date_time_utc ? game.date_time_utc.split(' ')[0] : null,
         opponent: teamMap[oppId] || 'Unknown',
         isHome,
         atlScore: isHome ? game.home_score : game.away_score,

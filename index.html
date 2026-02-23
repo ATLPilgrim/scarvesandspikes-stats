@@ -3658,9 +3658,15 @@
     // Initialize
     async function init() {
       try {
-        const defaultSeason = new Date().getFullYear();
+        let defaultSeason = new Date().getFullYear();
 
-        const matches = await loadSeason(defaultSeason);
+        let matches = await loadSeason(defaultSeason);
+
+        // If current year has no matches (season hasn't started), fall back to previous year
+        if (matches.length === 0 && defaultSeason > 2017) {
+          defaultSeason = defaultSeason - 1;
+          matches = await loadSeason(defaultSeason);
+        }
 
         document.getElementById('seasonFilter').value = defaultSeason;
 

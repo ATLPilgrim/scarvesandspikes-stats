@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     // Fetch game data for requested seasons in parallel
     const seasonPromises = seasons.map(async (season) => {
       const [gamesRes, xgoalsRes, playerXgoalsRes] = await Promise.all([
-        fetch(`https://app.americansocceranalysis.com/api/v1/mls/games?season_name=${season}`),
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/games?team_id=${atlantaId}&season_name=${season}`),
         fetch(`https://app.americansocceranalysis.com/api/v1/mls/games/xgoals?season_name=${season}`),
         fetch(`https://app.americansocceranalysis.com/api/v1/mls/players/xgoals?team_id=${atlantaId}&season_name=${season}&split_by_games=true`)
       ]);
