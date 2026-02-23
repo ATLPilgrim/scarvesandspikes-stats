@@ -3,7 +3,7 @@
 
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/xml');
-  res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate'); // Cache for 24 hours
+  res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=86400'); // Cache for 24 hours
 
   try {
     const atlantaId = 'KAqBN0Vqbg';

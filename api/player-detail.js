@@ -5,7 +5,7 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+  // Cache-Control set dynamically before response (see below)
 
   try {
     const { slug, season: requestedSeason } = req.query;
@@ -468,6 +468,14 @@ export default async function handler(req, res) {
         xgoalsFaced: gkHasXgoals ? parseFloat(gkAggXgoalsFaced.toFixed(2)) : null,
         goalsPrevented: gkHasXgoals ? parseFloat((gkAggGoalsConceded - gkAggXgoalsFaced).toFixed(2)) : null
       };
+    }
+
+    // Dynamic cache TTL based on season
+    const currentYear = new Date().getFullYear();
+    if (season < currentYear) {
+      res.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate=604800');
+    } else {
+      res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=3600');
     }
 
     return res.status(200).json(responseData);

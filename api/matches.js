@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 's-maxage=3600'); // Cache for 1 hour
+  // Cache-Control set dynamically before response (see below)
 
   try {
     const atlantaId = 'KAqBN0Vqbg';
@@ -250,6 +250,16 @@ export default async function handler(req, res) {
     const availableSeasons = [];
     for (let year = currentYear; year >= 2017; year--) {
       availableSeasons.push(year);
+    }
+
+    // Dynamic cache TTL based on season
+    const isCurrentSeason = !requestedSeason || requestedSeason === 'all' || parseInt(requestedSeason) >= currentYear;
+    if (isCurrentSeason && enrichedMatches.length === 0) {
+      res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=60');
+    } else if (!isCurrentSeason) {
+      res.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate=604800');
+    } else {
+      res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=3600');
     }
 
     res.status(200).json({

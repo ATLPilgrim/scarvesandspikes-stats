@@ -6,7 +6,8 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 's-maxage=3600');
+  // Cache for 4 hours (fetches all seasons; data changes ~2x/week during season)
+  res.setHeader('Cache-Control', 's-maxage=14400, stale-while-revalidate=14400');
 
   try {
     const atlantaId = 'KAqBN0Vqbg';

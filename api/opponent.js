@@ -6,8 +6,8 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   
-  // Cache for 1 hour
-  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+  // Cache for 4 hours (fetches all seasons; data changes ~2x/week during season)
+  res.setHeader('Cache-Control', 's-maxage=14400, stale-while-revalidate=14400');
 
   const { opponent } = req.query;
   

@@ -7,7 +7,7 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 's-maxage=3600');
+  // Cache-Control set dynamically before response (see below)
 
   try {
     const atlantaId = 'KAqBN0Vqbg';
@@ -62,6 +62,17 @@ export default async function handler(req, res) {
         net: parseFloat((totalFor - totalAgainst).toFixed(4)),
         actions: actions
       };
+    }
+
+    // Dynamic cache TTL based on season
+    const currentYear = new Date().getFullYear();
+    const isHistorical = parseInt(season) < currentYear;
+    if (!isHistorical && Object.values(zones).every(v => v === null)) {
+      res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=60');
+    } else if (isHistorical) {
+      res.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate=604800');
+    } else {
+      res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=3600');
     }
 
     res.status(200).json({
