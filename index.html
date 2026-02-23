@@ -1967,9 +1967,13 @@
       const gameId = card.dataset.gameId;
       const season = card.dataset.season;
 
-      // Show loading
-      analyticsEl.innerHTML = '<div class="loading-spinner--small"></div><span>Loading Analytics</span>';
+      // Show loading with delayed hint if it takes a while
+      analyticsEl.innerHTML = '<div class="loading-spinner--small"></div><span class="analytics-loading-text">Loading player analytics</span>';
       analyticsEl.classList.add('loading-state');
+      const slowHint = setTimeout(() => {
+        const textEl = analyticsEl.querySelector('.analytics-loading-text');
+        if (textEl) textEl.textContent = 'Loading player analytics — just a few more seconds';
+      }, 4000);
 
       const match = findMatchByGameId(gameId);
 
@@ -1979,6 +1983,7 @@
         loadMatchDetails(season),
         oppId ? loadOpponentDetails(oppId, season) : Promise.resolve(null)
       ]);
+      clearTimeout(slowHint);
       analyticsEl.classList.remove('loading-state');
 
       const details = games ? (games[gameId] || null) : null;
@@ -3707,10 +3712,18 @@
         document.getElementById('compFilter').addEventListener('change', applyFilters);
         document.getElementById('opponentFilter').addEventListener('change', applyFilters);
 
-        // Prefetch match details in background so card expansion is instant
+        // Prefetch match + opponent details in background so card expansion is instant
         // Delay slightly to let the UI settle and not compete with insights loading
-        setTimeout(() => {
-          loadMatchDetails(defaultSeason).catch(() => {});
+        setTimeout(async () => {
+          try {
+            await loadMatchDetails(defaultSeason);
+            // Prefetch opponent details for all unique opponents in this season
+            const uniqueOpponents = [...new Set(matches.map(m => m.opponentId).filter(Boolean))];
+            // Fire all in parallel — each is cached individually
+            await Promise.all(uniqueOpponents.map(oppId =>
+              loadOpponentDetails(oppId, defaultSeason).catch(() => {})
+            ));
+          } catch (e) { /* silent — card click will retry */ }
         }, 2000);
 
       } catch (error) {
