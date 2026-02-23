@@ -200,6 +200,21 @@
       margin: 0 auto;
     }
 
+    .hero-credit {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-top: var(--space-xs);
+    }
+
+    .hero-credit-link {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .hero-credit-link:hover {
+      text-decoration: underline;
+    }
+
     /* Main Container */
     .container {
       max-width: 1200px;
@@ -1778,6 +1793,7 @@
       <img src="/badge_community.png" alt="Scarves and Spikes Community" class="hero-badge">
       <h1 class="hero-title">Atlanta United <span>Match History</span></h1>
       <p class="hero-subtitle">Every MLS match from 2017 to present with Expected Goals analytics</p>
+      <p class="hero-credit">Data by <a href="https://americansocceranalysis.com" class="hero-credit-link" target="_blank" rel="noopener">American Soccer Analysis</a></p>
     </div>
   </section>
 
@@ -3690,6 +3706,12 @@
         document.getElementById('verdictFilter').addEventListener('change', applyFilters);
         document.getElementById('compFilter').addEventListener('change', applyFilters);
         document.getElementById('opponentFilter').addEventListener('change', applyFilters);
+
+        // Prefetch match details in background so card expansion is instant
+        // Delay slightly to let the UI settle and not compete with insights loading
+        setTimeout(() => {
+          loadMatchDetails(defaultSeason).catch(() => {});
+        }, 2000);
 
       } catch (error) {
         console.error('Error:', error);
