@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const baseUrl = 'https://stats.scarvesandspikes.com';
 
     // Fetch all teams Atlanta has played
-    const seasons = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026'];
+    const seasons = Array.from({ length: new Date().getFullYear() - 2016 }, (_, i) => String(2017 + i));
 
     const [teamsRes, p1Res, p2Res, p3Res, p4Res, ...seasonResponses] = await Promise.all([
       fetch('https://app.americansocceranalysis.com/api/v1/mls/teams'),

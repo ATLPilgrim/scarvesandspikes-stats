@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const atlantaId = 'KAqBN0Vqbg';
-    const seasons = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026'];
+    const seasons = Array.from({ length: new Date().getFullYear() - 2016 }, (_, i) => String(2017 + i));
 
     // Fetch teams + all season games in parallel
     const [teamsRes, ...seasonResponses] = await Promise.all([
