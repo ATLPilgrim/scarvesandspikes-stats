@@ -20,6 +20,22 @@
   <meta name="twitter:description" content="Complete head-to-head history between Atlanta United and their MLS opponents with xG analytics.">
   <meta name="twitter:image" content="https://stats.scarvesandspikes.com/badge_community.png">
 
+  <script id="structured-data" type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Atlanta United Opponents - Head to Head History",
+    "description": "Complete head-to-head history between Atlanta United and their MLS opponents with xG analytics.",
+    "url": "https://stats.scarvesandspikes.com/opponent.html",
+    "about": {
+      "@type": "SportsTeam",
+      "name": "Atlanta United",
+      "sport": "Soccer",
+      "memberOf": { "@type": "SportsOrganization", "name": "Major League Soccer" }
+    }
+  }
+  </script>
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -156,6 +172,14 @@
     }
 
     .hero-title span { color: var(--gold); }
+
+    .hero-description {
+      font-size: 1.125rem;
+      color: var(--gray-300);
+      max-width: 500px;
+      margin: 0 auto var(--space-sm);
+      line-height: 1.5;
+    }
 
     .hero-record {
       font-family: var(--font-display);
@@ -814,7 +838,8 @@
   <section class="hero">
     <div class="hero-content">
       <p class="hero-subtitle" id="heroSubtitle">Head to Head History</p>
-      <h1 class="hero-title" id="heroTitle">Pick an <span>Opponent</span></h1>
+      <h1 class="hero-title" id="heroTitle">Atlanta United <span>Opponents</span></h1>
+      <p class="hero-description">All-time records, goals, and expected goals (xG) analytics from every meeting since 2017. Includes regular season and playoff matches.</p>
       <p class="hero-record" id="heroRecord"></p>
     </div>
   </section>
@@ -1185,10 +1210,35 @@
           return;
         }
 
-        // Update page title and meta
-        document.title = `Atlanta United vs ${data.opponent} - Head to Head History | ScarvesAndSpikes.com`;
-        document.querySelector('meta[name="description"]').content =
-          `Complete head-to-head history: Atlanta United is ${data.stats.wins}-${data.stats.draws}-${data.stats.losses} against ${data.opponent} in MLS play. View all ${data.stats.totalMatches} matches with xG analytics.`;
+        // Update page title and meta for SEO and social sharing
+        const pageUrl = `https://stats.scarvesandspikes.com/opponent.html?team=${encodeURIComponent(data.slug)}`;
+        const desc = `Atlanta United is ${data.stats.wins}-${data.stats.draws}-${data.stats.losses} all-time against ${data.opponent}. Full head-to-head match history with xG analytics from all ${data.stats.totalMatches} meetings.`;
+        document.title = `Atlanta United vs ${data.opponent} - Head to Head Record | ScarvesAndSpikes.com`;
+        document.querySelector('meta[name="description"]').content = desc;
+        document.querySelector('link[rel="canonical"]').href = pageUrl;
+        document.querySelector('meta[property="og:url"]').content = pageUrl;
+        document.querySelector('meta[property="og:title"]').content = document.title;
+        document.querySelector('meta[property="og:description"]').content = desc;
+        document.querySelector('meta[name="twitter:title"]').content = document.title;
+        document.querySelector('meta[name="twitter:description"]').content = desc;
+
+        // Update structured data
+        const ld = document.getElementById('structured-data');
+        if (ld) {
+          ld.textContent = JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": document.title,
+            "description": desc,
+            "url": pageUrl,
+            "about": {
+              "@type": "SportsTeam",
+              "name": "Atlanta United",
+              "sport": "Soccer",
+              "memberOf": { "@type": "SportsOrganization", "name": "Major League Soccer" }
+            }
+          });
+        }
 
         // Update hero
         document.getElementById('opponentName').textContent = data.opponent;

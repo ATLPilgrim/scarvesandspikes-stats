@@ -20,6 +20,21 @@
   <meta name="twitter:description" content="Atlanta United player profile with season-by-season xG stats, goals added radar, and full game log.">
   <meta name="twitter:image" content="https://stats.scarvesandspikes.com/badge_community.png">
 
+  <script id="structured-data" type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Atlanta United Player",
+    "affiliation": {
+      "@type": "SportsTeam",
+      "name": "Atlanta United",
+      "sport": "Soccer",
+      "memberOf": { "@type": "SportsOrganization", "name": "Major League Soccer" }
+    },
+    "url": "https://stats.scarvesandspikes.com/player.html"
+  }
+  </script>
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -797,7 +812,7 @@
   <section class="hero">
     <div class="hero-content">
       <p class="hero-subtitle">Player Profile</p>
-      <h1 class="hero-title" id="heroName"></h1>
+      <h1 class="hero-title" id="heroName">Atlanta United Player</h1>
       <div class="hero-meta" id="heroMeta"></div>
       <p class="hero-credit">Season stats, xG analytics, goals added radar, and full game log for every Atlanta United appearance.</p>
     </div>
@@ -922,6 +937,24 @@
       document.querySelector('meta[name="description"]').content = desc;
       document.querySelector('meta[name="twitter:title"]').content = document.title;
       document.querySelector('meta[name="twitter:description"]').content = desc;
+
+      // Update structured data
+      const ld = document.getElementById('structured-data');
+      if (ld) {
+        ld.textContent = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "name": player.name,
+          "jobTitle": mapPositionLabel(player.position),
+          "affiliation": {
+            "@type": "SportsTeam",
+            "name": "Atlanta United",
+            "sport": "Soccer",
+            "memberOf": { "@type": "SportsOrganization", "name": "Major League Soccer" }
+          },
+          "url": pageUrl
+        });
+      }
 
       const group = mapPosition(player.position);
       const posClass = group ? group.toLowerCase() : '';
