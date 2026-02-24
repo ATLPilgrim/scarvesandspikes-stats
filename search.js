@@ -79,6 +79,10 @@
     return startsWithName.concat(startsWithLast, contains).slice(0, 8);
   }
 
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   function renderDropdown(results, dropdown, query) {
     if (!query || query.length < 2) {
       dropdown.style.display = 'none';
@@ -96,9 +100,9 @@
       var p = results[i];
       var posMap = { GK: 'GK', CB: 'D', FB: 'D', LB: 'D', RB: 'D', CM: 'M', DM: 'M', AM: 'M', W: 'M', LW: 'M', RW: 'M', WM: 'M', WF: 'M', ST: 'F', CF: 'F', FW: 'F' };
       var pos = (p.position && posMap[p.position.toUpperCase()]) || '';
-      html += '<a class="player-search-item" href="/player.html?id=' + p.slug + '">';
-      html += '<span class="player-search-name">' + p.name + '</span>';
-      html += '<span class="player-search-meta">' + pos + (pos ? ' &middot; ' : '') + p.seasonsRange + '</span>';
+      html += '<a class="player-search-item" href="/player.html?id=' + encodeURIComponent(p.slug) + '">';
+      html += '<span class="player-search-name">' + escapeHtml(p.name) + '</span>';
+      html += '<span class="player-search-meta">' + escapeHtml(pos) + (pos ? ' &middot; ' : '') + escapeHtml(p.seasonsRange) + '</span>';
       html += '</a>';
     }
 

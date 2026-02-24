@@ -3,15 +3,30 @@
 // Params: ?slug={slug}&season={year} (season optional, defaults to most recent)
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: restrict to production and Vercel preview origins
+  const origin = req.headers.origin;
+  if (origin === 'https://stats.scarvesandspikes.com' || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  // Cache-Control set dynamically before response (see below)
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
     const { slug, season: requestedSeason } = req.query;
 
     if (!slug) {
       return res.status(400).json({ error: 'slug parameter is required' });
+    }
+    // Validate inputs to prevent parameter injection
+    if (!/^[a-z0-9-]+$/.test(slug)) {
+      return res.status(400).json({ error: 'Invalid slug parameter' });
+    }
+    if (requestedSeason && !/^\d{4}$/.test(requestedSeason)) {
+      return res.status(400).json({ error: 'Invalid season parameter' });
     }
 
     const atlantaId = 'KAqBN0Vqbg';
@@ -482,6 +497,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error fetching player detail:', error);
-    return res.status(500).json({ error: 'Failed to fetch player detail', details: error.message });
+    return res.status(500).json({ error: 'Failed to fetch player detail' });
   }
 }

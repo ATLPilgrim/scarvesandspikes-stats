@@ -4,8 +4,18 @@
 // No parameters required. Returns all opponents sorted alphabetically.
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: restrict to production and Vercel preview origins
+  const origin = req.headers.origin;
+  if (origin === 'https://stats.scarvesandspikes.com' || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET');
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   // Cache for 4 hours (fetches all seasons; data changes ~2x/week during season)
   res.setHeader('Cache-Control', 's-maxage=14400, stale-while-revalidate=14400');
 
@@ -95,6 +105,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error fetching opponents data:', error);
-    res.status(500).json({ error: 'Failed to fetch opponents data', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch opponents data' });
   }
 }

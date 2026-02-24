@@ -7,10 +7,17 @@
 // Supports ?season= parameter to load one season at a time for faster response
 
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: restrict to production and Vercel preview origins
+  const origin = req.headers.origin;
+  if (origin === 'https://stats.scarvesandspikes.com' || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  // Cache-Control set dynamically before response (see below)
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
     const atlantaId = 'KAqBN0Vqbg';
@@ -18,6 +25,11 @@ export default async function handler(req, res) {
     // Get season from query param, default to current year
     const requestedSeason = req.query.season;
     const currentYear = new Date().getFullYear();
+
+    // Validate season param to prevent parameter injection
+    if (requestedSeason && requestedSeason !== 'all' && !/^\d{4}$/.test(requestedSeason)) {
+      return res.status(400).json({ error: 'Invalid season parameter' });
+    }
     
     // If "all" is requested, fetch all seasons; otherwise fetch just the requested one
     let seasons = [];
@@ -271,6 +283,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Failed to fetch match data', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch match data' });
   }
 }

@@ -763,7 +763,7 @@
     async function loadGoalkeeperData(season) {
       if (gkDataCache[season]) return gkDataCache[season];
       try {
-        const res = await fetch(`/api/goalkeeper?season=${season}`);
+        const res = await fetch(`/api/goalkeeper?season=${encodeURIComponent(season)}`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         gkDataCache[season] = data;

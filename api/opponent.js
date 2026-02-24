@@ -2,15 +2,23 @@
 // Returns all Atlanta United matches against a specific opponent
 
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: restrict to production and Vercel preview origins
+  const origin = req.headers.origin;
+  if (origin === 'https://stats.scarvesandspikes.com' || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   // Cache for 4 hours (fetches all seasons; data changes ~2x/week during season)
   res.setHeader('Cache-Control', 's-maxage=14400, stale-while-revalidate=14400');
 
   const { opponent } = req.query;
-  
+
   if (!opponent) {
     return res.status(400).json({ error: 'Opponent parameter required' });
   }
@@ -136,7 +144,13 @@ export default async function handler(req, res) {
         .replace(/-cf$/, '');
     };
 
-    const requestedSlug = normalizeOpponent(decodeURIComponent(opponent));
+    let decodedOpponent;
+    try {
+      decodedOpponent = decodeURIComponent(opponent);
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid opponent parameter' });
+    }
+    const requestedSlug = normalizeOpponent(decodedOpponent);
 
     // Find matching opponent
     const matchingMatches = allMatches.filter(m => {

@@ -7,10 +7,17 @@
 // Supports ?type=league for full MLS xG league table
 
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: restrict to production and Vercel preview origins
+  const origin = req.headers.origin;
+  if (origin === 'https://stats.scarvesandspikes.com' || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  // Cache-Control set dynamically before response (see below)
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
     const atlantaId = 'KAqBN0Vqbg';
@@ -19,6 +26,12 @@ export default async function handler(req, res) {
 
     if (!season || season === 'all') {
       return res.status(400).json({ error: 'A specific season is required (e.g. ?season=2024)' });
+    }
+    if (!/^\d{4}$/.test(season)) {
+      return res.status(400).json({ error: 'Invalid season parameter' });
+    }
+    if (type && type !== 'league') {
+      return res.status(400).json({ error: 'Invalid type parameter' });
     }
 
     // ── League Table Mode ──
@@ -152,6 +165,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error fetching insights data:', error);
-    res.status(500).json({ error: 'Failed to fetch insights data', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch insights data' });
   }
 }

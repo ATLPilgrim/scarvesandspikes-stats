@@ -915,8 +915,8 @@
       if (playerDataCache[cacheKey]) return playerDataCache[cacheKey];
       try {
         const url = season
-          ? `/api/player-detail?slug=${slug}&season=${season}`
-          : `/api/player-detail?slug=${slug}`;
+          ? `/api/player-detail?slug=${encodeURIComponent(slug)}&season=${encodeURIComponent(season)}`
+          : `/api/player-detail?slug=${encodeURIComponent(slug)}`;
         const res = await fetch(url);
         if (!res.ok) {
           if (res.status === 404) return null;

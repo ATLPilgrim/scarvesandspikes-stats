@@ -2,6 +2,10 @@
 // Generates XML sitemap with all opponent and player pages for SEO
 
 export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).send('Method not allowed');
+  }
+
   res.setHeader('Content-Type', 'application/xml');
   res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=86400'); // Cache for 24 hours
 

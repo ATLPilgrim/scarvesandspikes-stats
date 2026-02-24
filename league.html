@@ -627,7 +627,7 @@
 
     async function loadLeague(season) {
       if (leagueCache[season]) return leagueCache[season];
-      const response = await fetch(`/api/insights?type=league&season=${season}`);
+      const response = await fetch(`/api/insights?type=league&season=${encodeURIComponent(season)}`);
       const data = await response.json();
       leagueCache[season] = data.table || [];
       return leagueCache[season];

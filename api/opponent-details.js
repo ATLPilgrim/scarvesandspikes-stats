@@ -5,9 +5,17 @@
 // Returns player xpass, goals-added, and goalkeeper data keyed by game_id
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: restrict to production and Vercel preview origins
+  const origin = req.headers.origin;
+  if (origin === 'https://stats.scarvesandspikes.com' || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  // Cache-Control set dynamically before response (see below)
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
     const teamId = req.query.team_id;
@@ -15,6 +23,9 @@ export default async function handler(req, res) {
 
     if (!teamId || !season) {
       return res.status(400).json({ error: 'team_id and season parameters are required' });
+    }
+    if (!/^\d{4}$/.test(season) || !/^[a-zA-Z0-9]+$/.test(teamId)) {
+      return res.status(400).json({ error: 'Invalid parameters' });
     }
 
     // Fetch all endpoints in parallel
@@ -146,6 +157,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error fetching opponent details:', error);
-    res.status(500).json({ error: 'Failed to fetch opponent details', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch opponent details' });
   }
 }

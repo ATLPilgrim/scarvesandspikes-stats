@@ -3,8 +3,18 @@
 // Uses /mls/players for name lookup and /mls/players/xgoals for stats
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: restrict to production and Vercel preview origins
+  const origin = req.headers.origin;
+  if (origin === 'https://stats.scarvesandspikes.com' || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET');
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=86400');
 
   try {
@@ -143,6 +153,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error fetching player data:', error);
-    return res.status(500).json({ error: 'Failed to fetch player data', details: error.message });
+    return res.status(500).json({ error: 'Failed to fetch player data' });
   }
 }

@@ -6,10 +6,17 @@
 // Supports ?season= parameter (required, rejects "all")
 
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: restrict to production and Vercel preview origins
+  const origin = req.headers.origin;
+  if (origin === 'https://stats.scarvesandspikes.com' || (origin && origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  // Cache-Control set dynamically before response (see below)
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
     const atlantaId = 'KAqBN0Vqbg';
@@ -17,6 +24,9 @@ export default async function handler(req, res) {
 
     if (!season || season === 'all') {
       return res.status(400).json({ error: 'A specific season is required (e.g. ?season=2024)' });
+    }
+    if (!/^\d{4}$/.test(season)) {
+      return res.status(400).json({ error: 'Invalid season parameter' });
     }
 
     // Fetch all endpoints in parallel
@@ -195,7 +205,7 @@ export default async function handler(req, res) {
     goalkeepers.sort((a, b) => b.aggregate.minutesPlayed - a.aggregate.minutesPlayed);
 
     // Available seasons
-    const availableSeasons = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017];
+    const availableSeasons = Array.from({ length: currentYear - 2016 }, (_, i) => currentYear - i);
 
     // Dynamic cache TTL based on season
     const currentYear = new Date().getFullYear();
@@ -216,6 +226,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Error fetching goalkeeper data:', error);
-    res.status(500).json({ error: 'Failed to fetch goalkeeper data', details: error.message });
+    res.status(500).json({ error: 'Failed to fetch goalkeeper data' });
   }
 }

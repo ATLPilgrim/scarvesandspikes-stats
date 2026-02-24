@@ -2102,7 +2102,7 @@
       const cacheKey = `${teamId}_${season}`;
       if (opponentDetailsCache[cacheKey]) return opponentDetailsCache[cacheKey];
       try {
-        const response = await fetch(`/api/opponent-details?team_id=${teamId}&season=${season}`);
+        const response = await fetch(`/api/opponent-details?team_id=${encodeURIComponent(teamId)}&season=${encodeURIComponent(season)}`);
         if (!response.ok) return null;
         const data = await response.json();
         opponentDetailsCache[cacheKey] = data.games || {};
@@ -2117,7 +2117,7 @@
     async function loadMatchDetails(season) {
       if (matchDetailsCache[season]) return matchDetailsCache[season];
       try {
-        const response = await fetch(`/api/match-details?season=${season}`);
+        const response = await fetch(`/api/match-details?season=${encodeURIComponent(season)}`);
         if (!response.ok) return null;
         const data = await response.json();
         matchDetailsCache[season] = data.games || {};
@@ -3247,7 +3247,7 @@
     async function loadInsights(season) {
       if (insightsCache[season]) return insightsCache[season];
       try {
-        const response = await fetch(`/api/insights?season=${season}`);
+        const response = await fetch(`/api/insights?season=${encodeURIComponent(season)}`);
         if (!response.ok) return null;
         const data = await response.json();
         insightsCache[season] = data;
@@ -3451,7 +3451,7 @@
     async function loadZoneGplus(season) {
       if (zoneGplusCache[season]) return zoneGplusCache[season];
       try {
-        const response = await fetch(`/api/zone-gplus?season=${season}`);
+        const response = await fetch(`/api/zone-gplus?season=${encodeURIComponent(season)}`);
         if (!response.ok) return null;
         const data = await response.json();
         zoneGplusCache[season] = data;
@@ -4209,7 +4209,7 @@
         return matchesBySeasonCache[season];
       }
 
-      const response = await fetch(`/api/matches?season=${season}`);
+      const response = await fetch(`/api/matches?season=${encodeURIComponent(season)}`);
       const data = await response.json();
 
       matchesBySeasonCache[season] = data.matches;
@@ -4514,7 +4514,7 @@
 
         // Deep link: scroll to and expand a specific match card immediately after render
         if (deepLinkMatch) {
-          const card = document.querySelector(`[data-game-id="${deepLinkMatch}"]`);
+          const card = document.querySelector(`[data-game-id="${CSS.escape(deepLinkMatch)}"]`);
           if (card) {
             // Use instant scroll — no animation delay, user expects to land on the card
             card.scrollIntoView({ behavior: 'instant', block: 'center' });

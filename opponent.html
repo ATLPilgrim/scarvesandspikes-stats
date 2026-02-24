@@ -1220,9 +1220,10 @@
         if (!response.ok) {
           if (data.availableOpponents) {
             document.getElementById('opponentName').textContent = 'Unknown';
+            const safeOpp = opponent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
             document.getElementById('content').innerHTML = `
               <div class="error-state">
-                <p>Opponent "${opponent}" not found.</p>
+                <p>Opponent "${safeOpp}" not found.</p>
               </div>
               ${renderOpponentNav(data.availableOpponents, '')}
             `;
