@@ -8,7 +8,7 @@
   <meta name="google-site-verification" content="ALloYlPiQ2UmdhEjprptX-nfJll_34v-FQygShLrDo8" />
   <!-- End Google verification -->
   <title>MLS xG Standings | ScarvesAndSpikes.com</title>
-  <meta name="description" content="MLS Expected Goals standings table. Compare actual points vs expected points (xPts) to see which teams are overperforming or underperforming based on xG analytics.">
+  <meta name="description" content="MLS xG standings table. Compare actual points to expected points and find which teams are overperforming or underperforming.">
   <link rel="canonical" href="https://stats.scarvesandspikes.com/league.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="MLS xG Standings | ScarvesAndSpikes.com">
@@ -151,6 +151,22 @@
       font-size: 0.95rem;
       color: var(--gray-300);
       margin-top: var(--space-sm);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--gray-800);
+      margin-bottom: var(--space-lg);
     }
 
     .hero-credit {
@@ -523,7 +539,7 @@
     <div class="hero-content">
       <img src="/badge_community.png" alt="Scarves and Spikes Community" class="hero-badge">
       <h1 class="hero-title">MLS <span>xG Standings</span></h1>
-      <p class="hero-subtitle">Expected Goals league table — see which teams are overperforming or underperforming</p>
+      <p class="hero-subtitle">Expected Goals league table sorted by Supporter's Shield standings. Compare actual points to expected points and find which MLS teams are running hot or cold.</p>
       <p class="hero-credit">Data by <a href="https://americansocceranalysis.com" class="hero-credit-link" target="_blank" rel="noopener">American Soccer Analysis</a></p>
     </div>
   </section>
@@ -548,6 +564,8 @@
       </div>
       <button class="sort-toggle" id="sortToggle">Sort by xPts</button>
     </div>
+
+    <h2 class="section-heading">League Standings</h2>
 
     <div id="tableContainer">
       <div class="loading">
@@ -634,7 +652,7 @@
           <td>${rank}</td>
           <td class="team-col">
             <div class="team-cell">
-              <img class="team-logo" src="/logos/${slug}.svg" alt="" onerror="this.style.display='none'">
+              <img class="team-logo" src="/logos/${slug}.svg" alt="${team.team_name} logo" onerror="this.style.display='none'">
               <span class="team-name-text">${team.team_name}</span>
             </div>
           </td>

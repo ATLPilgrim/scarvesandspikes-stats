@@ -157,6 +157,29 @@
 
     .hero-title span { color: var(--gold); }
 
+    .hero-description {
+      font-size: 1.125rem;
+      color: var(--gray-300);
+      max-width: 500px;
+      margin: 0 auto var(--space-sm);
+      line-height: 1.5;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--gray-800);
+      margin-bottom: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+
+    .section-heading:first-child { margin-top: 0; }
+
     .hero-season {
       font-family: var(--font-display);
       font-size: 1.5rem;
@@ -652,6 +675,7 @@
     <div class="hero-content">
       <p class="hero-subtitle">Goalkeeper Analytics</p>
       <h1 class="hero-title">Between the <span>Sticks</span></h1>
+      <p class="hero-description">Save percentages, goals prevented, and goals added breakdowns for every Atlanta United goalkeeper. Compare expected goals faced to actual goals conceded to see who is outperforming the numbers.</p>
       <p class="hero-season" id="heroSeasonLabel"></p>
     </div>
   </section>
@@ -662,6 +686,8 @@
     <div class="gk-season-selector">
       <select id="seasonSelector"></select>
     </div>
+
+    <h2 class="section-heading">Goalkeeper Profiles</h2>
 
     <!-- Content Area -->
     <div id="content">

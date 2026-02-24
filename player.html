@@ -8,14 +8,16 @@
   <meta name="google-site-verification" content="ALloYlPiQ2UmdhEjprptX-nfJll_34v-FQygShLrDo8" />
   <!-- End Google verification -->
   <title>Player Profile | Atlanta United | ScarvesAndSpikes.com</title>
-  <meta name="description" content="Atlanta United player analytics with per-season stats, expected goals, goals added radar, and game logs.">
+  <meta name="description" content="Atlanta United player profile with season-by-season xG stats, goals added radar, and full game log.">
+  <link rel="canonical" href="https://stats.scarvesandspikes.com/player.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Player Profile | Atlanta United | ScarvesAndSpikes.com">
-  <meta property="og:description" content="Atlanta United player analytics with per-season stats, expected goals, goals added radar, and game logs.">
+  <meta property="og:description" content="Atlanta United player profile with season-by-season xG stats, goals added radar, and full game log.">
+  <meta property="og:url" content="https://stats.scarvesandspikes.com/player.html">
   <meta property="og:image" content="https://stats.scarvesandspikes.com/badge_community.png">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Player Profile | Atlanta United | ScarvesAndSpikes.com">
-  <meta name="twitter:description" content="Atlanta United player analytics with per-season stats, expected goals, goals added radar, and game logs.">
+  <meta name="twitter:description" content="Atlanta United player profile with season-by-season xG stats, goals added radar, and full game log.">
   <meta name="twitter:image" content="https://stats.scarvesandspikes.com/badge_community.png">
 
   <!-- Fonts -->
@@ -207,6 +209,19 @@
     }
 
     .back-link:hover { color: var(--gold-light); }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: var(--space-md);
+      margin-top: var(--space-xl);
+    }
+
+    .section-heading:first-child { margin-top: 0; }
 
     /* Season Selector */
     .season-selector {
@@ -784,6 +799,7 @@
       <p class="hero-subtitle">Player Profile</p>
       <h1 class="hero-title" id="heroName"></h1>
       <div class="hero-meta" id="heroMeta"></div>
+      <p class="hero-credit">Season stats, xG analytics, goals added radar, and full game log for every Atlanta United appearance.</p>
     </div>
   </section>
 
@@ -895,6 +911,18 @@
       document.getElementById('heroName').textContent = player.name;
       document.title = `${player.name} | Atlanta United | ScarvesAndSpikes.com`;
 
+      // Update meta tags for SEO and social sharing
+      const slug = getSlug();
+      const pageUrl = `https://stats.scarvesandspikes.com/player.html?id=${slug}`;
+      const desc = `${player.name} stats with Atlanta United. Season-by-season expected goals (xG), goals added breakdown, and complete match log.`;
+      document.querySelector('link[rel="canonical"]').href = pageUrl;
+      document.querySelector('meta[property="og:url"]').content = pageUrl;
+      document.querySelector('meta[property="og:title"]').content = document.title;
+      document.querySelector('meta[property="og:description"]').content = desc;
+      document.querySelector('meta[name="description"]').content = desc;
+      document.querySelector('meta[name="twitter:title"]').content = document.title;
+      document.querySelector('meta[name="twitter:description"]').content = desc;
+
       const group = mapPosition(player.position);
       const posClass = group ? group.toLowerCase() : '';
       const posLabel = mapPositionLabel(player.position);
@@ -927,11 +955,13 @@
 
       const gk = isGK(data.player.position);
       content.innerHTML = `
+        <h2 class="section-heading">Season Analytics</h2>
         <div class="analytics-grid">
           ${renderStatsCard(data, gk)}
           ${renderXgMeter(data, gk)}
           ${renderRadarChart(data, gk)}
         </div>
+        <h2 class="section-heading">Match-by-Match Results</h2>
         ${renderGameLog(data, gk)}
       `;
     }

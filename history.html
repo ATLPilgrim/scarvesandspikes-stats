@@ -162,7 +162,23 @@
       color: var(--gray-300);
       max-width: 500px;
       margin: 0 auto;
+      line-height: 1.5;
     }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--gray-800);
+      margin-bottom: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+
+    .section-heading:first-child { margin-top: 0; }
 
     /* Container */
     .container {
@@ -849,7 +865,7 @@
     <div class="hero-content">
       <p class="hero-subtitle">All-Time Record Book</p>
       <h1 class="hero-title">Club <span>History</span></h1>
-      <p class="hero-description">Records from 2017 to present</p>
+      <p class="hero-description">Manager records, season-by-season results, home and away splits, and streak trackers for Atlanta United from 2017 to present.</p>
     </div>
   </section>
 
@@ -1253,7 +1269,9 @@
       const streakData = computeStreaks(matches);
 
       const container = document.getElementById('content');
-      let html = renderOnThisDay(matches);
+      let html = '<h2 class="section-heading">On This Day</h2>';
+      html += renderOnThisDay(matches);
+      html += '<h2 class="section-heading">Club Records</h2>';
       html += '<div class="club-stats-grid">';
       html += renderManagerRecords(managerData);
       html += renderVenueStats(venueData);
