@@ -3757,18 +3757,18 @@
       function drawWatermarkLogos(wmSize) {
         ctx.save();
         ctx.globalAlpha = 0.06;
-        // ATL logo — bottom-left, rotated slightly
+        // ATL logo — bottom-left, pushed toward center, rotated
         if (atlLogo) {
           ctx.save();
-          ctx.translate(wmSize * 0.3, H - wmSize * 0.3);
+          ctx.translate(wmSize * 0.5, H - wmSize * 0.45);
           ctx.rotate(-0.15);
           ctx.drawImage(atlLogo, -wmSize / 2, -wmSize / 2, wmSize, wmSize);
           ctx.restore();
         }
-        // OPP logo — top-right, rotated opposite
+        // OPP logo — top-right, pushed toward center, rotated opposite
         if (oppLogo) {
           ctx.save();
-          ctx.translate(W - wmSize * 0.3, wmSize * 0.3);
+          ctx.translate(W - wmSize * 0.5, wmSize * 0.45);
           ctx.rotate(0.15);
           ctx.drawImage(oppLogo, -wmSize / 2, -wmSize / 2, wmSize, wmSize);
           ctx.restore();
@@ -3789,12 +3789,12 @@
 
         // S&S badge + text in header
         if (ssBadge) {
-          ctx.drawImage(ssBadge, 14, 8, 40, 40);
+          ctx.drawImage(ssBadge, 10, 4, 48, 48);
         }
-        ctx.font = `700 20px ${display}`;
-        ctx.fillStyle = gold;
+        ctx.font = `700 22px ${display}`;
+        ctx.fillStyle = white;
         ctx.textAlign = 'left';
-        ctx.fillText('SCARVES & SPIKES', 62, 36);
+        ctx.fillText('SCARVES & SPIKES', 66, 38);
 
         ctx.font = `500 14px ${body}`;
         ctx.fillStyle = gray300;
@@ -3883,12 +3883,12 @@
 
         // S&S badge + text in header (centered)
         if (ssBadge) {
-          ctx.drawImage(ssBadge, W / 2 - 130, 12, 48, 48);
+          ctx.drawImage(ssBadge, W / 2 - 155, 8, 56, 56);
         }
-        ctx.font = `700 24px ${display}`;
-        ctx.fillStyle = gold;
+        ctx.font = `700 28px ${display}`;
+        ctx.fillStyle = white;
         ctx.textAlign = 'left';
-        ctx.fillText('SCARVES & SPIKES', W / 2 - 74, 44);
+        ctx.fillText('SCARVES & SPIKES', W / 2 - 90, 48);
 
         // Result accent bar (full width, below header)
         ctx.fillStyle = resultColor;
