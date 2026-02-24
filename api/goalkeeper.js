@@ -204,11 +204,11 @@ export default async function handler(req, res) {
     // Sort by minutes played descending (primary starter first)
     goalkeepers.sort((a, b) => b.aggregate.minutesPlayed - a.aggregate.minutesPlayed);
 
-    // Available seasons
-    const availableSeasons = Array.from({ length: currentYear - 2016 }, (_, i) => currentYear - i);
-
     // Dynamic cache TTL based on season
     const currentYear = new Date().getFullYear();
+
+    // Available seasons
+    const availableSeasons = Array.from({ length: currentYear - 2016 }, (_, i) => currentYear - i);
     const isHistorical = parseInt(season) < currentYear;
     if (!isHistorical && goalkeepers.length === 0) {
       res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=60');
