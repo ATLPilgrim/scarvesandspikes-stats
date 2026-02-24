@@ -111,6 +111,23 @@
     dropdown.style.display = 'block';
   }
 
+  function positionDropdown(input, dropdown) {
+    var rect = input.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = (rect.bottom + 4) + 'px';
+    // Align right edge with input right edge, but don't overflow left
+    var right = window.innerWidth - rect.right;
+    dropdown.style.right = right + 'px';
+    dropdown.style.left = 'auto';
+    // Ensure dropdown doesn't overflow left edge
+    var dropdownWidth = Math.min(260, window.innerWidth - 16);
+    dropdown.style.width = dropdownWidth + 'px';
+    if (rect.right - dropdownWidth < 8) {
+      dropdown.style.right = 'auto';
+      dropdown.style.left = '8px';
+    }
+  }
+
   function init() {
     var wrapper = document.querySelector('.player-search');
     if (!wrapper) return;
@@ -118,6 +135,13 @@
     var input = wrapper.querySelector('.player-search-input');
     var dropdown = wrapper.querySelector('.player-search-dropdown');
     if (!input || !dropdown) return;
+
+    // Move dropdown to body so it escapes overflow containers (mobile nav)
+    document.body.appendChild(dropdown);
+
+    function showDropdown() {
+      positionDropdown(input, dropdown);
+    }
 
     function doSearch() {
       var query = input.value.trim();
@@ -127,11 +151,13 @@
       }
       if (!playerCache) {
         showLoading(dropdown);
+        showDropdown();
         loadPlayers(function() { doSearch(); });
         return;
       }
       var results = searchPlayers(playerCache, query);
       renderDropdown(results, dropdown, query);
+      if (dropdown.style.display === 'block') showDropdown();
     }
 
     input.addEventListener('focus', function() {
@@ -151,8 +177,16 @@
       }
     });
 
+    // Reposition on scroll/resize since dropdown is now fixed
+    window.addEventListener('scroll', function() {
+      if (dropdown.style.display === 'block') showDropdown();
+    }, { passive: true });
+    window.addEventListener('resize', function() {
+      if (dropdown.style.display === 'block') showDropdown();
+    });
+
     document.addEventListener('click', function(e) {
-      if (!wrapper.contains(e.target)) {
+      if (!wrapper.contains(e.target) && !dropdown.contains(e.target)) {
         dropdown.style.display = 'none';
       }
     });

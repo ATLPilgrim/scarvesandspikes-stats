@@ -417,17 +417,13 @@
 
     .player-search-dropdown {
       display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--gray-800);
+      background: var(--gray-900);
       border: 1px solid var(--gray-700);
       border-radius: var(--radius-md);
-      margin-top: 4px;
-      max-height: 240px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      max-height: 360px;
       overflow-y: auto;
-      z-index: 200;
     }
 
     .player-search-dropdown.visible { display: block; }
