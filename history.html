@@ -229,6 +229,15 @@
       letter-spacing: 0.1em;
     }
 
+    .loading-hint {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      text-transform: none;
+      letter-spacing: normal;
+      margin-top: var(--space-xs);
+    }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -888,6 +897,7 @@
       <div class="loading">
         <div class="loading-spinner"></div>
         <p class="loading-text">Loading Club History</p>
+        <p class="loading-hint">This may take a moment depending on how much data needs to load</p>
       </div>
     </div>
   </main>
