@@ -600,10 +600,17 @@
         return;
       }
 
-      // Sort by selected metric
+      // Sort by selected metric with Supporter's Shield tiebreakers: Pts > GD > GF
       const sorted = [...table].sort((a, b) => {
-        if (sortByXpts) return (b.xpoints || 0) - (a.xpoints || 0);
-        return (b.points || 0) - (a.points || 0);
+        const ptsA = sortByXpts ? (a.xpoints || 0) : (a.points || 0);
+        const ptsB = sortByXpts ? (b.xpoints || 0) : (b.points || 0);
+        if (ptsB !== ptsA) return ptsB - ptsA;
+        const gdA = sortByXpts ? (a.xgoal_diff || 0) : (a.goal_diff || 0);
+        const gdB = sortByXpts ? (b.xgoal_diff || 0) : (b.goal_diff || 0);
+        if (gdB !== gdA) return gdB - gdA;
+        const gfA = sortByXpts ? (a.xgoals_for || 0) : (a.goals_for || 0);
+        const gfB = sortByXpts ? (b.xgoals_for || 0) : (b.goals_for || 0);
+        return gfB - gfA;
       });
 
       const sortPtsClass = !sortByXpts ? ' sort-active' : '';

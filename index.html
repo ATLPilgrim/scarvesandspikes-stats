@@ -1739,6 +1739,14 @@
       border-radius: 2px;
     }
 
+    .form-chart-desc {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      margin-bottom: var(--space-sm);
+      line-height: 1.5;
+    }
+
     .form-chart svg {
       width: 100%;
       height: auto;
@@ -3615,9 +3623,10 @@
 
       // Colors
       const burgundy = '#80000a';
-      const burgundyDark = '#5a0007';
       const gold = '#c9a227';
+      const goldDark = '#9a7a1a';
       const black = '#0a0a0a';
+      const gray950 = '#121212';
       const gray900 = '#1a1a1a';
       const gray800 = '#242424';
       const gray700 = '#333333';
@@ -3630,162 +3639,221 @@
       const drawColor = '#666666';
 
       const resultColor = match.result === 'W' ? winColor : match.result === 'L' ? lossColor : drawColor;
+      const resultLabel = match.result === 'W' ? 'WIN' : match.result === 'L' ? 'LOSS' : 'DRAW';
 
       // Fonts
       const display = 'Oswald';
       const body = 'Source Sans 3';
 
-      // Background
+      // Background — dark neutral base (no burgundy bleed)
+      ctx.fillStyle = gray950;
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle gradient overlay
       const grad = ctx.createLinearGradient(0, 0, W, H);
-      grad.addColorStop(0, burgundyDark);
-      grad.addColorStop(0.4, '#121212');
-      grad.addColorStop(1, gray900);
+      grad.addColorStop(0, 'rgba(26,26,26,0.95)');
+      grad.addColorStop(1, 'rgba(10,10,10,1)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
 
       // Load logos
       const atlSlug = 'atlanta-united';
       const oppSlug = normalizeTeamNameForLogo(match.opponent);
-      const [atlLogo, oppLogo, ssBadge, ssWordmark] = await Promise.all([
+      const [atlLogo, oppLogo, ssBadge] = await Promise.all([
         loadImage(`/logos/${atlSlug}.svg`),
         loadImage(`/logos/${oppSlug}.svg`),
-        loadImage('/badge_community.png'),
-        loadImage('https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png')
+        loadImage('/badge_community.png')
       ]);
+
+      // ── Helper: draw xG comparison bars ──
+      function drawXgBars(ctx, centerX, startY, barW, barH) {
+        if (match.atlXg === null || match.oppXg === null) return startY;
+
+        const maxXg = Math.max(match.atlXg, match.oppXg, 0.5);
+        const atlBarW = (match.atlXg / maxXg) * barW;
+        const oppBarW = (match.oppXg / maxXg) * barW;
+        const barX = centerX - barW / 2;
+
+        // Section label
+        ctx.font = `600 ${isHorizontal ? 11 : 13}px ${display}`;
+        ctx.fillStyle = gray400;
+        ctx.textAlign = 'left';
+        ctx.fillText('EXPECTED GOALS', barX, startY);
+
+        // Divider
+        ctx.strokeStyle = gray700;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(barX, startY + 8);
+        ctx.lineTo(barX + barW, startY + 8);
+        ctx.stroke();
+
+        const row1Y = startY + 28;
+        const row2Y = row1Y + barH + 16;
+
+        // ATL bar
+        ctx.font = `600 ${isHorizontal ? 13 : 15}px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'left';
+        ctx.fillText('ATL', barX, row1Y - 4);
+
+        ctx.font = `700 ${isHorizontal ? 16 : 18}px ${display}`;
+        ctx.textAlign = 'right';
+        ctx.fillText(match.atlXg.toFixed(2), barX + barW, row1Y - 4);
+
+        // ATL bar background
+        drawRoundedRect(ctx, barX, row1Y, barW, barH, 4);
+        ctx.fillStyle = gray800;
+        ctx.fill();
+        // ATL bar fill
+        if (atlBarW > 0) {
+          drawRoundedRect(ctx, barX, row1Y, Math.max(atlBarW, 8), barH, 4);
+          ctx.fillStyle = gold;
+          ctx.fill();
+        }
+
+        // OPP bar
+        ctx.font = `600 ${isHorizontal ? 13 : 15}px ${display}`;
+        ctx.fillStyle = gray300;
+        ctx.textAlign = 'left';
+        ctx.fillText(match.opponentAbbr || 'OPP', barX, row2Y - 4);
+
+        ctx.font = `700 ${isHorizontal ? 16 : 18}px ${display}`;
+        ctx.textAlign = 'right';
+        ctx.fillText(match.oppXg.toFixed(2), barX + barW, row2Y - 4);
+
+        // OPP bar background
+        drawRoundedRect(ctx, barX, row2Y, barW, barH, 4);
+        ctx.fillStyle = gray800;
+        ctx.fill();
+        // OPP bar fill
+        if (oppBarW > 0) {
+          drawRoundedRect(ctx, barX, row2Y, Math.max(oppBarW, 8), barH, 4);
+          ctx.fillStyle = gray400;
+          ctx.fill();
+        }
+
+        // xG Diff below bars
+        const diffY = row2Y + barH + 28;
+        if (match.xgDiff !== null) {
+          const diffStr = `xG Diff: ${match.xgDiff > 0 ? '+' : ''}${match.xgDiff}`;
+          ctx.font = `500 ${isHorizontal ? 14 : 16}px ${body}`;
+          ctx.fillStyle = match.xgDiff > 0 ? winColor : match.xgDiff < 0 ? lossColor : gray400;
+          ctx.textAlign = 'center';
+          ctx.fillText(diffStr, centerX, diffY);
+        }
+
+        // xPoints if available
+        if (match.atlXpoints !== null && match.atlXpoints !== undefined) {
+          ctx.font = `400 ${isHorizontal ? 12 : 14}px ${body}`;
+          ctx.fillStyle = gray400;
+          ctx.fillText(`xPoints: ${match.atlXpoints}`, centerX, diffY + 22);
+        }
+
+        return diffY + 30;
+      }
+
+      // ── Helper: draw watermark logos ──
+      function drawWatermarkLogos(wmSize) {
+        ctx.save();
+        ctx.globalAlpha = 0.06;
+        // ATL logo — bottom-left, rotated slightly
+        if (atlLogo) {
+          ctx.save();
+          ctx.translate(wmSize * 0.3, H - wmSize * 0.3);
+          ctx.rotate(-0.15);
+          ctx.drawImage(atlLogo, -wmSize / 2, -wmSize / 2, wmSize, wmSize);
+          ctx.restore();
+        }
+        // OPP logo — top-right, rotated opposite
+        if (oppLogo) {
+          ctx.save();
+          ctx.translate(W - wmSize * 0.3, wmSize * 0.3);
+          ctx.rotate(0.15);
+          ctx.drawImage(oppLogo, -wmSize / 2, -wmSize / 2, wmSize, wmSize);
+          ctx.restore();
+        }
+        ctx.restore();
+      }
 
       if (isHorizontal) {
         // ── HORIZONTAL CARD (1200×630) ──
 
-        // Header bar
-        ctx.fillStyle = burgundy;
-        ctx.fillRect(0, 0, W, 52);
+        // Watermark logos (behind everything)
+        drawWatermarkLogos(380);
 
-        // S&S badge + wordmark in header
-        let headerTextX = 24;
+        // Header bar
+        const headerH = 56;
+        ctx.fillStyle = burgundy;
+        ctx.fillRect(0, 0, W, headerH);
+
+        // S&S badge + text in header
         if (ssBadge) {
-          const badgeH = 36;
-          const badgeW = badgeH;
-          ctx.drawImage(ssBadge, 12, 8, badgeW, badgeH);
-          headerTextX = 12 + badgeW + 8;
+          ctx.drawImage(ssBadge, 14, 8, 40, 40);
         }
-        if (ssWordmark) {
-          const wmH = 24;
-          const wmW = ssWordmark.width * (wmH / ssWordmark.height);
-          ctx.drawImage(ssWordmark, headerTextX, 14, wmW, wmH);
-        } else {
-          ctx.font = `700 18px ${display}`;
-          ctx.fillStyle = gold;
-          ctx.textAlign = 'left';
-          ctx.fillText('SCARVES & SPIKES', headerTextX, 34);
-        }
+        ctx.font = `700 20px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'left';
+        ctx.fillText('SCARVES & SPIKES', 62, 36);
 
         ctx.font = `500 14px ${body}`;
         ctx.fillStyle = gray300;
         ctx.textAlign = 'right';
-        ctx.fillText(`${formatDate(match.date)}  |  ${match.isHome ? 'HOME' : 'AWAY'}`, W - 24, 34);
+        ctx.fillText(`${formatDate(match.date)}  |  ${match.isHome ? 'HOME' : 'AWAY'}`, W - 24, 36);
 
-        // Result stripe on left
+        // Result accent bar (top, below header — bright and clear)
         ctx.fillStyle = resultColor;
-        ctx.fillRect(0, 52, 5, H - 52);
+        ctx.fillRect(0, headerH, W, 5);
 
         // Score section
-        const scoreY = 160;
-        const logoSize = 80;
+        const scoreY = 170;
+        const logoSize = 72;
         const centerX = W / 2;
 
-        // ATL logo + name
-        if (atlLogo) ctx.drawImage(atlLogo, centerX - 260 - logoSize, scoreY - logoSize / 2, logoSize, logoSize);
-        ctx.font = `700 20px ${display}`;
+        // ATL logo + name (left side)
+        if (atlLogo) ctx.drawImage(atlLogo, centerX - 220, scoreY - logoSize / 2, logoSize, logoSize);
+        ctx.font = `700 16px ${display}`;
         ctx.fillStyle = gold;
-        ctx.textAlign = 'right';
-        ctx.fillText('ATLANTA UNITED', centerX - 260 - logoSize - 12, scoreY + 7);
+        ctx.textAlign = 'center';
+        ctx.fillText('ATLANTA UNITED', centerX - 220 + logoSize / 2, scoreY + logoSize / 2 + 20);
 
         // Score
-        ctx.font = `700 64px ${display}`;
+        ctx.font = `700 72px ${display}`;
         ctx.fillStyle = white;
         ctx.textAlign = 'center';
-        ctx.fillText(`${match.atlScore} - ${match.oppScore}`, centerX, scoreY + 20);
+        ctx.fillText(`${match.atlScore} - ${match.oppScore}`, centerX, scoreY + 22);
 
-        // OPP logo + name
-        if (oppLogo) ctx.drawImage(oppLogo, centerX + 260, scoreY - logoSize / 2, logoSize, logoSize);
-        ctx.font = `700 20px ${display}`;
+        // Result label under score
+        ctx.font = `700 14px ${display}`;
+        ctx.fillStyle = resultColor;
+        ctx.fillText(resultLabel, centerX, scoreY + 44);
+
+        // OPP logo + name (right side)
+        if (oppLogo) ctx.drawImage(oppLogo, centerX + 220 - logoSize, scoreY - logoSize / 2, logoSize, logoSize);
+        ctx.font = `700 16px ${display}`;
         ctx.fillStyle = gray100;
-        ctx.textAlign = 'left';
-        ctx.fillText(match.opponent.toUpperCase(), centerX + 260 + logoSize + 12, scoreY + 7);
-
-        // xG values
-        const xgY = scoreY + 60;
-        ctx.font = `600 22px ${display}`;
-        ctx.fillStyle = gold;
         ctx.textAlign = 'center';
-        if (match.atlXg !== null) ctx.fillText(`${match.atlXg} xG`, centerX - 180, xgY);
-        ctx.fillStyle = gray300;
-        if (match.oppXg !== null) ctx.fillText(`${match.oppXg} xG`, centerX + 180, xgY);
-
-        // xG Diff
-        if (match.xgDiff !== null) {
-          const diffStr = `xG Diff: ${match.xgDiff > 0 ? '+' : ''}${match.xgDiff}`;
-          ctx.font = `500 16px ${body}`;
-          ctx.fillStyle = match.xgDiff > 0 ? winColor : match.xgDiff < 0 ? lossColor : gray400;
-          ctx.fillText(diffStr, centerX, xgY + 30);
-        }
+        ctx.fillText(match.opponent.toUpperCase(), centerX + 220 - logoSize / 2, scoreY + logoSize / 2 + 20);
 
         // Verdict badge
+        let verdictBottom = scoreY + 70;
         if (match.xgVerdict) {
           const verdictText = match.xgVerdict === 'robbed' ? 'ROBBED' : 'SMASH + GRAB';
           const verdictColor = match.xgVerdict === 'robbed' ? gold : '#00838f';
-          const vY = xgY + 58;
-          ctx.font = `700 14px ${display}`;
+          const vY = scoreY + 68;
+          ctx.font = `700 13px ${display}`;
           const vW = ctx.measureText(verdictText).width + 20;
-          drawRoundedRect(ctx, centerX - vW / 2, vY - 12, vW, 26, 4);
+          drawRoundedRect(ctx, centerX - vW / 2, vY - 11, vW, 24, 4);
           ctx.fillStyle = verdictColor;
           ctx.fill();
           ctx.fillStyle = match.xgVerdict === 'robbed' ? black : white;
           ctx.textAlign = 'center';
-          ctx.fillText(verdictText, centerX, vY + 5);
+          ctx.fillText(verdictText, centerX, vY + 4);
+          verdictBottom = vY + 22;
         }
 
-        // Top Performers
-        if (match.players && match.players.length > 0) {
-          const perfY = 370;
-          const perfX = 120;
-          const perfW = W - 240;
-
-          // Section header
-          ctx.font = `600 11px ${display}`;
-          ctx.fillStyle = gray400;
-          ctx.textAlign = 'left';
-          ctx.letterSpacing = '0.1em';
-          ctx.fillText('TOP PERFORMERS', perfX, perfY);
-
-          // Divider line
-          ctx.strokeStyle = gray700;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(perfX, perfY + 8);
-          ctx.lineTo(perfX + perfW, perfY + 8);
-          ctx.stroke();
-
-          const players = match.players.slice(0, 3);
-          players.forEach((p, i) => {
-            const py = perfY + 30 + i * 34;
-            ctx.font = `600 15px ${body}`;
-            ctx.fillStyle = white;
-            ctx.textAlign = 'left';
-            ctx.fillText(p.name, perfX, py);
-
-            const stats = [];
-            if (p.position) stats.push(p.position);
-            if (p.goals > 0) stats.push(`${p.goals} Goal${p.goals > 1 ? 's' : ''}`);
-            if (p.assists > 0) stats.push(`${p.assists} Ast`);
-            if (p.xg) stats.push(`${p.xg.toFixed(2)} xG`);
-            if (p.xa && p.xa > 0) stats.push(`${p.xa.toFixed(2)} xA`);
-
-            ctx.font = `400 13px ${body}`;
-            ctx.fillStyle = gray400;
-            ctx.fillText(stats.join('  ·  '), perfX, py + 18);
-          });
-        }
+        // xG Comparison Bars
+        drawXgBars(ctx, centerX, verdictBottom + 20, 500, 14);
 
         // Footer
         const footY = H - 44;
@@ -3805,49 +3873,41 @@
       } else {
         // ── VERTICAL CARD (1080×1350) ──
 
+        // Watermark logos (behind everything)
+        drawWatermarkLogos(500);
+
         // Header bar
+        const headerH = 72;
         ctx.fillStyle = burgundy;
-        ctx.fillRect(0, 0, W, 72);
+        ctx.fillRect(0, 0, W, headerH);
 
-        // S&S badge + wordmark in header (centered)
-        if (ssBadge && ssWordmark) {
-          const badgeH = 44;
-          const badgeW = badgeH;
-          const wmH = 28;
-          const wmW = ssWordmark.width * (wmH / ssWordmark.height);
-          const totalW = badgeW + 10 + wmW;
-          const startX = (W - totalW) / 2;
-          ctx.drawImage(ssBadge, startX, 14, badgeW, badgeH);
-          ctx.drawImage(ssWordmark, startX + badgeW + 10, 22, wmW, wmH);
-        } else if (ssBadge) {
-          ctx.drawImage(ssBadge, W / 2 - 22, 14, 44, 44);
-        } else {
-          ctx.font = `700 22px ${display}`;
-          ctx.fillStyle = gold;
-          ctx.textAlign = 'center';
-          ctx.fillText('SCARVES & SPIKES', W / 2, 46);
+        // S&S badge + text in header (centered)
+        if (ssBadge) {
+          ctx.drawImage(ssBadge, W / 2 - 130, 12, 48, 48);
         }
+        ctx.font = `700 24px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'left';
+        ctx.fillText('SCARVES & SPIKES', W / 2 - 74, 44);
 
-        // Result stripe on left
+        // Result accent bar (full width, below header)
         ctx.fillStyle = resultColor;
-        ctx.fillRect(0, 72, 6, H - 72);
+        ctx.fillRect(0, headerH, W, 6);
 
         // Date + venue
-        const infoY = 118;
         ctx.font = `500 16px ${body}`;
         ctx.fillStyle = gray300;
         ctx.textAlign = 'center';
-        ctx.fillText(`${formatDate(match.date)}  |  ${match.isHome ? 'HOME' : 'AWAY'}`, W / 2, infoY);
+        ctx.fillText(`${formatDate(match.date)}  |  ${match.isHome ? 'HOME' : 'AWAY'}`, W / 2, 118);
 
         // Logos + team names
         const logoSize = 120;
-        const logoY = 155;
+        const logoY = 150;
         const centerX = W / 2;
 
         if (atlLogo) ctx.drawImage(atlLogo, centerX - 200 - logoSize / 2, logoY, logoSize, logoSize);
         if (oppLogo) ctx.drawImage(oppLogo, centerX + 200 - logoSize / 2, logoY, logoSize, logoSize);
 
-        // Team names under logos
         ctx.font = `700 18px ${display}`;
         ctx.fillStyle = gold;
         ctx.textAlign = 'center';
@@ -3863,79 +3923,30 @@
         ctx.textAlign = 'center';
         ctx.fillText(`${match.atlScore} - ${match.oppScore}`, centerX, scoreY);
 
+        // Result label
+        ctx.font = `700 18px ${display}`;
+        ctx.fillStyle = resultColor;
+        ctx.fillText(resultLabel, centerX, scoreY + 30);
+
         // Verdict badge
-        let verdictOffset = 0;
+        let verdictBottom = scoreY + 40;
         if (match.xgVerdict) {
           const verdictText = match.xgVerdict === 'robbed' ? 'ROBBED' : 'SMASH + GRAB';
-          const verdictColor = match.xgVerdict === 'robbed' ? gold : '#00838f';
-          const vY = scoreY + 30;
+          const verdictBg = match.xgVerdict === 'robbed' ? gold : '#00838f';
+          const vY = scoreY + 60;
           ctx.font = `700 18px ${display}`;
           const vW = ctx.measureText(verdictText).width + 28;
           drawRoundedRect(ctx, centerX - vW / 2, vY - 14, vW, 34, 6);
-          ctx.fillStyle = verdictColor;
+          ctx.fillStyle = verdictBg;
           ctx.fill();
           ctx.fillStyle = match.xgVerdict === 'robbed' ? black : white;
           ctx.textAlign = 'center';
           ctx.fillText(verdictText, centerX, vY + 7);
-          verdictOffset = 50;
+          verdictBottom = vY + 30;
         }
 
-        // xG values
-        const xgY = scoreY + 50 + verdictOffset;
-        ctx.font = `600 28px ${display}`;
-        ctx.fillStyle = gold;
-        ctx.textAlign = 'center';
-        if (match.atlXg !== null) ctx.fillText(`${match.atlXg} xG`, centerX - 180, xgY);
-        ctx.fillStyle = gray300;
-        if (match.oppXg !== null) ctx.fillText(`${match.oppXg} xG`, centerX + 180, xgY);
-
-        // xG Diff
-        if (match.xgDiff !== null) {
-          const diffStr = `xG Diff: ${match.xgDiff > 0 ? '+' : ''}${match.xgDiff}`;
-          ctx.font = `500 18px ${body}`;
-          ctx.fillStyle = match.xgDiff > 0 ? winColor : match.xgDiff < 0 ? lossColor : gray400;
-          ctx.fillText(diffStr, centerX, xgY + 38);
-        }
-
-        // Top Performers
-        if (match.players && match.players.length > 0) {
-          const perfY = xgY + 90;
-          const perfX = 80;
-          const perfW = W - 160;
-
-          ctx.font = `600 13px ${display}`;
-          ctx.fillStyle = gray400;
-          ctx.textAlign = 'left';
-          ctx.fillText('TOP PERFORMERS', perfX, perfY);
-
-          ctx.strokeStyle = gray700;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(perfX, perfY + 10);
-          ctx.lineTo(perfX + perfW, perfY + 10);
-          ctx.stroke();
-
-          const players = match.players.slice(0, 5);
-          players.forEach((p, i) => {
-            const py = perfY + 38 + i * 44;
-            ctx.font = `600 17px ${body}`;
-            ctx.fillStyle = white;
-            ctx.textAlign = 'left';
-            ctx.fillText(p.name, perfX, py);
-
-            const stats = [];
-            if (p.position) stats.push(p.position);
-            if (p.minutes) stats.push(`${p.minutes}'`);
-            if (p.goals > 0) stats.push(`${p.goals} Goal${p.goals > 1 ? 's' : ''}`);
-            if (p.assists > 0) stats.push(`${p.assists} Ast`);
-            if (p.xg) stats.push(`${p.xg.toFixed(2)} xG`);
-            if (p.xa && p.xa > 0) stats.push(`${p.xa.toFixed(2)} xA`);
-
-            ctx.font = `400 14px ${body}`;
-            ctx.fillStyle = gray400;
-            ctx.fillText(stats.join('  ·  '), perfX, py + 22);
-          });
-        }
+        // xG Comparison Bars
+        const barsBottom = drawXgBars(ctx, centerX, verdictBottom + 30, 600, 18);
 
         // Match info
         const infoBlockY = H - 170;
@@ -3957,8 +3968,12 @@
         if (match.attendance) details.push(`Att: ${match.attendance.toLocaleString()}`);
         ctx.fillText(details.join('  |  '), centerX, detailY);
 
-        if (match.atlManager) {
-          ctx.fillText(`Manager: ${match.atlManager}`, centerX, detailY + 26);
+        // Show both managers if available
+        const managers = [];
+        if (match.atlManager) managers.push(`ATL: ${match.atlManager}`);
+        if (match.oppManager) managers.push(`${match.opponentAbbr}: ${match.oppManager}`);
+        if (managers.length > 0) {
+          ctx.fillText(managers.join('  |  '), centerX, detailY + 26);
         }
 
         // Footer
@@ -4221,8 +4236,8 @@
     function renderFormChart(matches, season) {
       const el = document.getElementById('formChart');
 
-      // Hide for "All Seasons" or fewer than 3 matches
-      if (!season || season === 'all' || !matches || matches.length < 3) {
+      // Hide for "All Seasons" or fewer than 2 matches
+      if (!season || season === 'all' || !matches || matches.length < 2) {
         el.classList.remove('visible');
         el.innerHTML = '';
         return;
@@ -4233,7 +4248,7 @@
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .filter(m => m.atlXg !== null && m.oppXg !== null);
 
-      if (chronological.length < 3) {
+      if (chronological.length < 2) {
         el.classList.remove('visible');
         el.innerHTML = '';
         return;
@@ -4334,6 +4349,7 @@
             </div>
           </div>
         </div>
+        <p class="form-chart-desc">Each point is one match. The gold line tracks ATL's xG (expected goals created) and the gray line tracks opponent xG conceded. Green fill = ATL had the xG advantage, red fill = opponent did. Dashed line = ATL season average. Colored dots at the bottom show the result: green = W, red = L, gray = D.</p>
         <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
           ${gridLines}
           ${yLabels}
