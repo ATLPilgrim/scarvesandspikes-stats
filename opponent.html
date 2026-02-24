@@ -476,6 +476,20 @@
 
     .match-card.expanded .match-details { display: block; }
 
+    .match-detail-link {
+      display: inline-block;
+      margin-top: var(--space-md);
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .match-detail-link:hover { text-decoration: underline; }
+
     .details-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1151,6 +1165,7 @@
                       <span class="detail-value">${match.season}</span>
                     </div>
                   </div>
+                  <a href="/?season=${match.season}&match=${match.gameId}" class="match-detail-link">View full match details &rarr;</a>
                 </div>
               </article>
             `;

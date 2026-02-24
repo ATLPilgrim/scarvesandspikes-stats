@@ -444,6 +444,8 @@
       justify-content: space-between;
       background: var(--gray-900);
       border: 1px solid var(--gray-800);
+      text-decoration: none;
+      color: inherit;
       border-radius: var(--radius-md);
       padding: var(--space-md);
       border-left: 4px solid var(--gray-500);
@@ -1342,8 +1344,9 @@
           const gaTotal = game.gk.goalsAddedTotal != null ? (game.gk.goalsAddedTotal >= 0 ? '+' : '') + game.gk.goalsAddedTotal.toFixed(2) : '-';
           const gaTotalColor = game.gk.goalsAddedTotal != null ? (game.gk.goalsAddedTotal >= 0 ? 'good' : 'bad') : '';
 
+          const gkSeason = game.date ? game.date.split('-')[0] : '';
           return `
-            <div class="game-row ${resultClass}">
+            <a class="game-row ${resultClass}" href="/?season=${gkSeason}&match=${game.gameId}">
               <div class="game-info">
                 <div class="game-date">${formatDateLong(game.date)}</div>
                 <div class="game-matchup">${venueLabel} ${game.opponent} ${scoreText}</div>
@@ -1370,7 +1373,7 @@
                   <div class="game-stat-label">g+</div>
                 </div>
               </div>
-            </div>
+            </a>
           `;
         }
 
@@ -1378,8 +1381,9 @@
         const gaTotal = game.goalsAddedTotal != null ? (game.goalsAddedTotal >= 0 ? '+' : '') + game.goalsAddedTotal.toFixed(2) : '-';
         const gaTotalColor = game.goalsAddedTotal != null ? (game.goalsAddedTotal >= 0 ? 'good' : 'bad') : '';
 
+        const gameSeason = game.date ? game.date.split('-')[0] : '';
         return `
-          <div class="game-row ${resultClass}">
+          <a class="game-row ${resultClass}" href="/?season=${gameSeason}&match=${game.gameId}">
             <div class="game-info">
               <div class="game-date">${formatDateLong(game.date)}</div>
               <div class="game-matchup">${venueLabel} ${game.opponent} ${scoreText}</div>
@@ -1414,7 +1418,7 @@
                 <div class="game-stat-label">g+</div>
               </div>
             </div>
-          </div>
+          </a>
         `;
       }).join('');
 

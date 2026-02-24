@@ -4466,12 +4466,16 @@
     // Initialize
     async function init() {
       try {
-        let defaultSeason = new Date().getFullYear();
+        const params = new URLSearchParams(window.location.search);
+        const deepLinkMatch = params.get('match');
+        const deepLinkSeason = params.get('season');
+
+        let defaultSeason = deepLinkSeason || new Date().getFullYear();
 
         let matches = await loadSeason(defaultSeason);
 
         // If current year has no matches (season hasn't started), fall back to previous year
-        if (matches.length === 0 && defaultSeason > 2017) {
+        if (matches.length === 0 && defaultSeason > 2017 && !deepLinkSeason) {
           defaultSeason = defaultSeason - 1;
           matches = await loadSeason(defaultSeason);
         }
@@ -4499,6 +4503,17 @@
         document.getElementById('verdictFilter').addEventListener('change', applyFilters);
         document.getElementById('compFilter').addEventListener('change', applyFilters);
         document.getElementById('opponentFilter').addEventListener('change', applyFilters);
+
+        // Deep link: scroll to and expand a specific match card
+        if (deepLinkMatch) {
+          const card = document.querySelector(`[data-game-id="${deepLinkMatch}"]`);
+          if (card) {
+            requestAnimationFrame(() => {
+              card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              setTimeout(() => toggleMatchCard(card), 400);
+            });
+          }
+        }
 
         // Prefetch match + opponent details in background so card expansion is instant
         // Delay slightly to let the UI settle and not compete with insights loading
