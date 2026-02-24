@@ -3646,9 +3646,11 @@
       // Load logos
       const atlSlug = 'atlanta-united';
       const oppSlug = normalizeTeamNameForLogo(match.opponent);
-      const [atlLogo, oppLogo] = await Promise.all([
+      const [atlLogo, oppLogo, ssBadge, ssWordmark] = await Promise.all([
         loadImage(`/logos/${atlSlug}.svg`),
-        loadImage(`/logos/${oppSlug}.svg`)
+        loadImage(`/logos/${oppSlug}.svg`),
+        loadImage('/badge_community.png'),
+        loadImage('https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png')
       ]);
 
       if (isHorizontal) {
@@ -3658,10 +3660,24 @@
         ctx.fillStyle = burgundy;
         ctx.fillRect(0, 0, W, 52);
 
-        ctx.font = `700 18px ${display}`;
-        ctx.fillStyle = gold;
-        ctx.textAlign = 'left';
-        ctx.fillText('SCARVES & SPIKES', 24, 34);
+        // S&S badge + wordmark in header
+        let headerTextX = 24;
+        if (ssBadge) {
+          const badgeH = 36;
+          const badgeW = badgeH;
+          ctx.drawImage(ssBadge, 12, 8, badgeW, badgeH);
+          headerTextX = 12 + badgeW + 8;
+        }
+        if (ssWordmark) {
+          const wmH = 24;
+          const wmW = ssWordmark.width * (wmH / ssWordmark.height);
+          ctx.drawImage(ssWordmark, headerTextX, 14, wmW, wmH);
+        } else {
+          ctx.font = `700 18px ${display}`;
+          ctx.fillStyle = gold;
+          ctx.textAlign = 'left';
+          ctx.fillText('SCARVES & SPIKES', headerTextX, 34);
+        }
 
         ctx.font = `500 14px ${body}`;
         ctx.fillStyle = gray300;
@@ -3791,19 +3807,33 @@
 
         // Header bar
         ctx.fillStyle = burgundy;
-        ctx.fillRect(0, 0, W, 64);
+        ctx.fillRect(0, 0, W, 72);
 
-        ctx.font = `700 22px ${display}`;
-        ctx.fillStyle = gold;
-        ctx.textAlign = 'center';
-        ctx.fillText('SCARVES & SPIKES', W / 2, 42);
+        // S&S badge + wordmark in header (centered)
+        if (ssBadge && ssWordmark) {
+          const badgeH = 44;
+          const badgeW = badgeH;
+          const wmH = 28;
+          const wmW = ssWordmark.width * (wmH / ssWordmark.height);
+          const totalW = badgeW + 10 + wmW;
+          const startX = (W - totalW) / 2;
+          ctx.drawImage(ssBadge, startX, 14, badgeW, badgeH);
+          ctx.drawImage(ssWordmark, startX + badgeW + 10, 22, wmW, wmH);
+        } else if (ssBadge) {
+          ctx.drawImage(ssBadge, W / 2 - 22, 14, 44, 44);
+        } else {
+          ctx.font = `700 22px ${display}`;
+          ctx.fillStyle = gold;
+          ctx.textAlign = 'center';
+          ctx.fillText('SCARVES & SPIKES', W / 2, 46);
+        }
 
         // Result stripe on left
         ctx.fillStyle = resultColor;
-        ctx.fillRect(0, 64, 6, H - 64);
+        ctx.fillRect(0, 72, 6, H - 72);
 
         // Date + venue
-        const infoY = 110;
+        const infoY = 118;
         ctx.font = `500 16px ${body}`;
         ctx.fillStyle = gray300;
         ctx.textAlign = 'center';
