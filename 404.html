@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/badge_community.png">
+  <link rel="apple-touch-icon" href="/badge_community.png">
+  <title>Page Not Found | ScarvesAndSpikes.com</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 520px;
+    }
+
+    .error-code {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(96px, 20vw, 160px);
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(180deg, #c9a227 0%, #9a7a1a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(20px, 4vw, 28px);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #cccccc;
+      margin-bottom: 24px;
+    }
+
+    .message {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #aaaaaa;
+      margin-bottom: 40px;
+    }
+
+    .message strong {
+      color: #c9a227;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .nav-links a {
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      color: #e0e0e0;
+      background: #242424;
+      border: 1px solid #333333;
+      border-radius: 8px;
+      padding: 10px 20px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: #80000a;
+      border-color: #80000a;
+      color: #ffffff;
+    }
+
+    .nav-links a.primary {
+      background: #80000a;
+      border-color: #80000a;
+      color: #ffffff;
+    }
+
+    .nav-links a.primary:hover {
+      background: #a8192a;
+      border-color: #a8192a;
+    }
+
+    .divider {
+      width: 60px;
+      height: 3px;
+      background: #80000a;
+      border-radius: 2px;
+      margin: 0 auto 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="error-code">404</div>
+    <div class="tagline">Offside by a mile</div>
+    <div class="divider"></div>
+    <p class="message">
+      Looks like this page got called offside. Happens to the best of us.<br>
+      Maybe <strong>VAR</strong> can help you find what you're looking for.
+    </p>
+    <div class="nav-links">
+      <a href="/" class="primary">Match History</a>
+      <a href="/players.html">Players</a>
+      <a href="/opponent.html">Opponents</a>
+      <a href="/league.html">Standings</a>
+      <a href="/goalkeeper.html">Goalkeepers</a>
+      <a href="/history.html">History</a>
+    </div>
+  </div>
+</body>
+</html>
