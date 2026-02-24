@@ -525,6 +525,79 @@
       color: var(--white);
     }
 
+    /* Share Button */
+    .share-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--gray-800);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .share-btn:hover {
+      background: var(--gray-700);
+      border-color: var(--gold);
+    }
+
+    .share-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--gray-300);
+    }
+
+    .share-btn:hover svg { fill: var(--gold); }
+
+    .share-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 4px;
+      background: var(--gray-800);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      z-index: 50;
+      min-width: 180px;
+      overflow: hidden;
+    }
+
+    .share-dropdown.visible { display: block; }
+
+    .share-option {
+      display: block;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      color: var(--gray-100);
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .share-option:hover { background: var(--gray-700); }
+
+    .share-option-label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .share-option-desc {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--gray-400);
+    }
+
     .match-score-row {
       display: flex;
       align-items: center;
@@ -1615,6 +1688,62 @@
       font-weight: 700;
     }
 
+    /* Form Chart */
+    .form-chart {
+      display: none;
+      margin-bottom: var(--space-xl);
+      padding: var(--space-lg);
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+    }
+
+    .form-chart.visible {
+      display: block;
+    }
+
+    .form-chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+
+    .form-chart-title {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+    }
+
+    .form-chart-legend {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+    }
+
+    .form-chart-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      color: var(--gray-400);
+    }
+
+    .form-chart-legend-swatch {
+      width: 12px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    .form-chart svg {
+      width: 100%;
+      height: auto;
+    }
+
     /* Player Search */
     .player-search {
       position: relative;
@@ -1787,6 +1916,7 @@
         <a href="/players.html" class="nav-link">Players</a>
         <a href="/opponent.html" class="nav-link">Opponents</a>
         <a href="/history.html" class="nav-link">History</a>
+        <a href="/league.html" class="nav-link">Standings</a>
         <div class="player-search">
           <input type="text" class="player-search-input" placeholder="Search players...">
           <div class="player-search-dropdown"></div>
@@ -1876,6 +2006,9 @@
 
     <!-- Current Form -->
     <div id="currentForm" class="current-form"></div>
+
+    <!-- Rolling Form Chart -->
+    <div id="formChart" class="form-chart"></div>
 
     <!-- Head to Head -->
     <section id="h2hSection" class="h2h-section">
@@ -3408,6 +3541,434 @@
       `;
     }
 
+    // ── Share Dropdown ──
+    function toggleShareDropdown(btn) {
+      // Close any other open dropdowns first
+      document.querySelectorAll('.share-dropdown.visible').forEach(d => {
+        if (d !== btn.querySelector('.share-dropdown')) d.classList.remove('visible');
+      });
+      const dropdown = btn.querySelector('.share-dropdown');
+      dropdown.classList.toggle('visible');
+    }
+
+    // Close share dropdowns when clicking elsewhere
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.share-dropdown.visible').forEach(d => d.classList.remove('visible'));
+    });
+
+    // ── Match Card Generation (Canvas) ──
+    const normalizeTeamNameForLogo = (name) => {
+      return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/^fc-/, '')
+        .replace(/-fc$/, '')
+        .replace(/-sc$/, '')
+        .replace(/^real-/, '')
+        .replace(/-cf$/, '');
+    };
+
+    function findMatchByGameId(gameId) {
+      for (const season of Object.keys(matchesBySeasonCache)) {
+        const matches = matchesBySeasonCache[season];
+        if (!matches) continue;
+        const found = matches.find(m => m.gameId === gameId);
+        if (found) return found;
+      }
+      return null;
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+    }
+
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    async function generateMatchCard(match, format) {
+      const isHorizontal = format === 'horizontal';
+      const W = isHorizontal ? 1200 : 1080;
+      const H = isHorizontal ? 630 : 1350;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      // Colors
+      const burgundy = '#80000a';
+      const burgundyDark = '#5a0007';
+      const gold = '#c9a227';
+      const black = '#0a0a0a';
+      const gray900 = '#1a1a1a';
+      const gray800 = '#242424';
+      const gray700 = '#333333';
+      const gray400 = '#888888';
+      const gray300 = '#aaaaaa';
+      const gray100 = '#e0e0e0';
+      const white = '#ffffff';
+      const winColor = '#2e7d32';
+      const lossColor = '#c62828';
+      const drawColor = '#666666';
+
+      const resultColor = match.result === 'W' ? winColor : match.result === 'L' ? lossColor : drawColor;
+
+      // Fonts
+      const display = 'Oswald';
+      const body = 'Source Sans 3';
+
+      // Background
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, burgundyDark);
+      grad.addColorStop(0.4, '#121212');
+      grad.addColorStop(1, gray900);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Load logos
+      const atlSlug = 'atlanta-united';
+      const oppSlug = normalizeTeamNameForLogo(match.opponent);
+      const [atlLogo, oppLogo] = await Promise.all([
+        loadImage(`/logos/${atlSlug}.svg`),
+        loadImage(`/logos/${oppSlug}.svg`)
+      ]);
+
+      if (isHorizontal) {
+        // ── HORIZONTAL CARD (1200×630) ──
+
+        // Header bar
+        ctx.fillStyle = burgundy;
+        ctx.fillRect(0, 0, W, 52);
+
+        ctx.font = `700 18px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'left';
+        ctx.fillText('SCARVES & SPIKES', 24, 34);
+
+        ctx.font = `500 14px ${body}`;
+        ctx.fillStyle = gray300;
+        ctx.textAlign = 'right';
+        ctx.fillText(`${formatDate(match.date)}  |  ${match.isHome ? 'HOME' : 'AWAY'}`, W - 24, 34);
+
+        // Result stripe on left
+        ctx.fillStyle = resultColor;
+        ctx.fillRect(0, 52, 5, H - 52);
+
+        // Score section
+        const scoreY = 160;
+        const logoSize = 80;
+        const centerX = W / 2;
+
+        // ATL logo + name
+        if (atlLogo) ctx.drawImage(atlLogo, centerX - 260 - logoSize, scoreY - logoSize / 2, logoSize, logoSize);
+        ctx.font = `700 20px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'right';
+        ctx.fillText('ATLANTA UNITED', centerX - 260 - logoSize - 12, scoreY + 7);
+
+        // Score
+        ctx.font = `700 64px ${display}`;
+        ctx.fillStyle = white;
+        ctx.textAlign = 'center';
+        ctx.fillText(`${match.atlScore} - ${match.oppScore}`, centerX, scoreY + 20);
+
+        // OPP logo + name
+        if (oppLogo) ctx.drawImage(oppLogo, centerX + 260, scoreY - logoSize / 2, logoSize, logoSize);
+        ctx.font = `700 20px ${display}`;
+        ctx.fillStyle = gray100;
+        ctx.textAlign = 'left';
+        ctx.fillText(match.opponent.toUpperCase(), centerX + 260 + logoSize + 12, scoreY + 7);
+
+        // xG values
+        const xgY = scoreY + 60;
+        ctx.font = `600 22px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'center';
+        if (match.atlXg !== null) ctx.fillText(`${match.atlXg} xG`, centerX - 180, xgY);
+        ctx.fillStyle = gray300;
+        if (match.oppXg !== null) ctx.fillText(`${match.oppXg} xG`, centerX + 180, xgY);
+
+        // xG Diff
+        if (match.xgDiff !== null) {
+          const diffStr = `xG Diff: ${match.xgDiff > 0 ? '+' : ''}${match.xgDiff}`;
+          ctx.font = `500 16px ${body}`;
+          ctx.fillStyle = match.xgDiff > 0 ? winColor : match.xgDiff < 0 ? lossColor : gray400;
+          ctx.fillText(diffStr, centerX, xgY + 30);
+        }
+
+        // Verdict badge
+        if (match.xgVerdict) {
+          const verdictText = match.xgVerdict === 'robbed' ? 'ROBBED' : 'SMASH + GRAB';
+          const verdictColor = match.xgVerdict === 'robbed' ? gold : '#00838f';
+          const vY = xgY + 58;
+          ctx.font = `700 14px ${display}`;
+          const vW = ctx.measureText(verdictText).width + 20;
+          drawRoundedRect(ctx, centerX - vW / 2, vY - 12, vW, 26, 4);
+          ctx.fillStyle = verdictColor;
+          ctx.fill();
+          ctx.fillStyle = match.xgVerdict === 'robbed' ? black : white;
+          ctx.textAlign = 'center';
+          ctx.fillText(verdictText, centerX, vY + 5);
+        }
+
+        // Top Performers
+        if (match.players && match.players.length > 0) {
+          const perfY = 370;
+          const perfX = 120;
+          const perfW = W - 240;
+
+          // Section header
+          ctx.font = `600 11px ${display}`;
+          ctx.fillStyle = gray400;
+          ctx.textAlign = 'left';
+          ctx.letterSpacing = '0.1em';
+          ctx.fillText('TOP PERFORMERS', perfX, perfY);
+
+          // Divider line
+          ctx.strokeStyle = gray700;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(perfX, perfY + 8);
+          ctx.lineTo(perfX + perfW, perfY + 8);
+          ctx.stroke();
+
+          const players = match.players.slice(0, 3);
+          players.forEach((p, i) => {
+            const py = perfY + 30 + i * 34;
+            ctx.font = `600 15px ${body}`;
+            ctx.fillStyle = white;
+            ctx.textAlign = 'left';
+            ctx.fillText(p.name, perfX, py);
+
+            const stats = [];
+            if (p.position) stats.push(p.position);
+            if (p.goals > 0) stats.push(`${p.goals} Goal${p.goals > 1 ? 's' : ''}`);
+            if (p.assists > 0) stats.push(`${p.assists} Ast`);
+            if (p.xg) stats.push(`${p.xg.toFixed(2)} xG`);
+            if (p.xa && p.xa > 0) stats.push(`${p.xa.toFixed(2)} xA`);
+
+            ctx.font = `400 13px ${body}`;
+            ctx.fillStyle = gray400;
+            ctx.fillText(stats.join('  ·  '), perfX, py + 18);
+          });
+        }
+
+        // Footer
+        const footY = H - 44;
+        ctx.fillStyle = gray800;
+        ctx.fillRect(0, footY, W, 44);
+
+        ctx.font = `500 12px ${body}`;
+        ctx.fillStyle = gray400;
+        ctx.textAlign = 'left';
+        ctx.fillText(`${match.isPlayoff ? 'MLS Cup Playoffs' : 'MLS Regular Season'}  |  ${match.stadium || ''}`, 24, footY + 27);
+
+        ctx.font = `600 12px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'right';
+        ctx.fillText('stats.scarvesandspikes.com', W - 24, footY + 27);
+
+      } else {
+        // ── VERTICAL CARD (1080×1350) ──
+
+        // Header bar
+        ctx.fillStyle = burgundy;
+        ctx.fillRect(0, 0, W, 64);
+
+        ctx.font = `700 22px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'center';
+        ctx.fillText('SCARVES & SPIKES', W / 2, 42);
+
+        // Result stripe on left
+        ctx.fillStyle = resultColor;
+        ctx.fillRect(0, 64, 6, H - 64);
+
+        // Date + venue
+        const infoY = 110;
+        ctx.font = `500 16px ${body}`;
+        ctx.fillStyle = gray300;
+        ctx.textAlign = 'center';
+        ctx.fillText(`${formatDate(match.date)}  |  ${match.isHome ? 'HOME' : 'AWAY'}`, W / 2, infoY);
+
+        // Logos + team names
+        const logoSize = 120;
+        const logoY = 155;
+        const centerX = W / 2;
+
+        if (atlLogo) ctx.drawImage(atlLogo, centerX - 200 - logoSize / 2, logoY, logoSize, logoSize);
+        if (oppLogo) ctx.drawImage(oppLogo, centerX + 200 - logoSize / 2, logoY, logoSize, logoSize);
+
+        // Team names under logos
+        ctx.font = `700 18px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'center';
+        ctx.fillText('ATLANTA UNITED', centerX - 200, logoY + logoSize + 28);
+
+        ctx.fillStyle = gray100;
+        ctx.fillText(match.opponent.toUpperCase(), centerX + 200, logoY + logoSize + 28);
+
+        // Score
+        const scoreY = logoY + logoSize + 90;
+        ctx.font = `700 88px ${display}`;
+        ctx.fillStyle = white;
+        ctx.textAlign = 'center';
+        ctx.fillText(`${match.atlScore} - ${match.oppScore}`, centerX, scoreY);
+
+        // Verdict badge
+        let verdictOffset = 0;
+        if (match.xgVerdict) {
+          const verdictText = match.xgVerdict === 'robbed' ? 'ROBBED' : 'SMASH + GRAB';
+          const verdictColor = match.xgVerdict === 'robbed' ? gold : '#00838f';
+          const vY = scoreY + 30;
+          ctx.font = `700 18px ${display}`;
+          const vW = ctx.measureText(verdictText).width + 28;
+          drawRoundedRect(ctx, centerX - vW / 2, vY - 14, vW, 34, 6);
+          ctx.fillStyle = verdictColor;
+          ctx.fill();
+          ctx.fillStyle = match.xgVerdict === 'robbed' ? black : white;
+          ctx.textAlign = 'center';
+          ctx.fillText(verdictText, centerX, vY + 7);
+          verdictOffset = 50;
+        }
+
+        // xG values
+        const xgY = scoreY + 50 + verdictOffset;
+        ctx.font = `600 28px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'center';
+        if (match.atlXg !== null) ctx.fillText(`${match.atlXg} xG`, centerX - 180, xgY);
+        ctx.fillStyle = gray300;
+        if (match.oppXg !== null) ctx.fillText(`${match.oppXg} xG`, centerX + 180, xgY);
+
+        // xG Diff
+        if (match.xgDiff !== null) {
+          const diffStr = `xG Diff: ${match.xgDiff > 0 ? '+' : ''}${match.xgDiff}`;
+          ctx.font = `500 18px ${body}`;
+          ctx.fillStyle = match.xgDiff > 0 ? winColor : match.xgDiff < 0 ? lossColor : gray400;
+          ctx.fillText(diffStr, centerX, xgY + 38);
+        }
+
+        // Top Performers
+        if (match.players && match.players.length > 0) {
+          const perfY = xgY + 90;
+          const perfX = 80;
+          const perfW = W - 160;
+
+          ctx.font = `600 13px ${display}`;
+          ctx.fillStyle = gray400;
+          ctx.textAlign = 'left';
+          ctx.fillText('TOP PERFORMERS', perfX, perfY);
+
+          ctx.strokeStyle = gray700;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(perfX, perfY + 10);
+          ctx.lineTo(perfX + perfW, perfY + 10);
+          ctx.stroke();
+
+          const players = match.players.slice(0, 5);
+          players.forEach((p, i) => {
+            const py = perfY + 38 + i * 44;
+            ctx.font = `600 17px ${body}`;
+            ctx.fillStyle = white;
+            ctx.textAlign = 'left';
+            ctx.fillText(p.name, perfX, py);
+
+            const stats = [];
+            if (p.position) stats.push(p.position);
+            if (p.minutes) stats.push(`${p.minutes}'`);
+            if (p.goals > 0) stats.push(`${p.goals} Goal${p.goals > 1 ? 's' : ''}`);
+            if (p.assists > 0) stats.push(`${p.assists} Ast`);
+            if (p.xg) stats.push(`${p.xg.toFixed(2)} xG`);
+            if (p.xa && p.xa > 0) stats.push(`${p.xa.toFixed(2)} xA`);
+
+            ctx.font = `400 14px ${body}`;
+            ctx.fillStyle = gray400;
+            ctx.fillText(stats.join('  ·  '), perfX, py + 22);
+          });
+        }
+
+        // Match info
+        const infoBlockY = H - 170;
+        ctx.strokeStyle = gray700;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(80, infoBlockY);
+        ctx.lineTo(W - 80, infoBlockY);
+        ctx.stroke();
+
+        const detailY = infoBlockY + 30;
+        ctx.font = `500 14px ${body}`;
+        ctx.fillStyle = gray400;
+        ctx.textAlign = 'center';
+
+        const details = [];
+        details.push(match.isPlayoff ? 'MLS Cup Playoffs' : 'MLS Regular Season');
+        if (match.stadium) details.push(match.stadium);
+        if (match.attendance) details.push(`Att: ${match.attendance.toLocaleString()}`);
+        ctx.fillText(details.join('  |  '), centerX, detailY);
+
+        if (match.atlManager) {
+          ctx.fillText(`Manager: ${match.atlManager}`, centerX, detailY + 26);
+        }
+
+        // Footer
+        const footY = H - 56;
+        ctx.fillStyle = gray800;
+        ctx.fillRect(0, footY, W, 56);
+
+        ctx.font = `700 16px ${display}`;
+        ctx.fillStyle = gold;
+        ctx.textAlign = 'center';
+        ctx.fillText('stats.scarvesandspikes.com', W / 2, footY + 36);
+      }
+
+      return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    }
+
+    async function downloadMatchCard(gameId, format) {
+      // Close dropdown
+      document.querySelectorAll('.share-dropdown.visible').forEach(d => d.classList.remove('visible'));
+
+      const match = findMatchByGameId(gameId);
+      if (!match) return;
+
+      // Wait for fonts to be ready
+      await document.fonts.ready;
+
+      const blob = await generateMatchCard(match, format);
+      if (!blob) return;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const dateStr = match.date.split('T')[0];
+      a.download = `atl-utd-vs-${normalizeTeamNameForLogo(match.opponent)}-${dateStr}-${format}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
     // Render match cards
     function renderMatches(matches) {
       const container = document.getElementById('matches');
@@ -3437,6 +3998,19 @@
                   ${match.xgVerdict === 'robbed' ? '<span class="badge robbed">Robbed</span>' : ''}
                   ${match.xgVerdict === 'smash-and-grab' ? '<span class="badge smash">Smash + Grab</span>' : ''}
                   <span class="badge result-${match.result.toLowerCase()}">${match.result}</span>
+                  <div class="share-btn" onclick="event.stopPropagation(); toggleShareDropdown(this)" data-game-id="${match.gameId}">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+                    <div class="share-dropdown">
+                      <button class="share-option" onclick="event.stopPropagation(); downloadMatchCard('${match.gameId}', 'horizontal')">
+                        <span class="share-option-label">Twitter / BlueSky / Threads</span>
+                        <span class="share-option-desc">1200 × 630 landscape</span>
+                      </button>
+                      <button class="share-option" onclick="event.stopPropagation(); downloadMatchCard('${match.gameId}', 'vertical')">
+                        <span class="share-option-label">Instagram</span>
+                        <span class="share-option-desc">1080 × 1350 portrait</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -3613,6 +4187,140 @@
       el.classList.add('visible');
     }
 
+    // ── Rolling Form Chart ──
+    function renderFormChart(matches, season) {
+      const el = document.getElementById('formChart');
+
+      // Hide for "All Seasons" or fewer than 3 matches
+      if (!season || season === 'all' || !matches || matches.length < 3) {
+        el.classList.remove('visible');
+        el.innerHTML = '';
+        return;
+      }
+
+      // Sort chronologically and filter to matches with xG data
+      const chronological = [...matches]
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .filter(m => m.atlXg !== null && m.oppXg !== null);
+
+      if (chronological.length < 3) {
+        el.classList.remove('visible');
+        el.innerHTML = '';
+        return;
+      }
+
+      const n = chronological.length;
+      const pad = { top: 28, right: 20, bottom: 36, left: 38 };
+      const w = 700;
+      const h = 240;
+      const plotW = w - pad.left - pad.right;
+      const plotH = h - pad.top - pad.bottom;
+
+      // Compute ranges
+      const allXg = chronological.flatMap(m => [m.atlXg, m.oppXg]);
+      const maxXg = Math.max(...allXg, 2);
+      const yMax = Math.ceil(maxXg * 2) / 2; // round up to nearest 0.5
+      const avgAtl = chronological.reduce((s, m) => s + m.atlXg, 0) / n;
+
+      const x = (i) => pad.left + (i / (n - 1)) * plotW;
+      const y = (v) => pad.top + (1 - v / yMax) * plotH;
+
+      // Build ATL and OPP polyline points
+      const atlPts = chronological.map((m, i) => `${x(i).toFixed(1)},${y(m.atlXg).toFixed(1)}`);
+      const oppPts = chronological.map((m, i) => `${x(i).toFixed(1)},${y(m.oppXg).toFixed(1)}`);
+
+      // Build shaded area segments (green when ATL > OPP, red when below)
+      let shadedPaths = '';
+      for (let i = 0; i < n - 1; i++) {
+        const m1 = chronological[i];
+        const m2 = chronological[i + 1];
+        const x1 = x(i), x2 = x(i + 1);
+        const ay1 = y(m1.atlXg), ay2 = y(m2.atlXg);
+        const oy1 = y(m1.oppXg), oy2 = y(m2.oppXg);
+
+        // Determine dominant color for this segment
+        const atlAvgSeg = (m1.atlXg + m2.atlXg) / 2;
+        const oppAvgSeg = (m1.oppXg + m2.oppXg) / 2;
+        const fill = atlAvgSeg >= oppAvgSeg ? 'rgba(46,125,50,0.12)' : 'rgba(198,40,40,0.12)';
+
+        shadedPaths += `<path d="M${x1.toFixed(1)},${ay1.toFixed(1)} L${x2.toFixed(1)},${ay2.toFixed(1)} L${x2.toFixed(1)},${oy2.toFixed(1)} L${x1.toFixed(1)},${oy1.toFixed(1)} Z" fill="${fill}"/>`;
+      }
+
+      // Y-axis grid lines
+      let gridLines = '';
+      let yLabels = '';
+      const yStep = yMax <= 2 ? 0.5 : 1;
+      for (let v = 0; v <= yMax; v += yStep) {
+        const yPos = y(v);
+        gridLines += `<line x1="${pad.left}" y1="${yPos.toFixed(1)}" x2="${w - pad.right}" y2="${yPos.toFixed(1)}" stroke="var(--gray-800)" stroke-width="0.5"/>`;
+        yLabels += `<text x="${pad.left - 6}" y="${(yPos + 3).toFixed(1)}" text-anchor="end" fill="var(--gray-500)" font-size="9" font-family="var(--font-body)">${v.toFixed(1)}</text>`;
+      }
+
+      // Average dashed line
+      const avgY = y(avgAtl);
+      const avgLine = `<line x1="${pad.left}" y1="${avgY.toFixed(1)}" x2="${w - pad.right}" y2="${avgY.toFixed(1)}" stroke="var(--gold)" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>`;
+      const avgLabel = `<text x="${w - pad.right + 4}" y="${(avgY + 3).toFixed(1)}" fill="var(--gold)" font-size="8" font-family="var(--font-body)" opacity="0.6">avg</text>`;
+
+      // Result dots on x-axis
+      const resultDots = chronological.map((m, i) => {
+        const cx = x(i).toFixed(1);
+        const cy = (h - pad.bottom + 14).toFixed(1);
+        const color = m.result === 'W' ? 'var(--win)' : m.result === 'L' ? 'var(--loss)' : 'var(--draw)';
+        return `<circle cx="${cx}" cy="${cy}" r="3.5" fill="${color}"/>`;
+      }).join('');
+
+      // Matchday labels (show every Nth to avoid crowding)
+      const labelEvery = n <= 10 ? 1 : n <= 20 ? 2 : n <= 30 ? 5 : 10;
+      const xLabels = chronological.map((m, i) => {
+        if (i % labelEvery !== 0 && i !== n - 1) return '';
+        const cx = x(i).toFixed(1);
+        return `<text x="${cx}" y="${(h - pad.bottom + 28).toFixed(1)}" text-anchor="middle" fill="var(--gray-500)" font-size="8" font-family="var(--font-body)">${m.matchday || (i + 1)}</text>`;
+      }).join('');
+
+      // Interactive dots on lines
+      const atlDots = chronological.map((m, i) => {
+        return `<circle cx="${x(i).toFixed(1)}" cy="${y(m.atlXg).toFixed(1)}" r="3" fill="var(--gold)" stroke="var(--gray-900)" stroke-width="1.5">
+          <title>MD${m.matchday || (i + 1)}: ATL ${m.atlXg} xG vs ${m.opponent}</title>
+        </circle>`;
+      }).join('');
+
+      const oppDots = chronological.map((m, i) => {
+        return `<circle cx="${x(i).toFixed(1)}" cy="${y(m.oppXg).toFixed(1)}" r="2.5" fill="var(--gray-500)" stroke="var(--gray-900)" stroke-width="1.5">
+          <title>MD${m.matchday || (i + 1)}: ${m.opponentAbbr} ${m.oppXg} xG</title>
+        </circle>`;
+      }).join('');
+
+      el.innerHTML = `
+        <div class="form-chart-header">
+          <span class="form-chart-title">Season xG Trend</span>
+          <div class="form-chart-legend">
+            <div class="form-chart-legend-item">
+              <span class="form-chart-legend-swatch" style="background: var(--gold);"></span>
+              ATL xG
+            </div>
+            <div class="form-chart-legend-item">
+              <span class="form-chart-legend-swatch" style="background: var(--gray-500);"></span>
+              Opponent xG
+            </div>
+          </div>
+        </div>
+        <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+          ${gridLines}
+          ${yLabels}
+          ${shadedPaths}
+          ${avgLine}
+          ${avgLabel}
+          <polyline points="${oppPts.join(' ')}" fill="none" stroke="var(--gray-500)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <polyline points="${atlPts.join(' ')}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+          ${oppDots}
+          ${atlDots}
+          ${resultDots}
+          ${xLabels}
+        </svg>
+      `;
+      el.classList.add('visible');
+    }
+
     // Apply filters
     async function applyFilters() {
       const season = document.getElementById('seasonFilter').value;
@@ -3669,6 +4377,7 @@
 
       updateSummary(filtered);
       renderCurrentForm(filtered);
+      renderFormChart(matches, season);
       updateH2H(matches, opponent);
       renderMatches(filtered);
 
@@ -3709,6 +4418,7 @@
         setupRandomOpponentLink(matches);
         updateSummary(matches);
         renderCurrentForm(matches);
+        renderFormChart(matches, defaultSeason);
         renderMatches(matches);
 
         // Load season insights for default season

@@ -1,0 +1,717 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- IMPORTANT: Do not remove - Google Search Console verification -->
+  <meta name="google-site-verification" content="ALloYlPiQ2UmdhEjprptX-nfJll_34v-FQygShLrDo8" />
+  <!-- End Google verification -->
+  <title>MLS xG Standings | ScarvesAndSpikes.com</title>
+  <meta name="description" content="MLS Expected Goals standings table. Compare actual points vs expected points (xPts) to see which teams are overperforming or underperforming based on xG analytics.">
+  <link rel="canonical" href="https://stats.scarvesandspikes.com/league.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="MLS xG Standings | ScarvesAndSpikes.com">
+  <meta property="og:description" content="MLS Expected Goals standings table. Compare actual points vs expected points to find which teams are lucky or unlucky.">
+  <meta property="og:url" content="https://stats.scarvesandspikes.com/league.html">
+  <meta property="og:image" content="https://stats.scarvesandspikes.com/badge_community.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MLS xG Standings | ScarvesAndSpikes.com">
+  <meta name="twitter:description" content="MLS Expected Goals standings table. Compare actual points vs expected points.">
+  <meta name="twitter:image" content="https://stats.scarvesandspikes.com/badge_community.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --burgundy: #80000a;
+      --burgundy-dark: #5a0007;
+      --burgundy-light: #a8192a;
+      --gold: #c9a227;
+      --gold-dark: #9a7a1a;
+      --gold-light: #e0bc4a;
+      --black: #0a0a0a;
+      --gray-950: #121212;
+      --gray-900: #1a1a1a;
+      --gray-800: #242424;
+      --gray-700: #333333;
+      --gray-600: #444444;
+      --gray-500: #666666;
+      --gray-400: #888888;
+      --gray-300: #aaaaaa;
+      --gray-200: #cccccc;
+      --gray-100: #e0e0e0;
+      --white: #ffffff;
+      --win: #2e7d32;
+      --loss: #c62828;
+      --draw: #666666;
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'Source Sans 3', sans-serif;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--gray-100);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .site-header {
+      background: linear-gradient(180deg, var(--gray-900) 0%, var(--black) 100%);
+      border-bottom: 1px solid var(--gray-800);
+      padding: var(--space-md) var(--space-lg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .logo-wordmark { height: 32px; width: auto; }
+
+    .nav-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .nav-link {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover { color: var(--gold-light); }
+    .nav-active { color: var(--white); cursor: default; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--burgundy-dark) 0%, var(--gray-950) 50%, var(--gray-900) 100%);
+      padding: var(--space-3xl) var(--space-lg);
+      text-align: center;
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .hero-content { max-width: 700px; margin: 0 auto; }
+
+    .hero-badge {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin-bottom: var(--space-md);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--white);
+    }
+
+    .hero-title span { color: var(--gold); }
+
+    .hero-subtitle {
+      font-size: 0.95rem;
+      color: var(--gray-300);
+      margin-top: var(--space-sm);
+    }
+
+    .hero-credit {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-top: var(--space-sm);
+    }
+
+    .hero-credit-link {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .hero-credit-link:hover { text-decoration: underline; }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    /* Controls row */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .filter-group label {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+    }
+
+    .filter-group select {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      background: var(--gray-800);
+      color: var(--gray-100);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs) var(--space-md);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .filter-group select:focus { border-color: var(--gold); }
+
+    .sort-toggle {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--gray-800);
+      color: var(--gold);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs) var(--space-md);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .sort-toggle:hover { border-color: var(--gold); background: var(--gray-700); }
+    .sort-toggle.active { background: var(--gold); color: var(--black); border-color: var(--gold); }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-3xl);
+    }
+
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--gray-700);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+    }
+
+    /* League Table */
+    .league-table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-800);
+    }
+
+    .league-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 700px;
+    }
+
+    .league-table th {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-400);
+      background: var(--gray-900);
+      padding: var(--space-sm) var(--space-sm);
+      text-align: center;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--gray-800);
+      position: sticky;
+      top: 0;
+    }
+
+    .league-table th:first-child,
+    .league-table td:first-child { text-align: center; width: 36px; }
+
+    .league-table th.team-col,
+    .league-table td.team-col { text-align: left; padding-left: var(--space-sm); }
+
+    .league-table th.sortable {
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .league-table th.sortable:hover { color: var(--gold); }
+    .league-table th.sort-active { color: var(--gold); }
+
+    .league-table td {
+      padding: var(--space-sm) var(--space-sm);
+      text-align: center;
+      border-bottom: 1px solid var(--gray-800);
+      white-space: nowrap;
+    }
+
+    .league-table tr {
+      background: var(--gray-950);
+      transition: background 0.15s;
+    }
+
+    .league-table tr:hover { background: var(--gray-900); }
+
+    .league-table tr.atl-row {
+      background: rgba(201, 162, 39, 0.08);
+      border-left: 3px solid var(--gold);
+    }
+
+    .league-table tr.atl-row:hover {
+      background: rgba(201, 162, 39, 0.14);
+    }
+
+    .team-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .team-logo {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .team-name-text {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: var(--gray-100);
+    }
+
+    .atl-row .team-name-text { color: var(--gold); }
+
+    .luck-positive { color: var(--win); font-weight: 600; }
+    .luck-negative { color: var(--loss); font-weight: 600; }
+    .luck-neutral { color: var(--gray-400); }
+
+    .pts-value { font-family: var(--font-display); font-weight: 600; }
+    .xpts-value { font-family: var(--font-display); font-weight: 500; color: var(--gray-300); }
+    .gd-positive { color: var(--win); }
+    .gd-negative { color: var(--loss); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-3xl);
+      color: var(--gray-400);
+    }
+
+    /* Player Search */
+    .player-search { position: relative; }
+
+    .player-search-input {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      background: var(--gray-800);
+      color: var(--gray-100);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      padding: var(--space-xs) var(--space-md);
+      width: 160px;
+      outline: none;
+      transition: border-color 0.2s, width 0.2s;
+    }
+
+    .player-search-input::placeholder { color: var(--gray-500); }
+    .player-search-input:focus { border-color: var(--gold); width: 200px; }
+
+    .player-search-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--gray-800);
+      border: 1px solid var(--gray-700);
+      border-radius: var(--radius-md);
+      margin-top: 4px;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 200;
+    }
+
+    .player-search-dropdown.visible { display: block; }
+
+    .player-search-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+      color: var(--gray-100);
+    }
+
+    .player-search-item:hover { background: var(--gray-700); }
+
+    .player-search-name {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .player-search-pos {
+      font-size: 0.7rem;
+      color: var(--gray-400);
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--gray-950);
+      border-top: 1px solid var(--gray-800);
+      padding: var(--space-2xl) var(--space-lg);
+      margin-top: var(--space-3xl);
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-lg);
+      text-align: center;
+    }
+
+    .footer-logo { width: 48px; height: 48px; border-radius: 50%; }
+
+    .footer-text {
+      font-size: 0.85rem;
+      color: var(--gray-400);
+    }
+
+    .footer-link {
+      color: var(--gold);
+      text-decoration: none;
+    }
+
+    .footer-link:hover { text-decoration: underline; }
+
+    .footer-credit {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      .nav-section {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: var(--space-md);
+        padding-bottom: var(--space-xs);
+      }
+
+      .nav-section::-webkit-scrollbar { height: 0; display: none; }
+
+      .nav-link { white-space: nowrap; font-size: 0.75rem; }
+
+      .player-search-input { width: 120px; font-size: 0.75rem; }
+      .player-search-input:focus { width: 150px; }
+
+      .hero { padding: var(--space-2xl) var(--space-md); }
+      .hero-title { font-size: 1.5rem; }
+
+      .container { padding: var(--space-lg) var(--space-md); }
+
+      .controls { gap: var(--space-md); }
+
+      .league-table { font-size: 0.78rem; }
+      .league-table th { font-size: 0.6rem; padding: var(--space-xs) var(--space-xs); }
+      .league-table td { padding: var(--space-xs) var(--space-xs); }
+      .team-logo { width: 20px; height: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-content">
+      <a href="https://scarvesandspikes.com" class="logo-link">
+        <img src="https://raw.githubusercontent.com/ATLPilgrim/scarvesandspikes-stats/main/logo_with_lockup_website.png" alt="Scarves and Spikes" class="logo-wordmark">
+      </a>
+      <nav class="nav-section">
+        <a href="/" class="nav-link">Match History</a>
+        <a href="/goalkeeper.html" class="nav-link">Goalkeepers</a>
+        <a href="/players.html" class="nav-link">Players</a>
+        <a href="/opponent.html" class="nav-link">Opponents</a>
+        <a href="/history.html" class="nav-link">History</a>
+        <span class="nav-link nav-active">Standings</span>
+        <div class="player-search">
+          <input type="text" class="player-search-input" placeholder="Search players...">
+          <div class="player-search-dropdown"></div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <img src="/badge_community.png" alt="Scarves and Spikes Community" class="hero-badge">
+      <h1 class="hero-title">MLS <span>xG Standings</span></h1>
+      <p class="hero-subtitle">Expected Goals league table — see which teams are overperforming or underperforming</p>
+      <p class="hero-credit">Data by <a href="https://americansocceranalysis.com" class="hero-credit-link" target="_blank" rel="noopener">American Soccer Analysis</a></p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container">
+    <div class="controls">
+      <div class="filter-group">
+        <label for="seasonFilter">Season</label>
+        <select id="seasonFilter">
+          <option value="2026">2026</option>
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+          <option value="2022">2022</option>
+          <option value="2021">2021</option>
+          <option value="2020">2020</option>
+          <option value="2019">2019</option>
+          <option value="2018">2018</option>
+          <option value="2017">2017</option>
+        </select>
+      </div>
+      <button class="sort-toggle" id="sortToggle">Sort by xPts</button>
+    </div>
+
+    <div id="tableContainer">
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading Standings</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <img src="/badge_community.png" alt="Scarves and Spikes" class="footer-logo">
+      <p class="footer-text">
+        Built by <a href="https://scarvesandspikes.com" class="footer-link">ScarvesAndSpikes.com</a> for Atlanta United supporters who love diving deep into the numbers.
+      </p>
+      <p class="footer-credit">Data provided by <a href="https://americansocceranalysis.com" class="footer-link" target="_blank" rel="noopener">American Soccer Analysis</a></p>
+    </div>
+  </footer>
+
+  <script>
+    let leagueCache = {};
+    let sortByXpts = false;
+
+    const normalizeTeamName = (name) => {
+      return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/^fc-/, '')
+        .replace(/-fc$/, '')
+        .replace(/-sc$/, '')
+        .replace(/^real-/, '')
+        .replace(/-cf$/, '');
+    };
+
+    async function loadLeague(season) {
+      if (leagueCache[season]) return leagueCache[season];
+      const response = await fetch(`/api/insights?type=league&season=${season}`);
+      const data = await response.json();
+      leagueCache[season] = data.table || [];
+      return leagueCache[season];
+    }
+
+    function renderTable(table) {
+      const container = document.getElementById('tableContainer');
+
+      if (!table || table.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No standings data available for this season.</p></div>';
+        return;
+      }
+
+      // Sort by selected metric
+      const sorted = [...table].sort((a, b) => {
+        if (sortByXpts) return (b.xpoints || 0) - (a.xpoints || 0);
+        return (b.points || 0) - (a.points || 0);
+      });
+
+      const sortPtsClass = !sortByXpts ? ' sort-active' : '';
+      const sortXptsClass = sortByXpts ? ' sort-active' : '';
+
+      const rows = sorted.map((team, i) => {
+        const rank = i + 1;
+        const slug = normalizeTeamName(team.team_name);
+        const rowClass = team.is_atlanta ? ' class="atl-row"' : '';
+        const gd = team.goal_diff;
+        const gdClass = gd > 0 ? 'gd-positive' : gd < 0 ? 'gd-negative' : '';
+        const gdStr = gd != null ? (gd > 0 ? '+' + gd : gd) : '-';
+        const xgd = team.xgoal_diff;
+        const xgdClass = xgd > 0 ? 'gd-positive' : xgd < 0 ? 'gd-negative' : '';
+        const xgdStr = xgd != null ? (xgd > 0 ? '+' + xgd : xgd) : '-';
+        const luck = team.luck;
+        const luckClass = luck > 0 ? 'luck-positive' : luck < 0 ? 'luck-negative' : 'luck-neutral';
+        const luckStr = luck != null ? (luck > 0 ? '+' + luck : luck) : '-';
+
+        return `<tr${rowClass}>
+          <td>${rank}</td>
+          <td class="team-col">
+            <div class="team-cell">
+              <img class="team-logo" src="/logos/${slug}.svg" alt="" onerror="this.style.display='none'">
+              <span class="team-name-text">${team.team_name}</span>
+            </div>
+          </td>
+          <td>${team.games_played || '-'}</td>
+          <td>${team.goals_for ?? '-'}</td>
+          <td>${team.goals_against ?? '-'}</td>
+          <td class="${gdClass}">${gdStr}</td>
+          <td class="${xgdClass}">${xgdStr}</td>
+          <td class="pts-value">${team.points ?? '-'}</td>
+          <td class="xpts-value">${team.xpoints ?? '-'}</td>
+          <td class="${luckClass}">${luckStr}</td>
+        </tr>`;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="league-table-wrapper">
+          <table class="league-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th class="team-col">Team</th>
+                <th>GP</th>
+                <th>GF</th>
+                <th>GA</th>
+                <th>GD</th>
+                <th>xGD</th>
+                <th class="sortable${sortPtsClass}" onclick="setSortPts()">Pts</th>
+                <th class="sortable${sortXptsClass}" onclick="setSortXpts()">xPts</th>
+                <th>Luck</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function setSortPts() {
+      sortByXpts = false;
+      document.getElementById('sortToggle').classList.remove('active');
+      document.getElementById('sortToggle').textContent = 'Sort by xPts';
+      refresh();
+    }
+
+    function setSortXpts() {
+      sortByXpts = true;
+      document.getElementById('sortToggle').classList.add('active');
+      document.getElementById('sortToggle').textContent = 'Sort by Pts';
+      refresh();
+    }
+
+    async function refresh() {
+      const season = document.getElementById('seasonFilter').value;
+      const table = await loadLeague(season);
+      renderTable(table);
+    }
+
+    async function init() {
+      try {
+        let defaultSeason = new Date().getFullYear();
+        let table = await loadLeague(defaultSeason);
+
+        // If current year has no data, fall back
+        if (table.length === 0 && defaultSeason > 2017) {
+          defaultSeason = defaultSeason - 1;
+          table = await loadLeague(defaultSeason);
+        }
+
+        document.getElementById('seasonFilter').value = defaultSeason;
+        renderTable(table);
+
+        document.getElementById('seasonFilter').addEventListener('change', refresh);
+        document.getElementById('sortToggle').addEventListener('click', () => {
+          if (sortByXpts) setSortPts();
+          else setSortXpts();
+        });
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><p>Error loading standings. Please try refreshing.</p></div>';
+      }
+    }
+
+    init();
+  </script>
+  <script src="/search.js"></script>
+</body>
+</html>

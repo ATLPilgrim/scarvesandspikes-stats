@@ -4,6 +4,7 @@
 //   /mls/teams/goals-added - g+ breakdown by action type
 //
 // Supports ?season= parameter (required, rejects "all")
+// Supports ?type=league for full MLS xG league table
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -14,11 +15,75 @@ export default async function handler(req, res) {
   try {
     const atlantaId = 'KAqBN0Vqbg';
     const season = req.query.season;
+    const type = req.query.type;
 
     if (!season || season === 'all') {
       return res.status(400).json({ error: 'A specific season is required (e.g. ?season=2024)' });
     }
 
+    // ── League Table Mode ──
+    if (type === 'league') {
+      const [xgoalsRes, teamsRes] = await Promise.all([
+        fetch(`https://app.americansocceranalysis.com/api/v1/mls/teams/xgoals?season_name=${season}`),
+        fetch('https://app.americansocceranalysis.com/api/v1/mls/teams')
+      ]);
+
+      const [xgoalsData, teamsData] = await Promise.all([
+        xgoalsRes.json(),
+        teamsRes.json()
+      ]);
+
+      // Build team name/abbr lookup
+      const teamMap = {};
+      teamsData.forEach(t => {
+        teamMap[t.team_id] = { name: t.team_name, abbr: t.team_abbreviation };
+      });
+
+      // Build league table from xgoals data
+      const table = (xgoalsData || [])
+        .filter(row => row.team_id && teamMap[row.team_id])
+        .map(row => {
+          const team = teamMap[row.team_id];
+          const points = row.points ?? null;
+          const xpoints = row.xpoints != null ? parseFloat(row.xpoints.toFixed(1)) : null;
+          const luck = points != null && xpoints != null ? parseFloat((points - xpoints).toFixed(1)) : null;
+
+          return {
+            team_id: row.team_id,
+            team_name: team.name,
+            team_abbr: team.abbr,
+            games_played: row.count_games || 0,
+            points: points,
+            xpoints: xpoints,
+            luck: luck,
+            goals_for: row.goals_for ?? null,
+            goals_against: row.goals_against ?? null,
+            goal_diff: row.goals_for != null && row.goals_against != null
+              ? row.goals_for - row.goals_against : null,
+            xgoals_for: row.xgoals_for != null ? parseFloat(row.xgoals_for.toFixed(1)) : null,
+            xgoals_against: row.xgoals_against != null ? parseFloat(row.xgoals_against.toFixed(1)) : null,
+            xgoal_diff: row.xgoals_for != null && row.xgoals_against != null
+              ? parseFloat((row.xgoals_for - row.xgoals_against).toFixed(1)) : null,
+            is_atlanta: row.team_id === atlantaId
+          };
+        })
+        .sort((a, b) => (b.points || 0) - (a.points || 0));
+
+      // Dynamic cache TTL
+      const currentYear = new Date().getFullYear();
+      const isHistorical = parseInt(season) < currentYear;
+      if (!isHistorical && table.length === 0) {
+        res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=60');
+      } else if (isHistorical) {
+        res.setHeader('Cache-Control', 's-maxage=604800, stale-while-revalidate=604800');
+      } else {
+        res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=3600');
+      }
+
+      return res.status(200).json({ season, table });
+    }
+
+    // ── Default: Atlanta Insights Mode ──
     // Fetch team xgoals and goals-added in parallel
     const [xgoalsRes, goalsAddedRes] = await Promise.all([
       fetch(`https://app.americansocceranalysis.com/api/v1/mls/teams/xgoals?team_id=${atlantaId}&season_name=${season}`),
