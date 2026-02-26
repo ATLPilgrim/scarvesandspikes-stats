@@ -4717,7 +4717,7 @@
     }
 
     function buildGaugeSVG(score) {
-      const cx = 150, cy = 160, r = 120;
+      const cx = 150, cy = 170, r = 120;
 
       // Color stops for smooth gradient: position (0-100) → [r, g, b]
       const colorStops = [
@@ -4745,8 +4745,8 @@
         return `rgb(${r},${g},${b})`;
       }
 
-      // Map score 0-100 to angle 180°-0° (left to right half circle)
-      const scoreToAngle = s => 180 - (s / 100) * 180;
+      // Map score 0-100 to angle: 180° (left) → 270° (top) → 360° (right)
+      const scoreToAngle = s => 180 + (s / 100) * 180;
 
       // Draw many small arc segments for smooth color blending
       const segments = 50;
@@ -4754,8 +4754,8 @@
       for (let i = 0; i < segments; i++) {
         const s0 = (i / segments) * 100;
         const s1 = ((i + 1) / segments) * 100;
-        const a1 = scoreToAngle(s1);
-        const a2 = scoreToAngle(s0);
+        const a1 = scoreToAngle(s0);
+        const a2 = scoreToAngle(s1);
         const color = lerpColor((s0 + s1) / 2);
         arcs += `<path d="${arcPath(cx, cy, r, a1, a2)}" fill="none" stroke="${color}" stroke-width="20" stroke-linecap="butt" opacity="0.8"/>`;
       }
@@ -4798,7 +4798,7 @@
       const color = getScoreColor(score);
       const scoreText = `<text x="${cx}" y="${cy + 35}" text-anchor="middle" fill="${color}" font-size="28" font-weight="700" font-family="var(--font-display)">${score}</text>`;
 
-      return `<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid meet">
+      return `<svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet">
         ${arcs}
         ${ticks}
         ${needle}
