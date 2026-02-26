@@ -4863,7 +4863,7 @@
         .map(f => {
           const level = f.weight < 0
             ? 'low'
-            : f.value >= 60 ? 'high' : f.value >= 30 ? 'medium' : 'low';
+            : f.value >= 60 ? 'high' : 'medium';
           const sign = f.weight < 0 ? '\u2212' : '+';
           const contribution = Math.abs(f.value * f.weight).toFixed(0);
           return `<span class="rage-factor-pill ${level}">${f.name} ${sign}${contribution}</span>`;
