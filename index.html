@@ -1870,6 +1870,14 @@
       padding: 0 var(--space-lg) var(--space-lg);
     }
 
+    .rage-meter-desc {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      margin: 0 0 var(--space-md);
+      line-height: 1.5;
+    }
+
     .rage-meter-gauge {
       display: flex;
       justify-content: center;
@@ -2221,6 +2229,7 @@
         </span>
       </div>
       <div class="rage-meter-body" id="rageMeterBody">
+        <p class="rage-meter-desc">A composite frustration score (0–100) blending recent form, robbery rate, season luck, xG finishing, losing streaks, blowout losses, and lucky wins. Higher = more rage. The pills below show each factor's contribution to the total — green is calming, gold is moderate, and red is driving the rage up.</p>
         <div class="rage-meter-gauge" id="rageMeterGauge"></div>
         <p class="rage-meter-zone-label" id="rageMeterZoneLabel"></p>
         <p class="rage-meter-explanation" id="rageMeterExplanation"></p>
@@ -4709,24 +4718,47 @@
 
     function buildGaugeSVG(score) {
       const cx = 150, cy = 160, r = 120;
-      const zones = [
-        { start: 0, end: 20, color: '#66bb6a' },
-        { start: 20, end: 40, color: '#aed581' },
-        { start: 40, end: 60, color: '#fdd835' },
-        { start: 60, end: 80, color: '#ffa726' },
-        { start: 80, end: 90, color: '#ef5350' },
-        { start: 90, end: 100, color: '#b71c1c' }
+
+      // Color stops for smooth gradient: position (0-100) → [r, g, b]
+      const colorStops = [
+        { pos: 0,   rgb: [102, 187, 106] },  // green
+        { pos: 15,  rgb: [139, 195, 74] },   // light green
+        { pos: 30,  rgb: [174, 213, 129] },  // lime
+        { pos: 45,  rgb: [253, 216, 53] },   // yellow
+        { pos: 60,  rgb: [255, 167, 38] },   // orange
+        { pos: 75,  rgb: [239, 83, 80] },    // red
+        { pos: 90,  rgb: [211, 47, 47] },    // dark red
+        { pos: 100, rgb: [183, 28, 28] }     // darkest red
       ];
+
+      function lerpColor(pos) {
+        let lo = colorStops[0], hi = colorStops[colorStops.length - 1];
+        for (let i = 0; i < colorStops.length - 1; i++) {
+          if (pos >= colorStops[i].pos && pos <= colorStops[i + 1].pos) {
+            lo = colorStops[i]; hi = colorStops[i + 1]; break;
+          }
+        }
+        const t = lo.pos === hi.pos ? 0 : (pos - lo.pos) / (hi.pos - lo.pos);
+        const r = Math.round(lo.rgb[0] + t * (hi.rgb[0] - lo.rgb[0]));
+        const g = Math.round(lo.rgb[1] + t * (hi.rgb[1] - lo.rgb[1]));
+        const b = Math.round(lo.rgb[2] + t * (hi.rgb[2] - lo.rgb[2]));
+        return `rgb(${r},${g},${b})`;
+      }
 
       // Map score 0-100 to angle 180°-0° (left to right half circle)
       const scoreToAngle = s => 180 - (s / 100) * 180;
 
+      // Draw many small arc segments for smooth color blending
+      const segments = 50;
       let arcs = '';
-      zones.forEach(z => {
-        const a1 = scoreToAngle(z.end);   // smaller score = larger angle
-        const a2 = scoreToAngle(z.start);
-        arcs += `<path d="${arcPath(cx, cy, r, a1, a2)}" fill="none" stroke="${z.color}" stroke-width="20" stroke-linecap="butt" opacity="0.7"/>`;
-      });
+      for (let i = 0; i < segments; i++) {
+        const s0 = (i / segments) * 100;
+        const s1 = ((i + 1) / segments) * 100;
+        const a1 = scoreToAngle(s1);
+        const a2 = scoreToAngle(s0);
+        const color = lerpColor((s0 + s1) / 2);
+        arcs += `<path d="${arcPath(cx, cy, r, a1, a2)}" fill="none" stroke="${color}" stroke-width="20" stroke-linecap="butt" opacity="0.8"/>`;
+      }
 
       // Tick marks
       let ticks = '';
