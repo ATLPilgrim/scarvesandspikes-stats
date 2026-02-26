@@ -1791,6 +1791,153 @@
       height: auto;
     }
 
+    /* Rage Meter */
+    .rage-meter-section {
+      display: none;
+      margin-bottom: var(--space-xl);
+      background: var(--gray-900);
+      border: 1px solid var(--gray-800);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .rage-meter-section.visible {
+      display: block;
+    }
+
+    .rage-meter-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-lg);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .rage-meter-header:hover {
+      background: var(--gray-800);
+    }
+
+    .rage-meter-title {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-200);
+    }
+
+    .rage-meter-toggle-hint {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .rage-meter-preview {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .rage-meter-chevron {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--gray-400);
+      border-bottom: 2px solid var(--gray-400);
+      transform: rotate(45deg);
+      transition: transform 0.2s;
+    }
+
+    .rage-meter-section.collapsed .rage-meter-chevron {
+      transform: rotate(45deg);
+    }
+
+    .rage-meter-section:not(.collapsed) .rage-meter-chevron {
+      transform: rotate(-135deg);
+    }
+
+    .rage-meter-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 var(--space-lg);
+    }
+
+    .rage-meter-section:not(.collapsed) .rage-meter-body {
+      max-height: 600px;
+      padding: 0 var(--space-lg) var(--space-lg);
+    }
+
+    .rage-meter-gauge {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .rage-meter-gauge svg {
+      width: 100%;
+      max-width: 340px;
+      height: auto;
+    }
+
+    .rage-needle {
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .rage-meter-zone-label {
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-100);
+      margin: 0 0 var(--space-xs);
+    }
+
+    .rage-meter-explanation {
+      text-align: center;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      color: var(--gray-400);
+      margin: 0 0 var(--space-md);
+      line-height: 1.5;
+    }
+
+    .rage-meter-factors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      justify-content: center;
+    }
+
+    .rage-factor-pill {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 12px;
+      border: 1px solid;
+    }
+
+    .rage-factor-pill.high {
+      color: #ef5350;
+      border-color: rgba(239, 83, 80, 0.4);
+      background: rgba(239, 83, 80, 0.1);
+    }
+
+    .rage-factor-pill.medium {
+      color: var(--gold);
+      border-color: rgba(201, 162, 39, 0.4);
+      background: rgba(201, 162, 39, 0.1);
+    }
+
+    .rage-factor-pill.low {
+      color: #66bb6a;
+      border-color: rgba(102, 187, 106, 0.4);
+      background: rgba(102, 187, 106, 0.1);
+    }
+
     /* Player Search */
     .player-search {
       position: relative;
@@ -1942,6 +2089,18 @@
       .comparison-container {
         grid-template-columns: 1fr;
       }
+
+      .rage-meter-gauge svg {
+        max-width: 280px;
+      }
+
+      .rage-meter-header {
+        padding: var(--space-sm) var(--space-md);
+      }
+
+      .rage-meter-section:not(.collapsed) .rage-meter-body {
+        padding: 0 var(--space-md) var(--space-md);
+      }
     }
   </style>
 </head>
@@ -2051,6 +2210,23 @@
 
     <!-- Rolling Form Chart -->
     <div id="formChart" class="form-chart"></div>
+
+    <!-- Expected Rage Meter -->
+    <div id="rageMeter" class="rage-meter-section collapsed">
+      <div class="rage-meter-header" id="rageMeterToggle">
+        <span class="rage-meter-title">Expected Rage</span>
+        <span class="rage-meter-toggle-hint">
+          <span class="rage-meter-preview" id="rageMeterPreview"></span>
+          <span class="rage-meter-chevron"></span>
+        </span>
+      </div>
+      <div class="rage-meter-body" id="rageMeterBody">
+        <div class="rage-meter-gauge" id="rageMeterGauge"></div>
+        <p class="rage-meter-zone-label" id="rageMeterZoneLabel"></p>
+        <p class="rage-meter-explanation" id="rageMeterExplanation"></p>
+        <div class="rage-meter-factors" id="rageMeterFactors"></div>
+      </div>
+    </div>
 
     <!-- Head to Head -->
     <section id="h2hSection" class="h2h-section">
@@ -4403,6 +4579,307 @@
       el.classList.add('visible');
     }
 
+    // ── Expected Rage Meter ──
+
+    function arcPath(cx, cy, r, startDeg, endDeg) {
+      const toRad = d => d * Math.PI / 180;
+      const x1 = cx + r * Math.cos(toRad(startDeg));
+      const y1 = cy + r * Math.sin(toRad(startDeg));
+      const x2 = cx + r * Math.cos(toRad(endDeg));
+      const y2 = cy + r * Math.sin(toRad(endDeg));
+      const largeArc = (endDeg - startDeg) > 180 ? 1 : 0;
+      return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+    }
+
+    function getRageZone(score) {
+      if (score <= 20) return { label: 'Vibes are immaculate', emoji: '\u2728' };
+      if (score <= 40) return { label: 'Cautious optimism', emoji: '\uD83E\uDD14' };
+      if (score <= 60) return { label: 'Checking transfer rumors', emoji: '\uD83D\uDCF1' };
+      if (score <= 80) return { label: 'Composing strongly worded tweets', emoji: '\uD83D\uDCA2' };
+      if (score <= 90) return { label: "Googling 'how to break a lease in Atlanta'", emoji: '\uD83C\uDFE0' };
+      return { label: 'Full meltdown. Scarves on fire.', emoji: '\uD83D\uDD25' };
+    }
+
+    function getScoreColor(score) {
+      if (score <= 20) return '#66bb6a';
+      if (score <= 40) return '#aed581';
+      if (score <= 60) return '#fdd835';
+      if (score <= 80) return '#ffa726';
+      if (score <= 90) return '#ef5350';
+      return '#b71c1c';
+    }
+
+    function computeRageScore(matches, insightsData, season) {
+      const chronological = [...matches]
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const factors = [];
+
+      // 1. Recent form (last 5, weighted by recency)
+      const last5 = chronological.slice(-5);
+      let formScore = 0;
+      const weights = [0.1, 0.15, 0.2, 0.25, 0.3];
+      const startIdx = 5 - last5.length;
+      last5.forEach((m, i) => {
+        const pts = m.result === 'L' ? 20 : m.result === 'D' ? 10 : 0;
+        formScore += pts * weights[startIdx + i] / weights.slice(startIdx).reduce((a, b) => a + b, 0);
+      });
+      formScore = Math.min(100, formScore * 5);
+      factors.push({ name: 'Recent form', value: formScore, weight: 0.30 });
+
+      // 2. Robbery frustration
+      const robberies = chronological.filter(m => m.xgVerdict === 'robbed');
+      const robberyRate = chronological.length > 0 ? robberies.length / chronological.length : 0;
+      let robberyScore = Math.min(100, robberyRate * 3.5 * 100);
+      const last3 = chronological.slice(-3);
+      const recentRobberies = last3.filter(m => m.xgVerdict === 'robbed').length;
+      robberyScore = Math.min(100, robberyScore + recentRobberies * 20);
+      factors.push({ name: 'Robberies', value: robberyScore, weight: 0.15 });
+
+      // 3. Season luck (from insights)
+      let luckScore = 50; // neutral default
+      if (insightsData && insightsData.luckValue !== null && insightsData.luckValue !== undefined) {
+        const luck = insightsData.luckValue;
+        // -10 luck = max rage (100), +5 luck = 0 rage
+        luckScore = Math.max(0, Math.min(100, (5 - luck) / 15 * 100));
+      }
+      factors.push({ name: 'Season luck', value: luckScore, weight: 0.15 });
+
+      // 4. xG underperformance
+      const withXg = chronological.filter(m => m.atlXg !== null && m.atlScore !== undefined);
+      let xgUnderScore = 50;
+      if (withXg.length > 0) {
+        const avgUnder = withXg.reduce((s, m) => s + (m.atlXg - m.atlScore), 0) / withXg.length;
+        // avgUnder > 0 means scoring fewer than expected (rage). 1.0 avg underperformance = 100
+        xgUnderScore = Math.max(0, Math.min(100, avgUnder * 100));
+      }
+      factors.push({ name: 'xG underperformance', value: xgUnderScore, weight: 0.10 });
+
+      // 5. Losing streak (from most recent)
+      let losingStreak = 0;
+      for (let i = chronological.length - 1; i >= 0; i--) {
+        if (chronological[i].result === 'L') losingStreak++;
+        else break;
+      }
+      const streakLookup = [0, 15, 35, 60, 80, 100];
+      const streakScore = losingStreak >= streakLookup.length
+        ? 100
+        : streakLookup[losingStreak];
+      factors.push({ name: 'Losing streak', value: streakScore, weight: 0.10 });
+
+      // 6. Blowout losses (3+ goal deficit)
+      const blowouts = chronological.filter(m => m.result === 'L' && (m.oppScore - m.atlScore) >= 3);
+      const blowoutRate = chronological.length > 0 ? blowouts.length / chronological.length : 0;
+      const blowoutScore = Math.min(100, blowoutRate * 5 * 100);
+      factors.push({ name: 'Blowout losses', value: blowoutScore, weight: 0.10 });
+
+      // 7. Smash-and-grab joy (negative rage)
+      const smashGrabs = chronological.filter(m => m.xgVerdict === 'smash-and-grab');
+      const smashRate = chronological.length > 0 ? smashGrabs.length / chronological.length : 0;
+      const smashScore = Math.min(100, smashRate * 3 * 100);
+      factors.push({ name: 'Lucky wins', value: smashScore, weight: -0.10 });
+
+      // Weighted sum
+      let raw = factors.reduce((s, f) => s + f.value * f.weight, 0);
+
+      // Playoff adjustment (historical seasons only)
+      const currentYear = new Date().getFullYear();
+      const seasonNum = parseInt(season, 10);
+      if (seasonNum < currentYear) {
+        const hasPlayoffMatches = chronological.some(m => m.isPlayoff);
+        if (!hasPlayoffMatches && chronological.length >= 20) {
+          // Missed playoffs
+          raw *= 1.10;
+          factors.push({ name: 'Missed playoffs', value: 100, weight: 0 });
+        } else if (hasPlayoffMatches) {
+          const playoffMatches = chronological.filter(m => m.isPlayoff);
+          if (playoffMatches.length >= 3) {
+            // Won at least a round
+            raw *= 0.85;
+            factors.push({ name: 'Playoff run', value: 0, weight: 0 });
+          }
+        }
+      }
+
+      const score = Math.max(0, Math.min(100, Math.round(raw)));
+      const zone = getRageZone(score);
+
+      return { score, factors, zoneLabel: zone.label, zoneEmoji: zone.emoji };
+    }
+
+    function buildGaugeSVG(score) {
+      const cx = 150, cy = 160, r = 120;
+      const zones = [
+        { start: 0, end: 20, color: '#66bb6a' },
+        { start: 20, end: 40, color: '#aed581' },
+        { start: 40, end: 60, color: '#fdd835' },
+        { start: 60, end: 80, color: '#ffa726' },
+        { start: 80, end: 90, color: '#ef5350' },
+        { start: 90, end: 100, color: '#b71c1c' }
+      ];
+
+      // Map score 0-100 to angle 180°-0° (left to right half circle)
+      const scoreToAngle = s => 180 - (s / 100) * 180;
+
+      let arcs = '';
+      zones.forEach(z => {
+        const a1 = scoreToAngle(z.end);   // smaller score = larger angle
+        const a2 = scoreToAngle(z.start);
+        arcs += `<path d="${arcPath(cx, cy, r, a1, a2)}" fill="none" stroke="${z.color}" stroke-width="20" stroke-linecap="butt" opacity="0.7"/>`;
+      });
+
+      // Tick marks
+      let ticks = '';
+      [0, 20, 40, 60, 80, 100].forEach(val => {
+        const angle = scoreToAngle(val) * Math.PI / 180;
+        const innerR = r - 14;
+        const outerR = r + 14;
+        const x1 = cx + innerR * Math.cos(angle);
+        const y1 = cy + innerR * Math.sin(angle);
+        const x2 = cx + outerR * Math.cos(angle);
+        const y2 = cy + outerR * Math.sin(angle);
+        ticks += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="var(--gray-700)" stroke-width="1.5"/>`;
+        // Labels
+        const labelR = r + 24;
+        const lx = cx + labelR * Math.cos(angle);
+        const ly = cy + labelR * Math.sin(angle);
+        ticks += `<text x="${lx.toFixed(1)}" y="${(ly + 3).toFixed(1)}" text-anchor="middle" fill="var(--gray-500)" font-size="10" font-family="var(--font-body)">${val}</text>`;
+      });
+
+      // Needle — starts pointing left (180°), will be rotated via CSS
+      const needleAngle = scoreToAngle(0); // 180° = left
+      const needleLen = r - 24;
+      const nx = cx + needleLen * Math.cos(needleAngle * Math.PI / 180);
+      const ny = cy + needleLen * Math.sin(needleAngle * Math.PI / 180);
+
+      // Determine target rotation: score 0 = 0° rotation, score 100 = 180° rotation (CW)
+      const targetRotation = (score / 100) * 180;
+
+      const needle = `
+        <g class="rage-needle" style="transform-origin: ${cx}px ${cy}px; transform: rotate(0deg);" data-target="${targetRotation}">
+          <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="var(--white)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="${cx}" cy="${cy}" r="6" fill="var(--white)"/>
+        </g>
+      `;
+
+      // Score text
+      const color = getScoreColor(score);
+      const scoreText = `<text x="${cx}" y="${cy + 35}" text-anchor="middle" fill="${color}" font-size="28" font-weight="700" font-family="var(--font-display)">${score}</text>`;
+
+      return `<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid meet">
+        ${arcs}
+        ${ticks}
+        ${needle}
+        ${scoreText}
+      </svg>`;
+    }
+
+    function getExplanationText(score, factors) {
+      // Find highest-weighted contributing factor (excluding negative weights)
+      const sorted = factors
+        .filter(f => f.weight > 0)
+        .sort((a, b) => (b.value * b.weight) - (a.value * a.weight));
+
+      const top = sorted[0];
+      if (!top) return '';
+
+      if (score <= 20) return "Nothing to see here. Everything is fine. Suspiciously fine.";
+      if (score >= 91) return "This is not a drill. I repeat, this is not a drill.";
+
+      const lines = {
+        'Recent form': [
+          "Recent results are testing the fanbase's patience.",
+          "The last few matches have not been kind.",
+          "Form? We don't know her."
+        ],
+        'Robberies': [
+          "xG says we should be winning. The scoreboard disagrees.",
+          "Being robbed is becoming a recurring theme.",
+          "The post and the crossbar are not our friends."
+        ],
+        'Season luck': [
+          "The expected points gods have not been generous.",
+          "Luck has left the building.",
+          "We're getting fewer points than we deserve and it shows."
+        ],
+        'xG underperformance': [
+          "Creating chances but finishing like it's optional.",
+          "The expected goals are there. The actual goals are MIA.",
+          "Finishing quality: concerning."
+        ],
+        'Losing streak': [
+          "Multiple Ls in a row will do this to you.",
+          "The streak is alive. The fans are not.",
+          "Someone stop the bleeding."
+        ],
+        'Blowout losses': [
+          "Getting blown out is never a vibe.",
+          "Some of these scorelines need a content warning.",
+          "Big losses leave big scars."
+        ]
+      };
+
+      const options = lines[top.name] || ["The numbers don't lie, and they spell frustration."];
+      return options[Math.floor(score / 35) % options.length];
+    }
+
+    function renderRageFactors(factors) {
+      return factors
+        .filter(f => f.weight !== 0)
+        .sort((a, b) => Math.abs(b.value * b.weight) - Math.abs(a.value * a.weight))
+        .slice(0, 5)
+        .map(f => {
+          const level = f.weight < 0
+            ? 'low'
+            : f.value >= 60 ? 'high' : f.value >= 30 ? 'medium' : 'low';
+          const sign = f.weight < 0 ? '\u2212' : '+';
+          const contribution = Math.abs(f.value * f.weight).toFixed(0);
+          return `<span class="rage-factor-pill ${level}">${f.name} ${sign}${contribution}</span>`;
+        })
+        .join('');
+    }
+
+    function renderRageMeter(matches, season) {
+      const el = document.getElementById('rageMeter');
+
+      // Hide for "All Seasons" or no matches
+      if (!season || season === 'all' || !matches || matches.length < 1) {
+        el.classList.remove('visible');
+        return;
+      }
+
+      const insightsData = insightsCache[season] || null;
+      const { score, factors, zoneLabel, zoneEmoji } = computeRageScore(matches, insightsData, season);
+
+      // Preview in header
+      const previewColor = getScoreColor(score);
+      document.getElementById('rageMeterPreview').innerHTML = `<span style="color: ${previewColor};">${score}</span>`;
+
+      // Gauge
+      document.getElementById('rageMeterGauge').innerHTML = buildGaugeSVG(score);
+
+      // Zone label
+      document.getElementById('rageMeterZoneLabel').textContent = `${zoneEmoji} ${zoneLabel}`;
+
+      // Explanation
+      document.getElementById('rageMeterExplanation').textContent = getExplanationText(score, factors);
+
+      // Factor pills
+      document.getElementById('rageMeterFactors').innerHTML = renderRageFactors(factors);
+
+      el.classList.add('visible');
+
+      // Animate needle after a short delay
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const needle = el.querySelector('.rage-needle');
+          if (needle) {
+            needle.style.transform = `rotate(${needle.dataset.target}deg)`;
+          }
+        });
+      });
+    }
+
     // Apply filters
     async function applyFilters() {
       const season = document.getElementById('seasonFilter').value;
@@ -4460,6 +4937,7 @@
       updateSummary(filtered);
       renderCurrentForm(filtered);
       renderFormChart(matches, season);
+      renderRageMeter(matches, season);
       updateH2H(matches, opponent);
       renderMatches(filtered);
 
@@ -4476,6 +4954,7 @@
           loadZoneGplus(season)
         ]);
         renderInsights(insightsData, season, zoneData);
+        renderRageMeter(matches, season);
       } else {
         hideInsights();
       }
@@ -4510,6 +4989,7 @@
         updateSummary(matches);
         renderCurrentForm(matches);
         renderFormChart(matches, defaultSeason);
+        renderRageMeter(matches, defaultSeason);
         renderMatches(matches);
 
         // Deep link: scroll to and expand a specific match card immediately after render
@@ -4528,6 +5008,7 @@
           loadZoneGplus(defaultSeason)
         ]);
         renderInsights(insightsData, defaultSeason, zoneData);
+        renderRageMeter(matches, defaultSeason);
 
         // Add filter event listeners
         document.getElementById('seasonFilter').addEventListener('change', applyFilters);
@@ -4536,6 +5017,10 @@
         document.getElementById('verdictFilter').addEventListener('change', applyFilters);
         document.getElementById('compFilter').addEventListener('change', applyFilters);
         document.getElementById('opponentFilter').addEventListener('change', applyFilters);
+
+        document.getElementById('rageMeterToggle').addEventListener('click', function() {
+          document.getElementById('rageMeter').classList.toggle('collapsed');
+        });
 
         // Prefetch match + opponent details in background so card expansion is instant
         // Delay slightly to let the UI settle and not compete with insights loading
