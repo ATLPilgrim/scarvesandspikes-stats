@@ -4703,20 +4703,25 @@
       // Weighted sum
       let raw = factors.reduce((s, f) => s + f.value * f.weight, 0);
 
+      // Season misery floor: terrible PPG guarantees minimum rage
+      const seasonPpg = totalMatches > 0 ? (wins * 3 + draws) / totalMatches : 1.5;
+      if (totalMatches >= 15 && seasonPpg < 1.0) {
+        const floor = 75 + (1.0 - seasonPpg) * 50;
+        raw = Math.max(raw, Math.min(95, floor));
+        factors.push({ name: 'Season misery', value: 100, weight: 0 });
+      }
+
       // Playoff adjustment (historical seasons only)
       const currentYear = new Date().getFullYear();
       const seasonNum = parseInt(season, 10);
       if (seasonNum < currentYear) {
         const hasPlayoffMatches = chronological.some(m => m.isPlayoff);
         if (!hasPlayoffMatches && chronological.length >= 20) {
-          // Missed playoffs — harsher penalty for truly terrible seasons
-          const ppg = (wins * 3 + draws) / totalMatches;
-          raw *= ppg < 1.0 ? 1.35 : 1.20;
+          raw *= 1.15;
           factors.push({ name: 'Missed playoffs', value: 100, weight: 0 });
         } else if (hasPlayoffMatches) {
           const playoffMatches = chronological.filter(m => m.isPlayoff);
           if (playoffMatches.length >= 3) {
-            // Won at least a round
             raw *= 0.85;
             factors.push({ name: 'Playoff run', value: 0, weight: 0 });
           }
