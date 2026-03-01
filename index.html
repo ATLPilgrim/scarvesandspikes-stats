@@ -2229,7 +2229,7 @@
         </span>
       </div>
       <div class="rage-meter-body" id="rageMeterBody">
-        <p class="rage-meter-desc">A composite frustration score (0–100) blending recent form, robbery rate, season luck, xG finishing, losing streaks, blowout losses, and lucky wins. Higher = more rage. The pills below show each factor's contribution to the total — green is calming, gold is moderate, and red is driving the rage up.</p>
+        <p class="rage-meter-desc">A composite frustration score (0–100) blending recent form, robbery rate, season luck, xG finishing, winless runs, blowout losses, season record, and lucky wins. Higher = more rage. The pills below show each factor's contribution to the total — green is calming, gold is moderate, and red is driving the rage up.</p>
         <div class="rage-meter-gauge" id="rageMeterGauge"></div>
         <p class="rage-meter-zone-label" id="rageMeterZoneLabel"></p>
         <p class="rage-meter-explanation" id="rageMeterExplanation"></p>
@@ -4634,7 +4634,7 @@
         formScore += pts * weights[startIdx + i] / weights.slice(startIdx).reduce((a, b) => a + b, 0);
       });
       formScore = Math.min(100, formScore * 5);
-      factors.push({ name: 'Recent form', value: formScore, weight: 0.30 });
+      factors.push({ name: 'Recent form', value: formScore, weight: 0.25 });
 
       // 2. Robbery frustration
       const robberies = chronological.filter(m => m.xgVerdict === 'robbed');
@@ -4643,7 +4643,7 @@
       const last3 = chronological.slice(-3);
       const recentRobberies = last3.filter(m => m.xgVerdict === 'robbed').length;
       robberyScore = Math.min(100, robberyScore + recentRobberies * 20);
-      factors.push({ name: 'Robberies', value: robberyScore, weight: 0.15 });
+      factors.push({ name: 'Robberies', value: robberyScore, weight: 0.10 });
 
       // 3. Season luck (from insights)
       let luckScore = 50; // neutral default
@@ -4652,7 +4652,7 @@
         // -10 luck = max rage (100), +5 luck = 0 rage
         luckScore = Math.max(0, Math.min(100, (5 - luck) / 15 * 100));
       }
-      factors.push({ name: 'Season luck', value: luckScore, weight: 0.15 });
+      factors.push({ name: 'Season luck', value: luckScore, weight: 0.10 });
 
       // 4. xG underperformance
       const withXg = chronological.filter(m => m.atlXg !== null && m.atlScore !== undefined);
@@ -4664,17 +4664,17 @@
       }
       factors.push({ name: 'xG underperformance', value: xgUnderScore, weight: 0.10 });
 
-      // 5. Losing streak (from most recent)
-      let losingStreak = 0;
+      // 5. Winless run (consecutive non-wins from most recent)
+      let winlessRun = 0;
       for (let i = chronological.length - 1; i >= 0; i--) {
-        if (chronological[i].result === 'L') losingStreak++;
+        if (chronological[i].result !== 'W') winlessRun++;
         else break;
       }
       const streakLookup = [0, 15, 35, 60, 80, 100];
-      const streakScore = losingStreak >= streakLookup.length
+      const streakScore = winlessRun >= streakLookup.length
         ? 100
-        : streakLookup[losingStreak];
-      factors.push({ name: 'Losing streak', value: streakScore, weight: 0.10 });
+        : streakLookup[winlessRun];
+      factors.push({ name: 'Winless run', value: streakScore, weight: 0.10 });
 
       // 6. Blowout losses (3+ goal deficit)
       const blowouts = chronological.filter(m => m.result === 'L' && (m.oppScore - m.atlScore) >= 3);
@@ -4682,7 +4682,19 @@
       const blowoutScore = Math.min(100, blowoutRate * 5 * 100);
       factors.push({ name: 'Blowout losses', value: blowoutScore, weight: 0.10 });
 
-      // 7. Smash-and-grab joy (negative rage)
+      // 7. Season record (points per game)
+      const wins = chronological.filter(m => m.result === 'W').length;
+      const draws = chronological.filter(m => m.result === 'D').length;
+      const totalMatches = chronological.length;
+      let recordScore = 50;
+      if (totalMatches > 0) {
+        const ppg = (wins * 3 + draws) / totalMatches;
+        // 1.5 ppg = 0 rage, 0.5 ppg = 100 rage (linear)
+        recordScore = Math.max(0, Math.min(100, (1.5 - ppg) / 1.0 * 100));
+      }
+      factors.push({ name: 'Season record', value: recordScore, weight: 0.15 });
+
+      // 8. Smash-and-grab joy (negative rage)
       const smashGrabs = chronological.filter(m => m.xgVerdict === 'smash-and-grab');
       const smashRate = chronological.length > 0 ? smashGrabs.length / chronological.length : 0;
       const smashScore = Math.min(100, smashRate * 3 * 100);
@@ -4698,7 +4710,7 @@
         const hasPlayoffMatches = chronological.some(m => m.isPlayoff);
         if (!hasPlayoffMatches && chronological.length >= 20) {
           // Missed playoffs
-          raw *= 1.10;
+          raw *= 1.20;
           factors.push({ name: 'Missed playoffs', value: 100, weight: 0 });
         } else if (hasPlayoffMatches) {
           const playoffMatches = chronological.filter(m => m.isPlayoff);
