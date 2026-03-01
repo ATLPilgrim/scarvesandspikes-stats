@@ -4643,7 +4643,7 @@
       const last3 = chronological.slice(-3);
       const recentRobberies = last3.filter(m => m.xgVerdict === 'robbed').length;
       robberyScore = Math.min(100, robberyScore + recentRobberies * 20);
-      factors.push({ name: 'Robberies', value: robberyScore, weight: 0.10 });
+      factors.push({ name: 'Robberies', value: robberyScore, weight: 0.05 });
 
       // 3. Season luck (from insights)
       let luckScore = 50; // neutral default
@@ -4692,7 +4692,7 @@
         // 1.5 ppg = 0 rage, 0.5 ppg = 100 rage (linear)
         recordScore = Math.max(0, Math.min(100, (1.5 - ppg) / 1.0 * 100));
       }
-      factors.push({ name: 'Season record', value: recordScore, weight: 0.15 });
+      factors.push({ name: 'Season record', value: recordScore, weight: 0.20 });
 
       // 8. Smash-and-grab joy (negative rage)
       const smashGrabs = chronological.filter(m => m.xgVerdict === 'smash-and-grab');
@@ -4709,8 +4709,9 @@
       if (seasonNum < currentYear) {
         const hasPlayoffMatches = chronological.some(m => m.isPlayoff);
         if (!hasPlayoffMatches && chronological.length >= 20) {
-          // Missed playoffs
-          raw *= 1.20;
+          // Missed playoffs — harsher penalty for truly terrible seasons
+          const ppg = (wins * 3 + draws) / totalMatches;
+          raw *= ppg < 1.0 ? 1.35 : 1.20;
           factors.push({ name: 'Missed playoffs', value: 100, weight: 0 });
         } else if (hasPlayoffMatches) {
           const playoffMatches = chronological.filter(m => m.isPlayoff);
