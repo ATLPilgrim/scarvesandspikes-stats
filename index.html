@@ -4601,20 +4601,26 @@
     }
 
     function getRageZone(score) {
-      if (score <= 20) return { label: 'Vibes are immaculate', emoji: '\u2728' };
-      if (score <= 40) return { label: 'Cautious optimism', emoji: '\uD83E\uDD14' };
-      if (score <= 60) return { label: 'Checking transfer rumors', emoji: '\uD83D\uDCF1' };
-      if (score <= 80) return { label: 'Composing strongly worded tweets', emoji: '\uD83D\uDCA2' };
-      if (score <= 90) return { label: "Googling 'how to break a lease in Atlanta'", emoji: '\uD83C\uDFE0' };
+      if (score <= 10) return { label: 'Peak contentment. We are massive.', emoji: '\u2728' };
+      if (score <= 20) return { label: 'Vibes are immaculate', emoji: '\uD83D\uDE0C' };
+      if (score <= 30) return { label: 'Cautious optimism', emoji: '\uD83E\uDD14' };
+      if (score <= 45) return { label: 'Refreshing ScarvesAndSpikes.com nervously', emoji: '\uD83D\uDCF1' };
+      if (score <= 60) return { label: 'Checking transfer rumors', emoji: '\uD83D\uDD04' };
+      if (score <= 75) return { label: 'Composing strongly worded tweets', emoji: '\uD83D\uDCA2' };
+      if (score <= 85) return { label: 'Rage-recording a podcast at 2am', emoji: '\uD83C\uDF99\uFE0F' };
+      if (score <= 92) return { label: "Googling 'how to break a lease in Atlanta'", emoji: '\uD83C\uDFE0' };
       return { label: 'Full meltdown. Scarves on fire.', emoji: '\uD83D\uDD25' };
     }
 
     function getScoreColor(score) {
-      if (score <= 20) return '#66bb6a';
-      if (score <= 40) return '#aed581';
-      if (score <= 60) return '#fdd835';
-      if (score <= 80) return '#ffa726';
-      if (score <= 90) return '#ef5350';
+      if (score <= 10) return '#66bb6a';
+      if (score <= 20) return '#8bc34a';
+      if (score <= 30) return '#aed581';
+      if (score <= 45) return '#fdd835';
+      if (score <= 60) return '#ffb300';
+      if (score <= 75) return '#ffa726';
+      if (score <= 85) return '#ef5350';
+      if (score <= 92) return '#d32f2f';
       return '#b71c1c';
     }
 
