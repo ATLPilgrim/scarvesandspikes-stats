@@ -4622,9 +4622,25 @@
       const chronological = [...matches]
         .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-      const factors = [];
+      const totalMatches = chronological.length;
+      const wins = chronological.filter(m => m.result === 'W').length;
+      const draws = chronological.filter(m => m.result === 'D').length;
+      const ppg = totalMatches > 0 ? (wins * 3 + draws) / totalMatches : 1.5;
 
-      // 1. Recent form (last 5, weighted by recency)
+      // Base rage from PPG: 2.0+ PPG = 0, 0.5 PPG = 100
+      const baseRage = Math.max(0, Math.min(100, (2.0 - ppg) / 1.5 * 100));
+
+      const factors = [];
+      factors.push({ name: 'Season record', contribution: Math.round(baseRage), isBase: true });
+
+      // --- Modifier calculations (each adds bounded points) ---
+
+      // 1. Draw frustration: drawRate > 20% starts adding rage, up to +10
+      const drawRate = totalMatches > 0 ? draws / totalMatches : 0;
+      const drawContribution = drawRate > 0.20 ? Math.min(10, (drawRate - 0.20) * 50) : 0;
+      factors.push({ name: 'Draws', contribution: drawContribution });
+
+      // 2. Recent form (last 5, weighted by recency) — up to +8
       const last5 = chronological.slice(-5);
       let formScore = 0;
       const weights = [0.1, 0.15, 0.2, 0.25, 0.3];
@@ -4634,97 +4650,85 @@
         formScore += pts * weights[startIdx + i] / weights.slice(startIdx).reduce((a, b) => a + b, 0);
       });
       formScore = Math.min(100, formScore * 5);
-      factors.push({ name: 'Recent form', value: formScore, weight: 0.25 });
+      factors.push({ name: 'Recent form', contribution: formScore / 100 * 8 });
 
-      // 2. Robbery frustration
-      const robberies = chronological.filter(m => m.xgVerdict === 'robbed');
-      const robberyRate = chronological.length > 0 ? robberies.length / chronological.length : 0;
-      let robberyScore = Math.min(100, robberyRate * 3.5 * 100);
-      const last3 = chronological.slice(-3);
-      const recentRobberies = last3.filter(m => m.xgVerdict === 'robbed').length;
-      robberyScore = Math.min(100, robberyScore + recentRobberies * 20);
-      factors.push({ name: 'Robberies', value: robberyScore, weight: 0.05 });
-
-      // 3. Season luck (from insights)
-      let luckScore = 50; // neutral default
-      if (insightsData && insightsData.luckValue !== null && insightsData.luckValue !== undefined) {
-        const luck = insightsData.luckValue;
-        // -10 luck = max rage (100), +5 luck = 0 rage
-        luckScore = Math.max(0, Math.min(100, (5 - luck) / 15 * 100));
-      }
-      factors.push({ name: 'Season luck', value: luckScore, weight: 0.10 });
-
-      // 4. xG underperformance
-      const withXg = chronological.filter(m => m.atlXg !== null && m.atlScore !== undefined);
-      let xgUnderScore = 50;
-      if (withXg.length > 0) {
-        const avgUnder = withXg.reduce((s, m) => s + (m.atlXg - m.atlScore), 0) / withXg.length;
-        // avgUnder > 0 means scoring fewer than expected (rage). 1.0 avg underperformance = 100
-        xgUnderScore = Math.max(0, Math.min(100, avgUnder * 100));
-      }
-      factors.push({ name: 'xG underperformance', value: xgUnderScore, weight: 0.10 });
-
-      // 5. Winless run (consecutive non-wins from most recent)
+      // 3. Winless run — up to +8
       let winlessRun = 0;
       for (let i = chronological.length - 1; i >= 0; i--) {
         if (chronological[i].result !== 'W') winlessRun++;
         else break;
       }
       const streakLookup = [0, 15, 35, 60, 80, 100];
-      const streakScore = winlessRun >= streakLookup.length
-        ? 100
-        : streakLookup[winlessRun];
-      factors.push({ name: 'Winless run', value: streakScore, weight: 0.10 });
+      const streakScore = winlessRun >= streakLookup.length ? 100 : streakLookup[winlessRun];
+      factors.push({ name: 'Winless run', contribution: streakScore / 100 * 8 });
 
-      // 6. Blowout losses (3+ goal deficit)
+      // 4. Blowout losses — up to +5
       const blowouts = chronological.filter(m => m.result === 'L' && (m.oppScore - m.atlScore) >= 3);
-      const blowoutRate = chronological.length > 0 ? blowouts.length / chronological.length : 0;
+      const blowoutRate = totalMatches > 0 ? blowouts.length / totalMatches : 0;
       const blowoutScore = Math.min(100, blowoutRate * 5 * 100);
-      factors.push({ name: 'Blowout losses', value: blowoutScore, weight: 0.10 });
+      factors.push({ name: 'Blowout losses', contribution: blowoutScore / 100 * 5 });
 
-      // 7. Season record (points per game)
-      const wins = chronological.filter(m => m.result === 'W').length;
-      const draws = chronological.filter(m => m.result === 'D').length;
-      const totalMatches = chronological.length;
-      let recordScore = 50;
-      if (totalMatches > 0) {
-        const ppg = (wins * 3 + draws) / totalMatches;
-        // 1.5 ppg = 0 rage, 0.5 ppg = 100 rage (linear)
-        recordScore = Math.max(0, Math.min(100, (1.5 - ppg) / 1.0 * 100));
+      // 5. Robberies — up to +5
+      const robberies = chronological.filter(m => m.xgVerdict === 'robbed');
+      const robberyRate = totalMatches > 0 ? robberies.length / totalMatches : 0;
+      let robberyScore = Math.min(100, robberyRate * 3.5 * 100);
+      const last3 = chronological.slice(-3);
+      const recentRobberies = last3.filter(m => m.xgVerdict === 'robbed').length;
+      robberyScore = Math.min(100, robberyScore + recentRobberies * 20);
+      factors.push({ name: 'Robberies', contribution: robberyScore / 100 * 5 });
+
+      // 6. Season luck — lucky: up to -4, unlucky: up to +5
+      let luckScore = 50; // neutral default
+      if (insightsData && insightsData.luckValue !== null && insightsData.luckValue !== undefined) {
+        const luck = insightsData.luckValue;
+        luckScore = Math.max(0, Math.min(100, (5 - luck) / 15 * 100));
       }
-      factors.push({ name: 'Season record', value: recordScore, weight: 0.20 });
+      const luckContribution = luckScore <= 50
+        ? -((50 - luckScore) / 50 * 4)
+        : ((luckScore - 50) / 50 * 5);
+      factors.push({ name: 'Season luck', contribution: luckContribution });
 
-      // 8. Smash-and-grab joy (negative rage)
+      // 7. xG underperformance — up to +5
+      const withXg = chronological.filter(m => m.atlXg !== null && m.atlScore !== undefined);
+      let xgUnderScore = 50;
+      if (withXg.length > 0) {
+        const avgUnder = withXg.reduce((s, m) => s + (m.atlXg - m.atlScore), 0) / withXg.length;
+        xgUnderScore = Math.max(0, Math.min(100, avgUnder * 100));
+      }
+      factors.push({ name: 'xG underperformance', contribution: xgUnderScore / 100 * 5 });
+
+      // 8. Lucky wins (negative rage) — up to -5
       const smashGrabs = chronological.filter(m => m.xgVerdict === 'smash-and-grab');
-      const smashRate = chronological.length > 0 ? smashGrabs.length / chronological.length : 0;
+      const smashRate = totalMatches > 0 ? smashGrabs.length / totalMatches : 0;
       const smashScore = Math.min(100, smashRate * 3 * 100);
-      factors.push({ name: 'Lucky wins', value: smashScore, weight: -0.10 });
+      factors.push({ name: 'Lucky wins', contribution: -(smashScore / 100 * 5) });
 
-      // Weighted sum
-      let raw = factors.reduce((s, f) => s + f.value * f.weight, 0);
+      // Sum: base + all modifiers
+      let raw = baseRage + factors.filter(f => !f.isBase).reduce((s, f) => s + f.contribution, 0);
 
-      // Season misery floor: terrible PPG guarantees minimum rage
-      const seasonPpg = totalMatches > 0 ? (wins * 3 + draws) / totalMatches : 1.5;
-      if (totalMatches >= 15 && seasonPpg < 1.0) {
-        const floor = 75 + (1.0 - seasonPpg) * 50;
-        raw = Math.max(raw, Math.min(95, floor));
-        factors.push({ name: 'Season misery', value: 100, weight: 0 });
-      }
-
-      // Playoff adjustment (historical seasons only)
+      // --- Post-hoc adjustments (historical seasons only) ---
       const currentYear = new Date().getFullYear();
       const seasonNum = parseInt(season, 10);
       if (seasonNum < currentYear) {
-        const hasPlayoffMatches = chronological.some(m => m.isPlayoff);
-        if (!hasPlayoffMatches && chronological.length >= 20) {
-          raw *= 1.15;
-          factors.push({ name: 'Missed playoffs', value: 100, weight: 0 });
-        } else if (hasPlayoffMatches) {
-          const playoffMatches = chronological.filter(m => m.isPlayoff);
-          if (playoffMatches.length >= 3) {
-            raw *= 0.85;
-            factors.push({ name: 'Playoff run', value: 0, weight: 0 });
-          }
+        const playoffMatches = chronological.filter(m => m.isPlayoff);
+        if (playoffMatches.length === 0 && totalMatches >= 20) {
+          raw += 8;
+          factors.push({ name: 'Missed playoffs', contribution: 8, isAdjustment: true });
+        } else if (playoffMatches.length >= 1 && playoffMatches.length <= 2) {
+          raw += 5;
+          factors.push({ name: 'First-round exit', contribution: 5, isAdjustment: true });
+        } else if (playoffMatches.length >= 3) {
+          raw -= 8;
+          factors.push({ name: 'Playoff run', contribution: -8, isAdjustment: true });
+        }
+      }
+
+      // Season misery floor: terrible PPG guarantees minimum rage
+      if (totalMatches >= 15 && ppg < 1.0) {
+        const floor = Math.min(95, 75 + (1.0 - ppg) * 50);
+        if (raw < floor) {
+          factors.push({ name: 'Season misery', contribution: Math.round(floor - raw), isAdjustment: true });
+          raw = floor;
         }
       }
 
@@ -4825,16 +4829,16 @@
     }
 
     function getExplanationText(score, factors) {
-      // Find highest-weighted contributing factor (excluding negative weights)
-      const sorted = factors
-        .filter(f => f.weight > 0)
-        .sort((a, b) => (b.value * b.weight) - (a.value * a.weight));
-
-      const top = sorted[0];
-      if (!top) return '';
-
       if (score <= 20) return "Nothing to see here. Everything is fine. Suspiciously fine.";
       if (score >= 91) return "This is not a drill. I repeat, this is not a drill.";
+
+      // Find highest contributing modifier (excluding base and adjustments)
+      const sorted = factors
+        .filter(f => !f.isBase && !f.isAdjustment && f.contribution > 0)
+        .sort((a, b) => b.contribution - a.contribution);
+
+      const top = sorted[0];
+      if (!top) return "The numbers don't lie, and they spell frustration.";
 
       const lines = {
         'Recent form': [
@@ -4857,15 +4861,20 @@
           "The expected goals are there. The actual goals are MIA.",
           "Finishing quality: concerning."
         ],
-        'Losing streak': [
-          "Multiple Ls in a row will do this to you.",
-          "The streak is alive. The fans are not.",
+        'Winless run': [
+          "Multiple matches without a win will do this to you.",
+          "The winless streak is alive. The fans are not.",
           "Someone stop the bleeding."
         ],
         'Blowout losses': [
           "Getting blown out is never a vibe.",
           "Some of these scorelines need a content warning.",
           "Big losses leave big scars."
+        ],
+        'Draws': [
+          "All these draws are slowly eating away at our souls.",
+          "Another draw. Another piece of the fanbase dies inside.",
+          "Draws: technically not losing, but it sure doesn't feel like winning."
         ]
       };
 
@@ -4874,19 +4883,38 @@
     }
 
     function renderRageFactors(factors) {
-      return factors
-        .filter(f => f.weight !== 0)
-        .sort((a, b) => Math.abs(b.value * b.weight) - Math.abs(a.value * a.weight))
-        .slice(0, 5)
-        .map(f => {
-          const level = f.weight < 0
-            ? 'low'
-            : f.value >= 60 ? 'high' : 'medium';
-          const sign = f.weight < 0 ? '\u2212' : '+';
-          const contribution = Math.abs(f.value * f.weight).toFixed(0);
-          return `<span class="rage-factor-pill ${level}">${f.name} ${sign}${contribution}</span>`;
-        })
-        .join('');
+      const base = factors.find(f => f.isBase);
+      const modifiers = factors
+        .filter(f => !f.isBase && !f.isAdjustment && Math.abs(f.contribution) >= 0.5)
+        .sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution))
+        .slice(0, 4);
+      const adjustments = factors.filter(f => f.isAdjustment);
+
+      const pills = [];
+
+      // Base factor always shown
+      if (base) {
+        const level = base.contribution >= 50 ? 'high' : base.contribution >= 25 ? 'medium' : 'low';
+        pills.push(`<span class="rage-factor-pill ${level}">Record ${base.contribution}</span>`);
+      }
+
+      // Top modifiers by absolute contribution
+      modifiers.forEach(f => {
+        const level = f.contribution >= 4 ? 'high' : f.contribution >= 1 ? 'medium' : 'low';
+        const sign = f.contribution >= 0 ? '+' : '\u2212';
+        const val = Math.abs(f.contribution).toFixed(0);
+        pills.push(`<span class="rage-factor-pill ${level}">${sign}${val} ${f.name}</span>`);
+      });
+
+      // Post-hoc adjustments
+      adjustments.forEach(f => {
+        const level = f.contribution > 0 ? 'high' : 'low';
+        const sign = f.contribution >= 0 ? '+' : '\u2212';
+        const val = Math.abs(f.contribution).toFixed(0);
+        pills.push(`<span class="rage-factor-pill ${level}">${sign}${val} ${f.name}</span>`);
+      });
+
+      return pills.join('');
     }
 
     function renderRageMeter(matches, season) {
