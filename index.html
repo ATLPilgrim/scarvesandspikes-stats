@@ -4634,7 +4634,10 @@
       const ppg = totalMatches > 0 ? (wins * 3 + draws) / totalMatches : 1.5;
 
       // Base rage from PPG: 2.0+ PPG = 0, 0.5 PPG = 100
-      const baseRage = Math.max(0, Math.min(100, (2.0 - ppg) / 1.5 * 100));
+      // Dampen toward neutral (50) for small samples — full strength at 10+ games
+      const rawBaseRage = Math.max(0, Math.min(100, (2.0 - ppg) / 1.5 * 100));
+      const sampleWeight = Math.min(1, totalMatches / 10);
+      const baseRage = rawBaseRage * sampleWeight + 50 * (1 - sampleWeight);
 
       const factors = [];
       factors.push({ name: 'Season record', contribution: Math.round(baseRage), isBase: true });
