@@ -12,7 +12,7 @@
   <title>Atlanta United vs Opponent | ScarvesAndSpikes.com</title>
   <meta name="description" content="Complete head-to-head history between Atlanta United and their MLS opponents with xG analytics.">
   <link rel="canonical" href="https://stats.scarvesandspikes.com/opponent.html">
-  <script>!function(){var t=new URLSearchParams(location.search).get('team');if(t){var u='https://stats.scarvesandspikes.com/opponent.html?team='+encodeURIComponent(t);document.querySelector('link[rel=canonical]').href=u;}}()</script>
+  <script>!function(){var t=new URLSearchParams(location.search).get('team');if(t){var u='https://stats.scarvesandspikes.com/opponent.html?team='+encodeURIComponent(t);document.querySelector('link[rel=canonical]').href=u;var n=t.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' ');var title='Atlanta United vs '+n+' - Head to Head Record | ScarvesAndSpikes.com';document.title=title;var d='Atlanta United head-to-head record against '+n+'. Full match history with xG analytics from every meeting.';document.querySelector('meta[name="description"]').content=d;document.querySelector('meta[property="og:title"]').content=title;document.querySelector('meta[property="og:description"]').content=d;document.querySelector('meta[property="og:url"]').content=u;}}()</script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Atlanta United vs Opponent | ScarvesAndSpikes.com">
   <meta property="og:description" content="Complete head-to-head history between Atlanta United and their MLS opponents with xG analytics.">
@@ -860,6 +860,7 @@
     <div class="hero-content">
       <p class="hero-subtitle" id="heroSubtitle">Head to Head History</p>
       <h1 class="hero-title" id="heroTitle">Atlanta United <span>Opponents</span></h1>
+      <script>!function(){var t=new URLSearchParams(location.search).get('team');if(t){var n=t.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' ');document.getElementById('heroTitle').innerHTML='Atlanta United vs <span>'+n+'</span>'}}()</script>
       <p class="hero-description">All-time records, goals, and expected goals (xG) analytics from every meeting since 2017. Includes regular season and playoff matches.</p>
       <p class="hero-record" id="heroRecord"></p>
     </div>

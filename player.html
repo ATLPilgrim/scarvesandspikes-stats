@@ -12,7 +12,7 @@
   <title>Player Profile | Atlanta United | ScarvesAndSpikes.com</title>
   <meta name="description" content="Atlanta United player profile with season-by-season xG stats, goals added radar, and full game log.">
   <link rel="canonical" href="https://stats.scarvesandspikes.com/player.html">
-  <script>!function(){var p=new URLSearchParams(location.search).get('id');if(p){var u='https://stats.scarvesandspikes.com/player.html?id='+encodeURIComponent(p);document.querySelector('link[rel=canonical]').href=u;}}()</script>
+  <script>!function(){var p=new URLSearchParams(location.search).get('id');if(p){var u='https://stats.scarvesandspikes.com/player.html?id='+encodeURIComponent(p);document.querySelector('link[rel=canonical]').href=u;var n=p.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' ');document.title=n+' | Atlanta United | ScarvesAndSpikes.com';var d=n+' stats with Atlanta United. Season-by-season expected goals (xG), goals added breakdown, and complete match log.';document.querySelector('meta[name="description"]').content=d;document.querySelector('meta[property="og:title"]').content=document.title;document.querySelector('meta[property="og:description"]').content=d;document.querySelector('meta[property="og:url"]').content=u;}}()</script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Player Profile | Atlanta United | ScarvesAndSpikes.com">
   <meta property="og:description" content="Atlanta United player profile with season-by-season xG stats, goals added radar, and full game log.">
@@ -822,6 +822,7 @@
     <div class="hero-content">
       <p class="hero-subtitle">Player Profile</p>
       <h1 class="hero-title" id="heroName">Atlanta United Player</h1>
+      <script>!function(){var p=new URLSearchParams(location.search).get('id');if(p){document.getElementById('heroName').textContent=p.split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' ')}}()</script>
       <div class="hero-meta" id="heroMeta"></div>
       <p class="hero-credit">Season stats, xG analytics, goals added radar, and full game log for every Atlanta United appearance.</p>
     </div>
