@@ -334,6 +334,13 @@
     .stats-value.win { color: var(--win); }
     .stats-value.loss { color: var(--loss); }
 
+    .data-footnote {
+      font-size: 0.65rem;
+      color: var(--gray-500);
+      margin-top: var(--space-sm);
+      font-style: italic;
+    }
+
     /* xG Performance Meter */
     .xg-meter-value {
       font-family: var(--font-display);
@@ -1112,6 +1119,7 @@
             <span class="stats-label">Key Passes</span>
             <span class="stats-value">${agg.keyPasses}</span>
           </div>
+          <div class="data-footnote">Assists reflect primary assists only. Secondary (hockey) assists are not tracked by ASA.</div>
         </div>
       `;
     }
