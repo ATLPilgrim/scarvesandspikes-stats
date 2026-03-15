@@ -4649,7 +4649,7 @@
       const drawContribution = drawRate > 0.20 ? Math.min(10, (drawRate - 0.20) * 50) : 0;
       factors.push({ name: 'Draws', contribution: drawContribution });
 
-      // 2. Recent form (last 5, weighted by recency) — up to +8
+      // 2. Recent form (last 5, weighted by recency) — bad form: up to +8, good form: up to -4
       const last5 = chronological.slice(-5);
       let formScore = 0;
       const weights = [0.1, 0.15, 0.2, 0.25, 0.3];
@@ -4659,7 +4659,11 @@
         formScore += pts * weights[startIdx + i] / weights.slice(startIdx).reduce((a, b) => a + b, 0);
       });
       formScore = Math.min(100, formScore * 5);
-      factors.push({ name: 'Recent form', contribution: formScore / 100 * 8 });
+      // Asymmetric: bad form adds rage, good form actively reduces it
+      const formContribution = formScore <= 50
+        ? -((50 - formScore) / 50 * 4)
+        : ((formScore - 50) / 50 * 8);
+      factors.push({ name: 'Recent form', contribution: formContribution });
 
       // 3. Winless run — up to +8
       let winlessRun = 0;
@@ -5136,6 +5140,5 @@
     init();
   </script>
   <script src="/search.js"></script>
-  <script src="/critters.js"></script>
 </body>
 </html>
