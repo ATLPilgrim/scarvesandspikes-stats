@@ -4763,7 +4763,13 @@
       const zone = getRageZone(score);
 
       const lastResult = totalMatches > 0 ? chronological[chronological.length - 1].result : null;
-      return { score, factors, lastResult, zoneLabel: zone.label, zoneEmoji: zone.emoji };
+      let winStreak = 0;
+      for (let i = chronological.length - 1; i >= 0; i--) {
+        if (chronological[i].result === 'W') winStreak++;
+        else break;
+      }
+      const streakBroken = factors.some(f => f.name === 'Streak broken');
+      return { score, factors, lastResult, winStreak, streakBroken, zoneLabel: zone.label, zoneEmoji: zone.emoji };
     }
 
     function buildGaugeSVG(score) {
@@ -4856,8 +4862,38 @@
       </svg>`;
     }
 
-    function getExplanationText(score, factors, lastResult) {
-      // Score-range quips — shown when no single modifier dominates, or for variety
+    function getExplanationText(score, factors, lastResult, winStreak, streakBroken) {
+      // --- Mood-based quips: override score-range when emotional context matters ---
+
+      // Relief quips — just snapped a long winless run
+      const reliefQuips = [
+        "Exhale. It's been a while since we could do that.",
+        "One win doesn't fix everything, but it sure fixes today.",
+        "The streak is dead. Long live the streak. A winning one, preferably.",
+        "Somewhere a supporter just unclenched for the first time in weeks.",
+        "Finally. FINALLY. Don't ruin this moment with rational analysis.",
+        "Is this what winning feels like? We almost forgot."
+      ];
+
+      // Cautious optimism quips — on a winning streak but score still high
+      const cautiousQuips = [
+        "Don't say it. Don't jinx it. Just... quietly enjoy this.",
+        "Two in a row. We're not getting excited. We're NOT getting excited.",
+        "The vibes are improving but we've been hurt before.",
+        "Winning streak? Careful, that's how they get your hopes up.",
+        "The number is still high, but the arrow is pointing the right way.",
+        "Back-to-back wins. Permission to feel a sliver of hope. Just a sliver."
+      ];
+
+      if (streakBroken) {
+        return reliefQuips[Math.floor(score / 17) % reliefQuips.length];
+      }
+
+      if (winStreak >= 2 && score > 30) {
+        return cautiousQuips[Math.floor(score / 13) % cautiousQuips.length];
+      }
+
+      // --- Score-range quips — general mood based on the number ---
       const rangeQuips = {
         tier1: [ // 0-10
           "Josef Martinez could never. Actually, he could.",
@@ -5016,7 +5052,7 @@
       }
 
       const insightsData = insightsCache[season] || null;
-      const { score, factors, lastResult, zoneLabel, zoneEmoji } = computeRageScore(matches, insightsData, season);
+      const { score, factors, lastResult, winStreak, streakBroken, zoneLabel, zoneEmoji } = computeRageScore(matches, insightsData, season);
 
       // Preview in header
       const previewColor = getScoreColor(score);
@@ -5029,7 +5065,7 @@
       document.getElementById('rageMeterZoneLabel').textContent = `${zoneEmoji} ${zoneLabel}`;
 
       // Explanation
-      document.getElementById('rageMeterExplanation').textContent = getExplanationText(score, factors, lastResult);
+      document.getElementById('rageMeterExplanation').textContent = getExplanationText(score, factors, lastResult, winStreak, streakBroken);
 
       // Factor pills
       document.getElementById('rageMeterFactors').innerHTML = renderRageFactors(factors);
