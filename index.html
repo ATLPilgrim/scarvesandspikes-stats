@@ -5061,8 +5061,14 @@
       // Gauge
       document.getElementById('rageMeterGauge').innerHTML = buildGaugeSVG(score);
 
-      // Zone label
-      document.getElementById('rageMeterZoneLabel').textContent = `${zoneEmoji} ${zoneLabel}`;
+      // Zone label — override with mood-aware label after streak relief or winning run
+      let displayLabel = `${zoneEmoji} ${zoneLabel}`;
+      if (streakBroken) {
+        displayLabel = '\uD83D\uDE2E\u200D\uD83D\uDCA8 Finally broke through';
+      } else if (winStreak >= 2 && score > 30) {
+        displayLabel = '\uD83E\uDD1E Cautious optimism (don\'t jinx it)';
+      }
+      document.getElementById('rageMeterZoneLabel').textContent = displayLabel;
 
       // Explanation
       document.getElementById('rageMeterExplanation').textContent = getExplanationText(score, factors, lastResult, winStreak, streakBroken);
