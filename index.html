@@ -4716,6 +4716,20 @@
       const smashScore = Math.min(100, smashRate * 3 * 100);
       factors.push({ name: 'Lucky wins', contribution: -(smashScore / 100 * 5) });
 
+      // 9. Streak-breaking relief — up to -4
+      // Snapping a long winless run feels better than the math suggests
+      if (totalMatches >= 2 && chronological[chronological.length - 1].result === 'W') {
+        let priorWinless = 0;
+        for (let i = chronological.length - 2; i >= 0; i--) {
+          if (chronological[i].result !== 'W') priorWinless++;
+          else break;
+        }
+        if (priorWinless >= 3) {
+          const relief = -Math.min(4, (priorWinless - 2) * 1.5);
+          factors.push({ name: 'Streak broken', contribution: relief });
+        }
+      }
+
       // Sum: base + all modifiers
       let raw = baseRage + factors.filter(f => !f.isBase).reduce((s, f) => s + f.contribution, 0);
 
@@ -4842,8 +4856,64 @@
     }
 
     function getExplanationText(score, factors) {
-      if (score <= 20) return "Nothing to see here. Everything is fine. Suspiciously fine.";
-      if (score >= 91) return "This is not a drill. I repeat, this is not a drill.";
+      // Score-range quips — shown when no single modifier dominates, or for variety
+      const rangeQuips = {
+        tier1: [ // 0-10
+          "Josef Martinez could never. Actually, he could.",
+          "Somewhere, Tata Martino is smiling.",
+          "The golden spike has never shined brighter."
+        ],
+        tier2: [ // 11-20
+          "Nothing to see here. Everything is fine. Suspiciously fine.",
+          "The Five Stripes are giving the people what they want.",
+          "Atlanta has no complaints. Well, about the team anyway."
+        ],
+        tier3: [ // 21-30
+          "Good vibes with a side of 'but what if...'",
+          "Optimistic, but still checking the standings after every match.",
+          "Things are fine. We just need to keep winning. Simple, right?"
+        ],
+        tier4: [ // 31-45
+          "Not panicking. Just aggressively monitoring the situation.",
+          "Starting to make that face your dad makes during a 'rebuilding year.'",
+          "The vibes are mid. The takes are heating up.",
+          "We're fine. This is fine. Everything is fine."
+        ],
+        tier5: [ // 46-60
+          "Could be worse. Could also be a lot better. Classic Five Stripes.",
+          "Not great, not terrible. The 3.6 roentgen of MLS seasons.",
+          "Still showing up on match day. That's loyalty. Or stubbornness.",
+          "The vibes are recoverable. Probably. Maybe."
+        ],
+        tier6: [ // 61-75
+          "The strongly worded tweets are writing themselves.",
+          "r/AtlantaUnited is in shambles.",
+          "Multiple podcasts have been rage-recorded about this.",
+          "The fanbase is united. United in frustration."
+        ],
+        tier7: [ // 76-85
+          "At this point the match thread IS the therapy session.",
+          "Local man yells at cloud. Cloud shaped like a soccer ball.",
+          "The 2019 vibes are a distant memory. Like, ancient history.",
+          "Someone check on the supporters' section. Actually, don't."
+        ],
+        tier8: [ // 86-92
+          "This is not a drill. I repeat, this is not a drill.",
+          "Selling the season tickets. Buying them back. Selling them again.",
+          "Even the golden spike is considering a transfer.",
+          "The Five Stripes have become the Five Stages of Grief."
+        ],
+        tier9: [ // 93-100
+          "Existence is pain. Soccer is pain. Same thing.",
+          "Tell my family I loved them before I watched this season.",
+          "They can't hurt you if you simply stop watching. (You won't stop watching.)",
+          "This season is the football equivalent of stepping on a LEGO. Repeatedly."
+        ]
+      };
+
+      const tier = score <= 10 ? 'tier1' : score <= 20 ? 'tier2' : score <= 30 ? 'tier3'
+        : score <= 45 ? 'tier4' : score <= 60 ? 'tier5' : score <= 75 ? 'tier6'
+        : score <= 85 ? 'tier7' : score <= 92 ? 'tier8' : 'tier9';
 
       // Find highest contributing modifier (excluding base and adjustments)
       const sorted = factors
@@ -4851,9 +4921,8 @@
         .sort((a, b) => b.contribution - a.contribution);
 
       const top = sorted[0];
-      if (!top) return "The numbers don't lie, and they spell frustration.";
 
-      const lines = {
+      const factorLines = {
         'Recent form': [
           "Recent results are testing the fanbase's patience.",
           "The last few matches have not been kind.",
@@ -4891,8 +4960,15 @@
         ]
       };
 
-      const options = lines[top.name] || ["The numbers don't lie, and they spell frustration."];
-      return options[Math.floor(score / 35) % options.length];
+      // Alternate between factor-based and score-range quips for variety
+      const quipPool = rangeQuips[tier];
+      if (top && factorLines[top.name] && top.contribution >= 3) {
+        // Strong factor — use factor-specific line
+        const options = factorLines[top.name];
+        return options[Math.floor(score / 35) % options.length];
+      }
+      // Otherwise use score-range quip
+      return quipPool[Math.floor(score / 17) % quipPool.length];
     }
 
     function renderRageFactors(factors) {
