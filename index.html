@@ -4762,7 +4762,8 @@
       const score = Math.max(0, Math.min(100, Math.round(raw)));
       const zone = getRageZone(score);
 
-      return { score, factors, zoneLabel: zone.label, zoneEmoji: zone.emoji };
+      const lastResult = totalMatches > 0 ? chronological[chronological.length - 1].result : null;
+      return { score, factors, lastResult, zoneLabel: zone.label, zoneEmoji: zone.emoji };
     }
 
     function buildGaugeSVG(score) {
@@ -4855,7 +4856,7 @@
       </svg>`;
     }
 
-    function getExplanationText(score, factors) {
+    function getExplanationText(score, factors, lastResult) {
       // Score-range quips — shown when no single modifier dominates, or for variety
       const rangeQuips = {
         tier1: [ // 0-10
@@ -4960,14 +4961,13 @@
         ]
       };
 
-      // Alternate between factor-based and score-range quips for variety
+      // Use factor-specific quote only when the most recent result isn't a win
+      // (factor quotes read as complaints, which feel wrong right after a victory)
       const quipPool = rangeQuips[tier];
-      if (top && factorLines[top.name] && top.contribution >= 3) {
-        // Strong factor — use factor-specific line
+      if (lastResult !== 'W' && top && factorLines[top.name] && top.contribution >= 3) {
         const options = factorLines[top.name];
         return options[Math.floor(score / 35) % options.length];
       }
-      // Otherwise use score-range quip
       return quipPool[Math.floor(score / 17) % quipPool.length];
     }
 
@@ -5016,7 +5016,7 @@
       }
 
       const insightsData = insightsCache[season] || null;
-      const { score, factors, zoneLabel, zoneEmoji } = computeRageScore(matches, insightsData, season);
+      const { score, factors, lastResult, zoneLabel, zoneEmoji } = computeRageScore(matches, insightsData, season);
 
       // Preview in header
       const previewColor = getScoreColor(score);
@@ -5029,7 +5029,7 @@
       document.getElementById('rageMeterZoneLabel').textContent = `${zoneEmoji} ${zoneLabel}`;
 
       // Explanation
-      document.getElementById('rageMeterExplanation').textContent = getExplanationText(score, factors);
+      document.getElementById('rageMeterExplanation').textContent = getExplanationText(score, factors, lastResult);
 
       // Factor pills
       document.getElementById('rageMeterFactors').innerHTML = renderRageFactors(factors);
