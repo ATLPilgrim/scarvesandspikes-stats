@@ -254,7 +254,7 @@
 
   <div class="preview-area">
     <div class="status" id="status">Select an opponent and date to generate a match preview graphic.</div>
-    <canvas id="previewCanvas" width="1080" height="1350" style="display:none;"></canvas>
+    <canvas id="previewCanvas" width="1080" height="1500" style="display:none;"></canvas>
   </div>
 </div>
 
@@ -390,7 +390,7 @@
   }
 
   async function renderPreview(data, matchDate, competition) {
-    const W = 1080, H = 1350;
+    const W = 1080, H = 1500;
     const canvas = document.getElementById('previewCanvas');
     canvas.width = W;
     canvas.height = H;
@@ -730,13 +730,13 @@
     });
 
     // ═══════════════════════════════════════════
-    // FOOTER (bottom 80px)
+    // FOOTER (bottom 90px)
     // ═══════════════════════════════════════════
-    const footerY = H - 80;
+    const footerY = H - 90;
 
     // Footer background
     ctx.fillStyle = 'rgba(128, 0, 10, 0.12)';
-    ctx.fillRect(0, footerY, W, 80);
+    ctx.fillRect(0, footerY, W, 90);
     drawDivider(footerY);
 
     // S&S badge
