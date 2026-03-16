@@ -484,12 +484,12 @@
 
     // Watermark logos (faint, behind everything)
     if (atlLogo) {
-      ctx.globalAlpha = 0.03;
+      ctx.globalAlpha = 0.07;
       ctx.drawImage(atlLogo, -80, H / 2 - 250, 500, 500);
       ctx.globalAlpha = 1;
     }
     if (oppLogo) {
-      ctx.globalAlpha = 0.03;
+      ctx.globalAlpha = 0.07;
       ctx.drawImage(oppLogo, W - 420, H / 2 - 250, 500, 500);
       ctx.globalAlpha = 1;
     }
@@ -702,9 +702,9 @@
     y += 30;
     drawLabel('TOP SCORERS', pad, y);
     topScorers.forEach((p, i) => {
-      y += 30;
+      y += 32;
       ctx.fillStyle = gray100;
-      ctx.font = `500 18px ${body}`;
+      ctx.font = `500 18px ${display}`;
       ctx.textAlign = 'left';
       ctx.fillText(p.name, pad, y);
       ctx.fillStyle = gold;
@@ -716,11 +716,10 @@
     // Top xG+xA contributors
     y += 40;
     drawLabel('TOP XG+XA CONTRIBUTORS', pad, y);
-    ctx.textAlign = 'left';
     topContributors.forEach((p, i) => {
-      y += 30;
+      y += 32;
       ctx.fillStyle = gray100;
-      ctx.font = `500 18px ${body}`;
+      ctx.font = `500 18px ${display}`;
       ctx.textAlign = 'left';
       ctx.fillText(p.name, pad, y);
       ctx.fillStyle = gold;
