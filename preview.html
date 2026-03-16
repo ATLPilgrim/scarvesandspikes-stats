@@ -254,7 +254,7 @@
 
   <div class="preview-area">
     <div class="status" id="status">Select an opponent and date to generate a match preview graphic.</div>
-    <canvas id="previewCanvas" width="1200" height="630" style="display:none;"></canvas>
+    <canvas id="previewCanvas" width="1080" height="1350" style="display:none;"></canvas>
   </div>
 </div>
 
@@ -390,22 +390,20 @@
   }
 
   async function renderPreview(data, matchDate, competition) {
-    const W = 1200, H = 630;
+    const W = 1080, H = 1350;
     const canvas = document.getElementById('previewCanvas');
     canvas.width = W;
     canvas.height = H;
     const ctx = canvas.getContext('2d');
+    const pad = 60; // horizontal padding
 
     // Colors
     const burgundy = '#80000a';
     const gold = '#c9a227';
-    const goldDark = '#9a7a1a';
     const gray950 = '#121212';
-    const gray900 = '#1a1a1a';
     const gray800 = '#242424';
     const gray700 = '#333333';
     const gray400 = '#888888';
-    const gray300 = '#aaaaaa';
     const gray100 = '#e0e0e0';
     const white = '#ffffff';
     const winColor = '#2e7d32';
@@ -415,18 +413,66 @@
     const display = 'Oswald';
     const body = 'Source Sans 3';
 
+    // ── Helpers ──
+    function drawDivider(y) {
+      ctx.strokeStyle = gray700;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad, y);
+      ctx.lineTo(W - pad, y);
+      ctx.stroke();
+    }
+
+    function drawSectionTitle(text, y) {
+      ctx.fillStyle = gold;
+      ctx.font = `700 20px ${display}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(text, pad, y);
+    }
+
+    function drawLabel(text, x, y) {
+      ctx.fillStyle = gray400;
+      ctx.font = `500 14px ${display}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(text, x, y);
+    }
+
+    function drawValue(text, x, y, size) {
+      ctx.fillStyle = gray100;
+      ctx.font = `600 ${size || 22}px ${display}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(text, x, y);
+    }
+
+    function drawResultCircles(results, x, y, r) {
+      const radius = r || 16;
+      const gap = radius * 2 + 10;
+      results.forEach((m, i) => {
+        const cx = x + i * gap + radius;
+        ctx.beginPath();
+        ctx.arc(cx, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = m.result === 'W' ? winColor : m.result === 'L' ? lossColor : drawColor;
+        ctx.fill();
+        ctx.fillStyle = white;
+        ctx.font = `700 ${radius}px ${display}`;
+        ctx.textAlign = 'center';
+        ctx.fillText(m.result, cx, y + radius * 0.35);
+      });
+      ctx.textAlign = 'left';
+    }
+
     // ── Background ──
     ctx.fillStyle = gray950;
     ctx.fillRect(0, 0, W, H);
-    const grad = ctx.createLinearGradient(0, 0, W, H);
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
     grad.addColorStop(0, 'rgba(26,26,26,0.95)');
     grad.addColorStop(1, 'rgba(10,10,10,1)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Top burgundy accent bar
+    // Top accent bar
     ctx.fillStyle = burgundy;
-    ctx.fillRect(0, 0, W, 4);
+    ctx.fillRect(0, 0, W, 5);
 
     // ── Load logos ──
     const oppSlug = normalizeTeamNameForLogo(data.opponent.opponent);
@@ -436,234 +482,153 @@
       loadImage('/badge_community.png')
     ]);
 
-    // ── Watermark logos ──
+    // Watermark logos (faint, behind everything)
     if (atlLogo) {
-      ctx.globalAlpha = 0.04;
-      ctx.drawImage(atlLogo, -40, H / 2 - 200, 400, 400);
+      ctx.globalAlpha = 0.03;
+      ctx.drawImage(atlLogo, -80, H / 2 - 250, 500, 500);
       ctx.globalAlpha = 1;
     }
     if (oppLogo) {
-      ctx.globalAlpha = 0.04;
-      ctx.drawImage(oppLogo, W - 360, H / 2 - 200, 400, 400);
+      ctx.globalAlpha = 0.03;
+      ctx.drawImage(oppLogo, W - 420, H / 2 - 250, 500, 500);
       ctx.globalAlpha = 1;
     }
 
     // ═══════════════════════════════════════════
-    // HEADER — Logos + Match Info (y: 10–130)
+    // HEADER (y: 20–220)
     // ═══════════════════════════════════════════
-    const headerY = 20;
-    const logoSize = 90;
+    const logoSize = 120;
+    const logoY = 30;
+    const centerX = W / 2;
 
-    // ATL logo
-    if (atlLogo) ctx.drawImage(atlLogo, 60, headerY, logoSize, logoSize);
+    // ATL logo (left of center)
+    if (atlLogo) ctx.drawImage(atlLogo, centerX - 200 - logoSize / 2, logoY, logoSize, logoSize);
 
-    // "vs" text
+    // "VS"
     ctx.fillStyle = gray400;
-    ctx.font = `500 22px ${display}`;
+    ctx.font = `600 28px ${display}`;
     ctx.textAlign = 'center';
-    ctx.fillText('VS', W / 2, headerY + 55);
+    ctx.fillText('VS', centerX, logoY + 75);
 
-    // Opponent logo
-    if (oppLogo) ctx.drawImage(oppLogo, W - 60 - logoSize, headerY, logoSize, logoSize);
+    // Opponent logo (right of center)
+    if (oppLogo) ctx.drawImage(oppLogo, centerX + 200 - logoSize / 2, logoY, logoSize, logoSize);
 
-    // Match info center
+    // Team names
+    ctx.font = `600 18px ${display}`;
     ctx.fillStyle = gold;
-    ctx.font = `700 26px ${display}`;
-    ctx.textAlign = 'center';
-    ctx.fillText('MATCH PREVIEW', W / 2, headerY + 28);
+    ctx.fillText('ATLANTA UNITED', centerX - 200, logoY + logoSize + 24);
+    ctx.fillStyle = gray100;
+    ctx.fillText(data.opponent.opponent.toUpperCase(), centerX + 200, logoY + logoSize + 24);
+
+    // Match info
+    ctx.fillStyle = gold;
+    ctx.font = `700 24px ${display}`;
+    ctx.fillText('MATCH PREVIEW', centerX, logoY + logoSize + 62);
 
     ctx.fillStyle = gray100;
-    ctx.font = `500 16px ${body}`;
-    ctx.fillText(formatDateNice(matchDate), W / 2, headerY + 75);
+    ctx.font = `500 18px ${body}`;
+    ctx.fillText(formatDateNice(matchDate), centerX, logoY + logoSize + 88);
 
     const venueText = venue === 'home' ? 'Mercedes-Benz Stadium' : `Away · ${data.opponent.opponent}`;
     ctx.fillStyle = gray400;
-    ctx.font = `400 14px ${body}`;
-    ctx.fillText(`${competition} · ${venueText}`, W / 2, headerY + 95);
+    ctx.font = `400 16px ${body}`;
+    ctx.fillText(`${competition} · ${venueText}`, centerX, logoY + logoSize + 112);
 
-    // Team names under logos
-    ctx.font = `600 14px ${display}`;
-    ctx.fillStyle = gold;
-    ctx.textAlign = 'center';
-    ctx.fillText('ATLANTA UNITED', 60 + logoSize / 2, headerY + logoSize + 16);
-    ctx.fillStyle = gray100;
-    ctx.fillText(data.opponent.opponent.toUpperCase(), W - 60 - logoSize / 2, headerY + logoSize + 16);
-
-    // Divider
-    const divY = 142;
-    ctx.strokeStyle = gray700;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(40, divY);
-    ctx.lineTo(W - 40, divY);
-    ctx.stroke();
+    let y = 280;
+    drawDivider(y);
 
     // ═══════════════════════════════════════════
-    // SECTION 1 — Head to Head (y: 150–230)
+    // SECTION 1 — Head to Head (y: ~290–430)
     // ═══════════════════════════════════════════
-    const s1Y = 155;
-    ctx.fillStyle = gold;
-    ctx.font = `700 15px ${display}`;
-    ctx.textAlign = 'left';
-    ctx.fillText('HEAD TO HEAD', 50, s1Y);
+    y += 30;
+    drawSectionTitle('HEAD TO HEAD', y);
 
     const stats = data.opponent.stats;
-    const h2hRecord = `${stats.wins}W - ${stats.draws}D - ${stats.losses}L`;
+    y += 35;
 
-    // All-time record
-    ctx.fillStyle = gray400;
-    ctx.font = `500 13px ${display}`;
-    ctx.fillText('ALL-TIME', 50, s1Y + 25);
-    ctx.fillStyle = white;
-    ctx.font = `600 22px ${display}`;
-    ctx.fillText(h2hRecord, 50, s1Y + 50);
+    // All-time record — big and centered
+    drawLabel('ALL-TIME RECORD', pad, y);
+    y += 30;
+    drawValue(`${stats.wins}W - ${stats.draws}D - ${stats.losses}L`, pad, y, 28);
 
-    // Last 5 meetings
+    // Stats row: Streak, Home, Away
+    const statColW = (W - pad * 2) / 3;
+    y += 45;
+    drawLabel('STREAK', pad, y);
+    drawLabel('HOME RECORD', pad + statColW, y);
+    drawLabel('AWAY RECORD', pad + statColW * 2, y);
+    y += 26;
+    if (stats.currentStreak) {
+      const sColor = stats.currentStreak.type === 'W' ? winColor : stats.currentStreak.type === 'L' ? lossColor : drawColor;
+      ctx.fillStyle = sColor;
+      ctx.font = `700 24px ${display}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(`${stats.currentStreak.type}${stats.currentStreak.count}`, pad, y);
+    }
+    drawValue(`${stats.homeWins}W-${stats.homeDraws}D-${stats.homeLosses}L`, pad + statColW, y, 20);
+    drawValue(`${stats.awayWins}W-${stats.awayDraws}D-${stats.awayLosses}L`, pad + statColW * 2, y, 20);
+
+    // Last meetings circles
+    y += 42;
     const recentMatches = [...data.opponent.matches]
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 5);
+    const recentLabel = recentMatches.length === 1 ? 'LAST MEETING' : `LAST ${recentMatches.length} MEETINGS`;
+    drawLabel(recentLabel, pad, y);
+    y += 30;
+    drawResultCircles(recentMatches, pad, y);
 
-    ctx.fillStyle = gray400;
-    ctx.font = `500 13px ${display}`;
-    ctx.fillText('LAST 5 MEETINGS', 320, s1Y + 25);
-
-    const circleY = s1Y + 45;
-    recentMatches.forEach((m, i) => {
-      const cx = 330 + i * 36;
-      ctx.beginPath();
-      ctx.arc(cx, circleY, 12, 0, Math.PI * 2);
-      ctx.fillStyle = m.result === 'W' ? winColor : m.result === 'L' ? lossColor : drawColor;
-      ctx.fill();
-      ctx.fillStyle = white;
-      ctx.font = `700 13px ${display}`;
-      ctx.textAlign = 'center';
-      ctx.fillText(m.result, cx, circleY + 5);
-    });
-    ctx.textAlign = 'left';
-
-    // Current streak
-    if (stats.currentStreak) {
-      const streakLabel = `${stats.currentStreak.type}${stats.currentStreak.count}`;
-      ctx.fillStyle = gray400;
-      ctx.font = `500 13px ${display}`;
-      ctx.fillText('STREAK', 560, s1Y + 25);
-      ctx.fillStyle = stats.currentStreak.type === 'W' ? winColor : stats.currentStreak.type === 'L' ? lossColor : drawColor;
-      ctx.font = `700 22px ${display}`;
-      ctx.fillText(streakLabel, 560, s1Y + 50);
-    }
-
-    // Home/Away H2H
-    ctx.fillStyle = gray400;
-    ctx.font = `500 13px ${display}`;
-    ctx.fillText('HOME', 720, s1Y + 25);
-    ctx.fillStyle = gray100;
-    ctx.font = `500 16px ${display}`;
-    ctx.fillText(`${stats.homeWins}W-${stats.homeDraws}D-${stats.homeLosses}L`, 720, s1Y + 48);
-
-    ctx.fillStyle = gray400;
-    ctx.font = `500 13px ${display}`;
-    ctx.fillText('AWAY', 880, s1Y + 25);
-    ctx.fillStyle = gray100;
-    ctx.font = `500 16px ${display}`;
-    ctx.fillText(`${stats.awayWins}W-${stats.awayDraws}D-${stats.awayLosses}L`, 880, s1Y + 48);
-
-    // Divider
-    const div2Y = 225;
-    ctx.strokeStyle = gray700;
-    ctx.beginPath();
-    ctx.moveTo(40, div2Y);
-    ctx.lineTo(W - 40, div2Y);
-    ctx.stroke();
+    y += 35;
+    drawDivider(y);
 
     // ═══════════════════════════════════════════
-    // SECTION 2 — Season Form (y: 230–400)
+    // SECTION 2 — Atlanta United Form (y: ~540–700)
     // ═══════════════════════════════════════════
-    const s2Y = 238;
-    const season = new Date().getFullYear();
-    ctx.fillStyle = gold;
-    ctx.font = `700 15px ${display}`;
-    ctx.textAlign = 'left';
-    ctx.fillText(`${season} SEASON FORM`, 50, s2Y);
+    y += 30;
+    drawSectionTitle('ATLANTA UNITED — ' + new Date().getFullYear() + ' SEASON', y);
 
-    // Center divider line
-    ctx.strokeStyle = gray700;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(W / 2, s2Y + 10);
-    ctx.lineTo(W / 2, 395);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // ── ATL side (left) ──
-    const atlX = 50;
-    const colW = W / 2 - 80;
-
-    // ATL label
-    ctx.fillStyle = gold;
-    ctx.font = `600 14px ${display}`;
-    ctx.fillText('ATLANTA UNITED', atlX, s2Y + 28);
-
-    // ATL last 5 results
     const atlMatches = data.matches.matches || [];
     const atlSorted = [...atlMatches].sort((a, b) => new Date(a.date) - new Date(b.date));
-    const atlLast5 = atlSorted.slice(-5);
-
-    ctx.fillStyle = gray400;
-    ctx.font = `500 12px ${display}`;
-    ctx.fillText(atlLast5.length === 1 ? 'LAST MATCH' : `LAST ${atlLast5.length}`, atlX, s2Y + 50);
-
-    atlLast5.forEach((m, i) => {
-      const cx = atlX + 10 + i * 36;
-      const cy = s2Y + 70;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 12, 0, Math.PI * 2);
-      ctx.fillStyle = m.result === 'W' ? winColor : m.result === 'L' ? lossColor : drawColor;
-      ctx.fill();
-      ctx.fillStyle = white;
-      ctx.font = `700 13px ${display}`;
-      ctx.textAlign = 'center';
-      ctx.fillText(m.result, cx, cy + 5);
-    });
-    ctx.textAlign = 'left';
-
-    // ATL season record
+    const atlRecent = atlSorted.slice(-5);
     const summary = data.matches.summary;
-    ctx.fillStyle = gray400;
-    ctx.font = `500 12px ${display}`;
-    ctx.fillText('RECORD', atlX, s2Y + 100);
-    ctx.fillStyle = gray100;
-    ctx.font = `600 18px ${display}`;
-    ctx.fillText(`${summary.wins}W - ${summary.draws}D - ${summary.losses}L`, atlX, s2Y + 122);
 
-    // ATL xG stats
+    // Form circles
+    y += 30;
+    const formLabel = atlRecent.length === 1 ? 'RECENT FORM (LAST MATCH)' : `RECENT FORM (LAST ${atlRecent.length})`;
+    drawLabel(formLabel, pad, y);
+    y += 30;
+    drawResultCircles(atlRecent, pad, y);
+
+    // Season record + xG stats
+    y += 45;
+    drawLabel('RECORD', pad, y);
+    drawLabel('GOALS FOR / AGAINST', pad + statColW, y);
+    y += 26;
+    drawValue(`${summary.wins}W - ${summary.draws}D - ${summary.losses}L`, pad, y, 22);
+    drawValue(`${summary.goalsFor} / ${summary.goalsAgainst}`, pad + statColW, y, 22);
+
     const atlInsights = data.insights;
     if (atlInsights && atlInsights.context) {
       const c = atlInsights.context;
       const gp = c.games_played || 1;
 
-      ctx.fillStyle = gray400;
-      ctx.font = `500 12px ${display}`;
-      ctx.fillText('XG FOR / AGAINST', atlX, s2Y + 148);
-      ctx.fillStyle = gray100;
-      ctx.font = `600 16px ${display}`;
-      ctx.fillText(`${(c.xgoals_for / gp).toFixed(2)} / ${(c.xgoals_against / gp).toFixed(2)} per game`, atlX, s2Y + 168);
-
-      ctx.fillStyle = gray400;
-      ctx.font = `500 12px ${display}`;
-      ctx.fillText('POINTS / XPOINTS', atlX + 250, s2Y + 148);
-      ctx.fillStyle = gray100;
-      ctx.font = `600 16px ${display}`;
-      ctx.fillText(`${c.points} / ${c.xpoints.toFixed(1)}`, atlX + 250, s2Y + 168);
+      y += 40;
+      drawLabel('XG FOR / AGAINST (PER GAME)', pad, y);
+      drawLabel('POINTS / XPOINTS', pad + statColW * 1.5, y);
+      y += 26;
+      drawValue(`${(c.xgoals_for / gp).toFixed(2)} / ${(c.xgoals_against / gp).toFixed(2)}`, pad, y, 22);
+      drawValue(`${c.points} / ${c.xpoints.toFixed(1)}`, pad + statColW * 1.5, y, 22);
     }
 
-    // ── Opponent side (right) ──
-    const oppX = W / 2 + 30;
+    y += 40;
+    drawDivider(y);
 
-    ctx.fillStyle = gray100;
-    ctx.font = `600 14px ${display}`;
-    ctx.fillText(data.opponent.opponent.toUpperCase(), oppX, s2Y + 28);
+    // ═══════════════════════════════════════════
+    // SECTION 3 — Opponent Form (y: ~760–890)
+    // ═══════════════════════════════════════════
+    y += 30;
+    drawSectionTitle(`${data.opponent.opponent.toUpperCase()} — ${new Date().getFullYear()} SEASON`, y);
 
-    // Opponent season stats from league table
     const leagueTable = data.league && data.league.table ? data.league.table : [];
     const oppTeam = leagueTable.find(t =>
       normalizeTeamNameForLogo(t.team_name) === normalizeTeamNameForLogo(data.opponent.opponent)
@@ -672,57 +637,47 @@
     if (oppTeam) {
       const gp = oppTeam.games_played || 1;
 
-      // Subtitle explaining this is season-wide data
+      y += 22;
       ctx.fillStyle = gray400;
-      ctx.font = `italic 400 11px ${body}`;
-      ctx.fillText('Season stats via MLS xG standings', oppX, s2Y + 45);
+      ctx.font = `italic 400 13px ${body}`;
+      ctx.textAlign = 'left';
+      ctx.fillText('Season stats via MLS xG standings', pad, y);
 
-      ctx.fillStyle = gray400;
-      ctx.font = `500 12px ${display}`;
-      ctx.fillText('SEASON', oppX, s2Y + 65);
-      ctx.fillStyle = gray100;
-      ctx.font = `600 18px ${display}`;
-      ctx.fillText(`${oppTeam.points} pts in ${gp} games`, oppX, s2Y + 87);
-
-      ctx.fillStyle = gray400;
-      ctx.font = `500 12px ${display}`;
-      ctx.fillText('GOAL DIFF / XG DIFF', oppX, s2Y + 113);
-      ctx.fillStyle = gray100;
-      ctx.font = `600 18px ${display}`;
+      y += 30;
+      drawLabel('POINTS', pad, y);
+      drawLabel('GOAL DIFF', pad + statColW, y);
+      drawLabel('XG DIFF', pad + statColW * 2, y);
+      y += 26;
+      drawValue(`${oppTeam.points} in ${gp} GP`, pad, y, 22);
       const gdSign = oppTeam.goal_diff >= 0 ? '+' : '';
+      drawValue(`${gdSign}${oppTeam.goal_diff}`, pad + statColW, y, 22);
       const xgdSign = oppTeam.xgoal_diff >= 0 ? '+' : '';
-      ctx.fillText(`${gdSign}${oppTeam.goal_diff} / ${xgdSign}${oppTeam.xgoal_diff.toFixed(1)} xGD`, oppX, s2Y + 135);
+      drawValue(`${xgdSign}${oppTeam.xgoal_diff.toFixed(1)}`, pad + statColW * 2, y, 22);
 
-      ctx.fillStyle = gray400;
-      ctx.font = `500 12px ${display}`;
-      ctx.fillText('XG FOR / AGAINST', oppX, s2Y + 161);
-      ctx.fillStyle = gray100;
-      ctx.font = `600 16px ${display}`;
-      ctx.fillText(`${(oppTeam.xgoals_for / gp).toFixed(2)} / ${(oppTeam.xgoals_against / gp).toFixed(2)} per game`, oppX, s2Y + 181);
+      y += 40;
+      drawLabel('XG FOR / AGAINST (PER GAME)', pad, y);
+      drawLabel('GOALS FOR / AGAINST', pad + statColW * 1.5, y);
+      y += 26;
+      drawValue(`${(oppTeam.xgoals_for / gp).toFixed(2)} / ${(oppTeam.xgoals_against / gp).toFixed(2)}`, pad, y, 22);
+      drawValue(`${oppTeam.goals_for} / ${oppTeam.goals_against}`, pad + statColW * 1.5, y, 22);
     } else {
+      y += 35;
       ctx.fillStyle = gray400;
-      ctx.font = `400 14px ${body}`;
-      ctx.fillText('No season data available', oppX, s2Y + 70);
+      ctx.font = `400 16px ${body}`;
+      ctx.textAlign = 'left';
+      ctx.fillText('No season data available yet', pad, y);
     }
 
-    // Divider
-    const div3Y = 400;
-    ctx.strokeStyle = gray700;
-    ctx.beginPath();
-    ctx.moveTo(40, div3Y);
-    ctx.lineTo(W - 40, div3Y);
-    ctx.stroke();
+    y += 40;
+    drawDivider(y);
 
     // ═══════════════════════════════════════════
-    // SECTION 3 — Key ATL Players (y: 405–540)
+    // SECTION 4 — Key ATL Players (y: ~950–1150)
     // ═══════════════════════════════════════════
-    const s3Y = 410;
-    ctx.fillStyle = gold;
-    ctx.font = `700 15px ${display}`;
-    ctx.textAlign = 'left';
-    ctx.fillText('KEY ATLANTA UNITED PLAYERS', 50, s3Y);
+    y += 30;
+    drawSectionTitle('KEY ATLANTA UNITED PLAYERS', y);
 
-    // Aggregate player stats from all season matches
+    // Aggregate player stats
     const playerMap = {};
     atlMatches.forEach(m => {
       if (!m.players) return;
@@ -740,84 +695,73 @@
     });
 
     const playerList = Object.values(playerMap);
-    const topScorers = [...playerList].sort((a, b) => b.goals - a.goals).slice(0, 3);
+    const topScorers = [...playerList].sort((a, b) => b.goals - a.goals).filter(p => p.goals > 0).slice(0, 3);
     const topContributors = [...playerList].sort((a, b) => b.xgPlusXa - a.xgPlusXa).slice(0, 3);
 
-    // Top scorers column
-    const colLeft = 50;
-    ctx.fillStyle = gray400;
-    ctx.font = `500 12px ${display}`;
-    ctx.fillText('TOP SCORERS', colLeft, s3Y + 25);
-
+    // Top scorers
+    y += 30;
+    drawLabel('TOP SCORERS', pad, y);
     topScorers.forEach((p, i) => {
-      const py = s3Y + 48 + i * 28;
+      y += 30;
       ctx.fillStyle = gray100;
-      ctx.font = `500 15px ${body}`;
-      ctx.fillText(p.name, colLeft, py);
+      ctx.font = `500 18px ${body}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(p.name, pad, y);
       ctx.fillStyle = gold;
-      ctx.font = `700 15px ${display}`;
-      ctx.fillText(`${p.goals}G`, colLeft + 260, py);
-      ctx.fillStyle = gray400;
-      ctx.font = `400 13px ${body}`;
-      ctx.fillText(`(${p.xg.toFixed(1)} xG)`, colLeft + 300, py);
+      ctx.font = `700 18px ${display}`;
+      ctx.textAlign = 'right';
+      ctx.fillText(`${p.goals}G  (${p.xg.toFixed(1)} xG)`, W / 2 - 20, y);
     });
 
-    // Top xG+xA contributors column
-    const colRight = W / 2 + 30;
-    ctx.fillStyle = gray400;
-    ctx.font = `500 12px ${display}`;
-    ctx.fillText('TOP XG+XA CONTRIBUTORS', colRight, s3Y + 25);
-
+    // Top xG+xA contributors
+    y += 40;
+    drawLabel('TOP XG+XA CONTRIBUTORS', pad, y);
+    ctx.textAlign = 'left';
     topContributors.forEach((p, i) => {
-      const py = s3Y + 48 + i * 28;
+      y += 30;
       ctx.fillStyle = gray100;
-      ctx.font = `500 15px ${body}`;
-      ctx.fillText(p.name, colRight, py);
+      ctx.font = `500 18px ${body}`;
+      ctx.textAlign = 'left';
+      ctx.fillText(p.name, pad, y);
       ctx.fillStyle = gold;
-      ctx.font = `700 15px ${display}`;
-      ctx.fillText(p.xgPlusXa.toFixed(1), colRight + 260, py);
-      ctx.fillStyle = gray400;
-      ctx.font = `400 13px ${body}`;
-      ctx.fillText('xG+xA', colRight + 305, py);
+      ctx.font = `700 18px ${display}`;
+      ctx.textAlign = 'right';
+      ctx.fillText(`${p.xgPlusXa.toFixed(1)} xG+xA`, W / 2 - 20, y);
     });
 
     // ═══════════════════════════════════════════
-    // FOOTER (y: 545–630)
+    // FOOTER (bottom 80px)
     // ═══════════════════════════════════════════
-    // Footer background
-    drawRoundedRect(ctx, 0, 555, W, 75, 0);
-    ctx.fillStyle = 'rgba(128, 0, 10, 0.15)';
-    ctx.fill();
+    const footerY = H - 80;
 
-    ctx.strokeStyle = gray700;
-    ctx.beginPath();
-    ctx.moveTo(40, 555);
-    ctx.lineTo(W - 40, 555);
-    ctx.stroke();
+    // Footer background
+    ctx.fillStyle = 'rgba(128, 0, 10, 0.12)';
+    ctx.fillRect(0, footerY, W, 80);
+    drawDivider(footerY);
 
     // S&S badge
     if (ssBadge) {
-      ctx.drawImage(ssBadge, 50, 567, 40, 40);
+      ctx.drawImage(ssBadge, pad, footerY + 18, 44, 44);
     }
 
     ctx.fillStyle = gold;
-    ctx.font = `700 16px ${display}`;
+    ctx.font = `700 18px ${display}`;
     ctx.textAlign = 'left';
-    ctx.fillText('SCARVESANDSPIKES.COM', 100, 585);
+    ctx.fillText('SCARVESANDSPIKES.COM', pad + 54, footerY + 38);
     ctx.fillStyle = gray400;
-    ctx.font = `400 12px ${body}`;
-    ctx.fillText('stats.scarvesandspikes.com', 100, 602);
+    ctx.font = `400 13px ${body}`;
+    ctx.fillText('stats.scarvesandspikes.com', pad + 54, footerY + 56);
 
     // Data source
     ctx.fillStyle = gray400;
-    ctx.font = `400 11px ${body}`;
+    ctx.font = `400 12px ${body}`;
     ctx.textAlign = 'right';
-    ctx.fillText('Data: American Soccer Analysis', W - 50, 585);
-    ctx.fillText(`Generated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`, W - 50, 602);
+    ctx.fillText('Data: American Soccer Analysis', W - pad, footerY + 38);
+    ctx.fillText(`Generated ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`, W - pad, footerY + 56);
 
     // Bottom accent bar
     ctx.fillStyle = gold;
-    ctx.fillRect(0, H - 4, W, 4);
+    ctx.fillRect(0, H - 5, W, 5);
 
     // Store blob for download
     generatedBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
