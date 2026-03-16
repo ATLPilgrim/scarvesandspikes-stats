@@ -610,7 +610,7 @@
 
     ctx.fillStyle = gray400;
     ctx.font = `500 12px ${display}`;
-    ctx.fillText('LAST 5', atlX, s2Y + 50);
+    ctx.fillText(atlLast5.length === 1 ? 'LAST MATCH' : `LAST ${atlLast5.length}`, atlX, s2Y + 50);
 
     atlLast5.forEach((m, i) => {
       const cx = atlX + 10 + i * 36;
@@ -672,31 +672,33 @@
     if (oppTeam) {
       const gp = oppTeam.games_played || 1;
 
+      // Subtitle explaining this is season-wide data
+      ctx.fillStyle = gray400;
+      ctx.font = `italic 400 11px ${body}`;
+      ctx.fillText('Season stats via MLS xG standings', oppX, s2Y + 45);
+
       ctx.fillStyle = gray400;
       ctx.font = `500 12px ${display}`;
-      ctx.fillText('SEASON RECORD', oppX, s2Y + 50);
+      ctx.fillText('SEASON', oppX, s2Y + 65);
       ctx.fillStyle = gray100;
       ctx.font = `600 18px ${display}`;
-
-      // Derive W-D-L from points and games: pts = 3W + D, gp = W + D + L
-      // Can't perfectly derive W-D-L from points alone, show pts + GP
-      ctx.fillText(`${oppTeam.points} pts in ${gp} games`, oppX, s2Y + 72);
+      ctx.fillText(`${oppTeam.points} pts in ${gp} games`, oppX, s2Y + 87);
 
       ctx.fillStyle = gray400;
       ctx.font = `500 12px ${display}`;
-      ctx.fillText('GOAL DIFF / XG DIFF', oppX, s2Y + 100);
+      ctx.fillText('GOAL DIFF / XG DIFF', oppX, s2Y + 113);
       ctx.fillStyle = gray100;
       ctx.font = `600 18px ${display}`;
       const gdSign = oppTeam.goal_diff >= 0 ? '+' : '';
       const xgdSign = oppTeam.xgoal_diff >= 0 ? '+' : '';
-      ctx.fillText(`${gdSign}${oppTeam.goal_diff} / ${xgdSign}${oppTeam.xgoal_diff.toFixed(1)} xGD`, oppX, s2Y + 122);
+      ctx.fillText(`${gdSign}${oppTeam.goal_diff} / ${xgdSign}${oppTeam.xgoal_diff.toFixed(1)} xGD`, oppX, s2Y + 135);
 
       ctx.fillStyle = gray400;
       ctx.font = `500 12px ${display}`;
-      ctx.fillText('XG FOR / AGAINST', oppX, s2Y + 148);
+      ctx.fillText('XG FOR / AGAINST', oppX, s2Y + 161);
       ctx.fillStyle = gray100;
       ctx.font = `600 16px ${display}`;
-      ctx.fillText(`${(oppTeam.xgoals_for / gp).toFixed(2)} / ${(oppTeam.xgoals_against / gp).toFixed(2)} per game`, oppX, s2Y + 168);
+      ctx.fillText(`${(oppTeam.xgoals_for / gp).toFixed(2)} / ${(oppTeam.xgoals_against / gp).toFixed(2)} per game`, oppX, s2Y + 181);
     } else {
       ctx.fillStyle = gray400;
       ctx.font = `400 14px ${body}`;
