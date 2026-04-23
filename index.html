@@ -1921,47 +1921,72 @@
 
     /* Rage Meltdown (score > 100) */
     @keyframes rage-shake {
-      0%, 100% { transform: translateX(0); }
-      10% { transform: translateX(-2px) rotate(-0.3deg); }
-      30% { transform: translateX(2px) rotate(0.3deg); }
-      50% { transform: translateX(-1px) rotate(-0.2deg); }
-      70% { transform: translateX(1px) rotate(0.2deg); }
-      90% { transform: translateX(-1px); }
+      0%, 100% { transform: translate(0, 0) rotate(0); }
+      8% { transform: translate(-3px, 1px) rotate(-0.5deg); }
+      16% { transform: translate(3px, -1px) rotate(0.5deg); }
+      24% { transform: translate(-2px, -1px) rotate(-0.4deg); }
+      32% { transform: translate(2px, 1px) rotate(0.3deg); }
+      40% { transform: translate(-3px, 0) rotate(-0.5deg); }
+      48% { transform: translate(1px, -1px) rotate(0.4deg); }
+      56% { transform: translate(-2px, 1px) rotate(-0.3deg); }
+      64% { transform: translate(3px, 0) rotate(0.5deg); }
+      72% { transform: translate(-1px, -1px) rotate(-0.2deg); }
+      80% { transform: translate(2px, 1px) rotate(0.3deg); }
+      88% { transform: translate(-1px, 0) rotate(-0.1deg); }
     }
 
     @keyframes flame-flicker {
-      0%, 100% { transform: scaleY(1) scaleX(1); opacity: 0.9; }
-      25% { transform: scaleY(1.1) scaleX(0.95); opacity: 1; }
-      50% { transform: scaleY(0.9) scaleX(1.05); opacity: 0.85; }
-      75% { transform: scaleY(1.05) scaleX(0.97); opacity: 0.95; }
+      0%, 100% { transform: scaleY(1) scaleX(1); opacity: 0.85; }
+      20% { transform: scaleY(1.15) scaleX(0.92); opacity: 1; }
+      40% { transform: scaleY(0.85) scaleX(1.08); opacity: 0.75; }
+      60% { transform: scaleY(1.1) scaleX(0.95); opacity: 0.9; }
+      80% { transform: scaleY(0.9) scaleX(1.03); opacity: 0.8; }
     }
 
     @keyframes flame-sway {
-      0%, 100% { transform: rotate(-2deg) translateY(0); }
-      33% { transform: rotate(2deg) translateY(-2px); }
-      66% { transform: rotate(-1deg) translateY(-1px); }
+      0%, 100% { transform: rotate(-3deg); }
+      33% { transform: rotate(3deg); }
+      66% { transform: rotate(-1.5deg); }
+    }
+
+    @keyframes meltdown-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(183, 28, 28, 0.2), 0 0 30px rgba(183, 28, 28, 0.1); }
+      50% { box-shadow: 0 0 20px rgba(239, 83, 80, 0.3), 0 0 40px rgba(183, 28, 28, 0.15); }
     }
 
     .rage-meter-section.meltdown:not(.collapsed) .rage-meter-body {
-      animation: rage-shake 0.4s ease-in-out 3;
+      animation: rage-shake 0.8s ease-in-out 3;
     }
 
     .rage-meter-section.meltdown {
-      border-color: #b71c1c;
-      box-shadow: 0 0 20px rgba(183, 28, 28, 0.15);
+      border-color: #d32f2f;
+      animation: meltdown-glow 2s ease-in-out infinite;
     }
 
     .rage-meter-section.meltdown .rage-meter-title {
       color: #ef5350;
     }
 
+    .rage-meter-section.meltdown .rage-meter-preview span {
+      text-shadow: 0 0 8px rgba(239, 83, 80, 0.6);
+    }
+
+    .rage-meter-section.meltdown .rage-meter-zone-label {
+      color: #ef5350;
+    }
+
+    .rage-meter-section.meltdown .rage-meter-explanation {
+      color: #ef5350;
+      font-style: italic;
+    }
+
     .rage-gauge-flames {
       transform-origin: center bottom;
-      animation: flame-flicker 0.6s ease-in-out infinite alternate;
+      animation: flame-flicker 0.5s ease-in-out infinite alternate;
     }
 
     .rage-gauge-flame-group {
-      animation: flame-sway 1.2s ease-in-out infinite alternate;
+      animation: flame-sway 1s ease-in-out infinite alternate;
     }
 
     .rage-meter-factors {
@@ -4911,36 +4936,32 @@
       const color = getScoreColor(score);
       const scoreText = `<text x="${cx}" y="${cy + 35}" text-anchor="middle" fill="${color}" font-size="28" font-weight="700" font-family="var(--font-display)">${score}</text>`;
 
-      // Flames when score > 100
+      // Flames when score > 100 — positioned along the gauge arc
       let flames = '';
       if (score > 100) {
-        flames = `
-          <g class="rage-gauge-flame-group">
-            <g class="rage-gauge-flames" style="animation-delay: 0s;">
-              <ellipse cx="${cx - 45}" cy="58" rx="10" ry="18" fill="#ff6d00" opacity="0.7"/>
-              <ellipse cx="${cx - 45}" cy="54" rx="6" ry="12" fill="#ffab00" opacity="0.85"/>
-              <ellipse cx="${cx - 45}" cy="51" rx="3" ry="7" fill="#fdd835" opacity="0.9"/>
+        const flamePositions = [15, 30, 50, 70, 85]; // score positions along arc
+        const flameSizes = [0.7, 0.9, 1.0, 0.9, 0.7]; // scale per position
+        const delays = [0, 0.12, 0.25, 0.08, 0.2];
+        let flameGroup = '';
+        flamePositions.forEach((pos, i) => {
+          const angle = scoreToAngle(pos) * Math.PI / 180;
+          const s = flameSizes[i];
+          // Position flame on the outer edge of the arc
+          const fx = cx + (r + 10) * Math.cos(angle);
+          const fy = cy + (r + 10) * Math.sin(angle);
+          // Rotate flame to point outward from center
+          const rotDeg = (scoreToAngle(pos) - 90).toFixed(1);
+          flameGroup += `
+            <g class="rage-gauge-flames" style="animation-delay: ${delays[i]}s;" transform="translate(${fx.toFixed(1)}, ${fy.toFixed(1)}) rotate(${rotDeg}) scale(${s})">
+              <path d="M0,4 C-5,-8 -3,-20 0,-28 C3,-20 5,-8 0,4Z" fill="#b71c1c" opacity="0.5"/>
+              <path d="M0,2 C-4,-6 -2,-16 0,-22 C2,-16 4,-6 0,2Z" fill="#d84315" opacity="0.65"/>
+              <path d="M0,0 C-3,-5 -2,-13 0,-18 C2,-13 3,-5 0,0Z" fill="#ff6d00" opacity="0.8"/>
+              <path d="M0,-2 C-2,-6 -1,-10 0,-14 C1,-10 2,-6 0,-2Z" fill="#ffab00" opacity="0.85"/>
+              <path d="M0,-4 C-1,-6 -0.5,-8 0,-10 C0.5,-8 1,-6 0,-4Z" fill="#fdd835" opacity="0.9"/>
             </g>
-            <g class="rage-gauge-flames" style="animation-delay: 0.15s;">
-              <ellipse cx="${cx}" cy="42" rx="14" ry="24" fill="#ff6d00" opacity="0.7"/>
-              <ellipse cx="${cx}" cy="36" rx="9" ry="16" fill="#ffab00" opacity="0.85"/>
-              <ellipse cx="${cx}" cy="32" rx="4" ry="9" fill="#fdd835" opacity="0.9"/>
-            </g>
-            <g class="rage-gauge-flames" style="animation-delay: 0.3s;">
-              <ellipse cx="${cx + 45}" cy="58" rx="10" ry="18" fill="#ff6d00" opacity="0.7"/>
-              <ellipse cx="${cx + 45}" cy="54" rx="6" ry="12" fill="#ffab00" opacity="0.85"/>
-              <ellipse cx="${cx + 45}" cy="51" rx="3" ry="7" fill="#fdd835" opacity="0.9"/>
-            </g>
-            <g class="rage-gauge-flames" style="animation-delay: 0.1s;">
-              <ellipse cx="${cx - 22}" cy="48" rx="8" ry="15" fill="#d84315" opacity="0.65"/>
-              <ellipse cx="${cx - 22}" cy="44" rx="5" ry="10" fill="#ff6d00" opacity="0.8"/>
-            </g>
-            <g class="rage-gauge-flames" style="animation-delay: 0.25s;">
-              <ellipse cx="${cx + 22}" cy="48" rx="8" ry="15" fill="#d84315" opacity="0.65"/>
-              <ellipse cx="${cx + 22}" cy="44" rx="5" ry="10" fill="#ff6d00" opacity="0.8"/>
-            </g>
-          </g>
-        `;
+          `;
+        });
+        flames = `<g class="rage-gauge-flame-group">${flameGroup}</g>`;
       }
 
       return `<svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet">
