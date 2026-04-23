@@ -1873,7 +1873,7 @@
     }
 
     .rage-meter-section:not(.collapsed) .rage-meter-body {
-      max-height: 600px;
+      max-height: 700px;
       padding: 0 var(--space-lg) var(--space-lg);
     }
 
@@ -1917,6 +1917,51 @@
       color: var(--gray-400);
       margin: 0 0 var(--space-md);
       line-height: 1.5;
+    }
+
+    /* Rage Meltdown (score > 100) */
+    @keyframes rage-shake {
+      0%, 100% { transform: translateX(0); }
+      10% { transform: translateX(-2px) rotate(-0.3deg); }
+      30% { transform: translateX(2px) rotate(0.3deg); }
+      50% { transform: translateX(-1px) rotate(-0.2deg); }
+      70% { transform: translateX(1px) rotate(0.2deg); }
+      90% { transform: translateX(-1px); }
+    }
+
+    @keyframes flame-flicker {
+      0%, 100% { transform: scaleY(1) scaleX(1); opacity: 0.9; }
+      25% { transform: scaleY(1.1) scaleX(0.95); opacity: 1; }
+      50% { transform: scaleY(0.9) scaleX(1.05); opacity: 0.85; }
+      75% { transform: scaleY(1.05) scaleX(0.97); opacity: 0.95; }
+    }
+
+    @keyframes flame-sway {
+      0%, 100% { transform: rotate(-2deg) translateY(0); }
+      33% { transform: rotate(2deg) translateY(-2px); }
+      66% { transform: rotate(-1deg) translateY(-1px); }
+    }
+
+    .rage-meter-section.meltdown:not(.collapsed) .rage-meter-body {
+      animation: rage-shake 0.4s ease-in-out 3;
+    }
+
+    .rage-meter-section.meltdown {
+      border-color: #b71c1c;
+      box-shadow: 0 0 20px rgba(183, 28, 28, 0.15);
+    }
+
+    .rage-meter-section.meltdown .rage-meter-title {
+      color: #ef5350;
+    }
+
+    .rage-gauge-flames {
+      transform-origin: center bottom;
+      animation: flame-flicker 0.6s ease-in-out infinite alternate;
+    }
+
+    .rage-gauge-flame-group {
+      animation: flame-sway 1.2s ease-in-out infinite alternate;
     }
 
     .rage-meter-factors {
@@ -4617,7 +4662,8 @@
       if (score <= 75) return { label: 'Composing strongly worded tweets', emoji: '\uD83D\uDCA2' };
       if (score <= 85) return { label: 'Rage-recording a podcast at 2am', emoji: '\uD83C\uDF99\uFE0F' };
       if (score <= 92) return { label: "Googling 'how to break a lease in Atlanta'", emoji: '\uD83C\uDFE0' };
-      return { label: 'Full meltdown. Scarves on fire.', emoji: '\uD83D\uDD25' };
+      if (score <= 100) return { label: 'Full meltdown. Scarves on fire.', emoji: '\uD83D\uDD25' };
+      return { label: 'Beyond meltdown. The meter broke.', emoji: '\uD83D\uDCA0' };
     }
 
     function getScoreColor(score) {
@@ -4629,7 +4675,8 @@
       if (score <= 75) return '#ffa726';
       if (score <= 85) return '#ef5350';
       if (score <= 92) return '#d32f2f';
-      return '#b71c1c';
+      if (score <= 100) return '#b71c1c';
+      return '#b71c1c'; // meltdown — same darkest red
     }
 
     function computeRageScore(matches, insightsData, season) {
@@ -4767,7 +4814,7 @@
         }
       }
 
-      const score = Math.max(0, Math.min(100, Math.round(raw)));
+      const score = Math.max(0, Math.round(raw));
       const zone = getRageZone(score);
 
       const lastResult = totalMatches > 0 ? chronological[chronological.length - 1].result : null;
@@ -4849,7 +4896,9 @@
       const ny = cy + needleLen * Math.sin(needleAngle * Math.PI / 180);
 
       // Determine target rotation: score 0 = 0° rotation, score 100 = 180° rotation (CW)
-      const targetRotation = (score / 100) * 180;
+      // Cap needle at 100 even if score exceeds it
+      const clampedScore = Math.min(score, 100);
+      const targetRotation = (clampedScore / 100) * 180;
 
       const needle = `
         <g class="rage-needle" style="transform-origin: ${cx}px ${cy}px; transform: rotate(0deg);" data-target="${targetRotation}">
@@ -4862,7 +4911,40 @@
       const color = getScoreColor(score);
       const scoreText = `<text x="${cx}" y="${cy + 35}" text-anchor="middle" fill="${color}" font-size="28" font-weight="700" font-family="var(--font-display)">${score}</text>`;
 
+      // Flames when score > 100
+      let flames = '';
+      if (score > 100) {
+        flames = `
+          <g class="rage-gauge-flame-group">
+            <g class="rage-gauge-flames" style="animation-delay: 0s;">
+              <ellipse cx="${cx - 45}" cy="58" rx="10" ry="18" fill="#ff6d00" opacity="0.7"/>
+              <ellipse cx="${cx - 45}" cy="54" rx="6" ry="12" fill="#ffab00" opacity="0.85"/>
+              <ellipse cx="${cx - 45}" cy="51" rx="3" ry="7" fill="#fdd835" opacity="0.9"/>
+            </g>
+            <g class="rage-gauge-flames" style="animation-delay: 0.15s;">
+              <ellipse cx="${cx}" cy="42" rx="14" ry="24" fill="#ff6d00" opacity="0.7"/>
+              <ellipse cx="${cx}" cy="36" rx="9" ry="16" fill="#ffab00" opacity="0.85"/>
+              <ellipse cx="${cx}" cy="32" rx="4" ry="9" fill="#fdd835" opacity="0.9"/>
+            </g>
+            <g class="rage-gauge-flames" style="animation-delay: 0.3s;">
+              <ellipse cx="${cx + 45}" cy="58" rx="10" ry="18" fill="#ff6d00" opacity="0.7"/>
+              <ellipse cx="${cx + 45}" cy="54" rx="6" ry="12" fill="#ffab00" opacity="0.85"/>
+              <ellipse cx="${cx + 45}" cy="51" rx="3" ry="7" fill="#fdd835" opacity="0.9"/>
+            </g>
+            <g class="rage-gauge-flames" style="animation-delay: 0.1s;">
+              <ellipse cx="${cx - 22}" cy="48" rx="8" ry="15" fill="#d84315" opacity="0.65"/>
+              <ellipse cx="${cx - 22}" cy="44" rx="5" ry="10" fill="#ff6d00" opacity="0.8"/>
+            </g>
+            <g class="rage-gauge-flames" style="animation-delay: 0.25s;">
+              <ellipse cx="${cx + 22}" cy="48" rx="8" ry="15" fill="#d84315" opacity="0.65"/>
+              <ellipse cx="${cx + 22}" cy="44" rx="5" ry="10" fill="#ff6d00" opacity="0.8"/>
+            </g>
+          </g>
+        `;
+      }
+
       return `<svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet">
+        ${flames}
         ${arcs}
         ${ticks}
         ${needle}
@@ -4871,6 +4953,32 @@
     }
 
     function getExplanationText(score, factors, lastResult, winStreak, streakBroken) {
+      // --- Meltdown quips: score exceeded 100, the meter is broken ---
+      if (score > 100) {
+        const meltdownQuips = [
+          "This meter only goes to 100. It is no longer sufficient.",
+          "The developer of this meter is also an Atlanta United fan. He is unavailable for comment.",
+          "We built this rage meter as a joke. Nobody's laughing.",
+          "This score has exceeded the maximum. Much like our capacity for disappointment.",
+          "The xG model says we should be fine. The xG model is a liar.",
+          "At this point the meter is just a formality. We all know.",
+          "Mathematically, this shouldn't be possible. And yet.",
+          "The gauge is broken. So is our spirit. At least we're consistent.",
+          "Score exceeds maximum. Please contact your nearest supporters' group for emotional support.",
+          "Fun fact: this meter was stress-tested up to 100. We did not plan for this.",
+          "This meter filed a grievance with the MLS Players Association. It was denied.",
+          "We ran out of red. The gauge is now rendering in a color scientists call 'emotional damage.'",
+          "The expected goals were there. The goals were not. The fans are barely here. The vibes are nowhere.",
+          "Congratulations, you've unlocked a score the developer didn't think was possible. He's been refreshing the standings page and crying since Saturday.",
+          "This score is higher than our points per game, our goals per game, and our will to live per game. Combined.",
+          "We'd have more points this season if we got a point every time we disappointed 40,000 people.",
+          "The Five Stripes have been so bad that even this rage meter \u2014 coded by a fan who watches every match \u2014 is questioning its own life choices.",
+          "Mercedes-Benz Stadium's roof opens so God can watch. Lately we think He's just rubbernecking.",
+          "Other teams have a wage bill. We have a donation to the Make-A-Wish Foundation for opponents who need a confidence boost."
+        ];
+        return meltdownQuips[Math.floor(Math.random() * meltdownQuips.length)];
+      }
+
       // --- Mood-based quips: override score-range when emotional context matters ---
 
       // Relief quips — just snapped a long winless run
@@ -5084,6 +5192,13 @@
       // Factor pills
       document.getElementById('rageMeterFactors').innerHTML = renderRageFactors(factors);
 
+      // Meltdown mode
+      if (score > 100) {
+        el.classList.add('meltdown');
+      } else {
+        el.classList.remove('meltdown');
+      }
+
       el.classList.add('visible');
 
       // Animate needle after a short delay
@@ -5236,7 +5351,16 @@
         document.getElementById('opponentFilter').addEventListener('change', applyFilters);
 
         document.getElementById('rageMeterToggle').addEventListener('click', function() {
-          document.getElementById('rageMeter').classList.toggle('collapsed');
+          const meter = document.getElementById('rageMeter');
+          const wasCollapsed = meter.classList.contains('collapsed');
+          meter.classList.toggle('collapsed');
+          // Re-trigger shake animation on expand if in meltdown
+          if (wasCollapsed && meter.classList.contains('meltdown')) {
+            const body = document.getElementById('rageMeterBody');
+            body.style.animation = 'none';
+            body.offsetHeight; // force reflow
+            body.style.animation = '';
+          }
         });
 
         // Prefetch match + opponent details in background so card expansion is instant
