@@ -4940,28 +4940,33 @@
       let flames = '';
       if (score > 100) {
         const flamePositions = [15, 30, 50, 70, 85]; // score positions along arc
-        const flameSizes = [0.7, 0.9, 1.0, 0.9, 0.7]; // scale per position
+        const flameSizes = [0.8, 1.0, 1.2, 1.0, 0.8]; // scale per position
         const delays = [0, 0.12, 0.25, 0.08, 0.2];
         let flameGroup = '';
         flamePositions.forEach((pos, i) => {
           const angle = scoreToAngle(pos) * Math.PI / 180;
           const s = flameSizes[i];
           // Position flame on the outer edge of the arc
-          const fx = cx + (r + 10) * Math.cos(angle);
-          const fy = cy + (r + 10) * Math.sin(angle);
-          // Rotate flame to point outward from center
-          const rotDeg = (scoreToAngle(pos) - 90).toFixed(1);
+          const fx = cx + (r + 8) * Math.cos(angle);
+          const fy = cy + (r + 8) * Math.sin(angle);
+          // Rotate flame so its tip points outward from gauge center
+          const rotDeg = (scoreToAngle(pos) + 90).toFixed(1);
+          // Outer group: positions the flame via SVG transform (static)
+          // Inner group: CSS class applies flicker/sway animations (dynamic transform)
           flameGroup += `
-            <g class="rage-gauge-flames" style="animation-delay: ${delays[i]}s;" transform="translate(${fx.toFixed(1)}, ${fy.toFixed(1)}) rotate(${rotDeg}) scale(${s})">
-              <path d="M0,4 C-5,-8 -3,-20 0,-28 C3,-20 5,-8 0,4Z" fill="#b71c1c" opacity="0.5"/>
-              <path d="M0,2 C-4,-6 -2,-16 0,-22 C2,-16 4,-6 0,2Z" fill="#d84315" opacity="0.65"/>
-              <path d="M0,0 C-3,-5 -2,-13 0,-18 C2,-13 3,-5 0,0Z" fill="#ff6d00" opacity="0.8"/>
-              <path d="M0,-2 C-2,-6 -1,-10 0,-14 C1,-10 2,-6 0,-2Z" fill="#ffab00" opacity="0.85"/>
-              <path d="M0,-4 C-1,-6 -0.5,-8 0,-10 C0.5,-8 1,-6 0,-4Z" fill="#fdd835" opacity="0.9"/>
+            <g transform="translate(${fx.toFixed(1)}, ${fy.toFixed(1)}) rotate(${rotDeg}) scale(${s})">
+              <g class="rage-gauge-flames" style="animation-delay: ${delays[i]}s;">
+                <path d="M0,4 C-6,-8 -4,-22 0,-32 C4,-22 6,-8 0,4Z" fill="#7f0000" opacity="0.55"/>
+                <path d="M0,2 C-5,-7 -3,-18 0,-26 C3,-18 5,-7 0,2Z" fill="#b71c1c" opacity="0.7"/>
+                <path d="M0,0 C-4,-6 -2,-15 0,-21 C2,-15 4,-6 0,0Z" fill="#d84315" opacity="0.8"/>
+                <path d="M0,-2 C-3,-6 -1.5,-12 0,-16 C1.5,-12 3,-6 0,-2Z" fill="#ff6d00" opacity="0.85"/>
+                <path d="M0,-4 C-2,-7 -1,-10 0,-12 C1,-10 2,-7 0,-4Z" fill="#ffab00" opacity="0.9"/>
+                <path d="M0,-6 C-1,-8 -0.5,-9 0,-10 C0.5,-9 1,-8 0,-6Z" fill="#fdd835" opacity="0.95"/>
+              </g>
             </g>
           `;
         });
-        flames = `<g class="rage-gauge-flame-group">${flameGroup}</g>`;
+        flames = `<g>${flameGroup}</g>`;
       }
 
       return `<svg viewBox="0 0 300 220" preserveAspectRatio="xMidYMid meet">
